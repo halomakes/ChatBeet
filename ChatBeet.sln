@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet.Smtp", "ChatBeet.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet.Queuing", "ChatBeet.Queuing\ChatBeet.Queuing.csproj", "{F9602AB2-5522-4AA5-90E1-7DC02DE6805E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet.Irc", "ChatBeet.Irc\ChatBeet.Irc.csproj", "{BC0911EE-9E5C-453F-8315-1088E3E0766D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F9602AB2-5522-4AA5-90E1-7DC02DE6805E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9602AB2-5522-4AA5-90E1-7DC02DE6805E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9602AB2-5522-4AA5-90E1-7DC02DE6805E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC0911EE-9E5C-453F-8315-1088E3E0766D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC0911EE-9E5C-453F-8315-1088E3E0766D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC0911EE-9E5C-453F-8315-1088E3E0766D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC0911EE-9E5C-453F-8315-1088E3E0766D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
