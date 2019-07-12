@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet", "ChatBeet\ChatBeet.csproj", "{A8E03E35-02FA-4B9D-9662-60D13141E45F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet.Smtp", "ChatBeet.Smtp\ChatBeet.Smtp.csproj", "{FEE5DCFF-BA4F-4D18-AE73-B818C8909A7B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A8E03E35-02FA-4B9D-9662-60D13141E45F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8E03E35-02FA-4B9D-9662-60D13141E45F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8E03E35-02FA-4B9D-9662-60D13141E45F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8E03E35-02FA-4B9D-9662-60D13141E45F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEE5DCFF-BA4F-4D18-AE73-B818C8909A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEE5DCFF-BA4F-4D18-AE73-B818C8909A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEE5DCFF-BA4F-4D18-AE73-B818C8909A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEE5DCFF-BA4F-4D18-AE73-B818C8909A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F877D4DE-3CB3-4CBF-93E7-F350CF847547}
+	EndGlobalSection
+EndGlobal
