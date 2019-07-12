@@ -1,4 +1,5 @@
-﻿using SmtpServer;
+﻿using ChatBeet.Queuing;
+using SmtpServer;
 using SmtpServer.Mail;
 using SmtpServer.Protocol;
 using SmtpServer.Storage;
@@ -13,16 +14,18 @@ namespace ChatBeet.Smtp
 {
     internal class RadishMessageStore : MessageStore
     {
+        private readonly IMessageQueueService queueService;
+
+        public RadishMessageStore(IMessageQueueService queueService)
+        {
+            this.queueService = queueService;
+        }
+
         public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction, CancellationToken cancellationToken)
         {
             var textMessage = (ITextMessage)transaction.Message;
-            var text = string.Empty;
-
-            using (var reader = new StreamReader(textMessage.Content, Encoding.UTF8))
-            {
-                text = await reader.ReadToEndAsync();
-            }
-            Console.WriteLine(text);
+            var message = MimeKit.MimeMessage.Load(textMessage.Content);
+            queueService.Push(QueuedEmailMessage.FromMimeMessage(message));
 
             return SmtpResponse.Ok;
         }

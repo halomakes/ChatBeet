@@ -1,0 +1,30 @@
+﻿@page
+@inject ChatBeet.Queuing.IMessageQueueService queueService
+@{
+    ViewData["Title"] = "IncomingMessages";
+    var items = queueService.ViewAll();
+}
+
+<h1>IncomingMessages</h1>
+
+@foreach (var i in items)
+{
+    <div class="my-3">
+        <h3>@i.Title</h3>
+        <div>
+            <label>From</label>
+            <span>@i.Source</span>
+        </div>
+        <div>
+            <label>To</label>
+            <span>@i.Target</span>
+        </div>
+        <div>
+            <label>At</label>
+            <span>@i.TimeGenerated</span>
+        </div>
+        <div>
+            @i.Body
+        </div>
+    </div>
+}
