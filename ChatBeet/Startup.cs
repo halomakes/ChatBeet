@@ -1,3 +1,4 @@
+using ChatBeet.Queuing;
 using ChatBeet.Smtp;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +28,7 @@ namespace ChatBeet
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddSingleton<IMessageQueueService, MessageQueueService>();
             services.AddSmtpListener();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
