@@ -7,21 +7,25 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace ChatBeet.Irc
 {
-    public class IrcBotService : IHostedService, IDisposable
+    internal class IrcBotService : IHostedService, IDisposable
     {
         private readonly IrcClient client = new IrcClient();
         private readonly IMessageQueueService queueService;
         private readonly ILogger<IrcBotService> logger;
+        private readonly IrcBotConfiguration config;
         private Timer timer;
-        const string channelName = "#🥕";
 
-        public IrcBotService(IMessageQueueService queueService, ILogger<IrcBotService> logger)
+        public IrcBotService(IMessageQueueService queueService,
+            ILogger<IrcBotService> logger,
+            IOptions<IrcBotConfiguration> options)
         {
             this.queueService = queueService;
             this.logger = logger;
+            config = options.Value;
 
             Configure();
             Connect();
@@ -56,7 +60,6 @@ namespace ChatBeet.Irc
         private void ProcessQueue(object state)
         {
             SendQueuedMessages();
-            logger.LogInformation("trigger");
         }
 
         private void SendQueuedMessages()
@@ -64,23 +67,23 @@ namespace ChatBeet.Irc
             JoinChannel();
 
             var queue = queueService.PopAll();
-            queue.ForEach(q => client.SendMessage(SendType.Notice, channelName, q.Title));
+            queue.ForEach(q => client.SendMessage(SendType.Notice, config.Channel, q.Title));
 
             client.ListenOnce();
         }
 
         public void JoinChannel()
         {
-            if (!client.JoinedChannels.Cast<string>().Any(c => c.Contains("carrots")))
-                client.RfcJoin(channelName);
+            if (!client.JoinedChannels.Cast<string>().Any(c => c.Contains(config.Channel)))
+                client.RfcJoin(config.Channel);
         }
 
         public void Connect()
         {
             if (!client.IsConnected)
             {
-                client.Connect("irc.dtella.net", 6667);
-                client.Login("ChatBeet", "A chat bot, but it's a root vegetable.");
+                client.Connect(config.Server, config.Port);
+                client.Login(config.Nick, config.Identity);
             }
             JoinChannel();
         }
