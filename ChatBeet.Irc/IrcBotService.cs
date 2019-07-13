@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using ChatBeet.Queuing.Rules;
 
 namespace ChatBeet.Irc
 {
@@ -78,7 +79,17 @@ namespace ChatBeet.Irc
             JoinChannel();
 
             var queue = queueService.PopAll();
-            queue.ForEach(q => client.SendMessage(SendType.Notice, config.Channel, q.Title));
+            queue.ForEach(q => client.SendMessage(GetSendType(q), q.Channel, q.Content));
+        }
+
+        private SendType GetSendType(OutputMessage message)
+        {
+            switch (message.OutputType)
+            {
+                case OutputType.Activity: return SendType.Action;
+                case OutputType.Announcement: return SendType.Notice;
+                default: return SendType.Message;
+            }
         }
 
         public void JoinChannel()
