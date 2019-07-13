@@ -8,10 +8,6 @@ namespace ChatBeet.Queuing
 {
     public class QueueConfigurationAccessor
     {
-        private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-        {
-            TypeNameHandling = TypeNameHandling.Auto
-        };
         private string FileName = "rules.json";
         private List<Rule> Rules = new List<Rule>();
 

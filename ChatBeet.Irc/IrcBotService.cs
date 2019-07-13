@@ -34,8 +34,18 @@ namespace ChatBeet.Irc
         public Task StartAsync(CancellationToken cancellationToken)
         {
             Connect();
-            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
             return Task.CompletedTask;
+        }
+
+        private void MonitorIncomingMessages()
+        {
+            queueService.MessageAdded += QueueService_MessageAdded;
+        }
+
+        private void QueueService_MessageAdded(object sender, EventArgs e)
+        {
+            SendQueuedMessages();
         }
 
         private void Configure()
@@ -69,7 +79,7 @@ namespace ChatBeet.Irc
             var queue = queueService.PopAll();
             queue.ForEach(q => client.SendMessage(SendType.Notice, config.Channel, q.Title));
 
-            client.ListenOnce();
+            client.Listen();
         }
 
         public void JoinChannel()
