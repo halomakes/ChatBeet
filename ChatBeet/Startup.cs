@@ -31,7 +31,7 @@ namespace ChatBeet
             });
 
             services.AddSingleton<IMessageQueueService, MessageQueueService>();
-            services.AddIrcBot();
+            services.AddIrcBot(Configuration.GetSection("Irc"));
             services.AddSmtpListener();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
