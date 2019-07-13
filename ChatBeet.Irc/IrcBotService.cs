@@ -56,7 +56,19 @@ namespace ChatBeet.Irc
             client.SendDelay = 1000;
             client.ActiveChannelSyncing = true;
             client.OnRawMessage += Client_OnRawMessage;
+            client.OnChannelMessage += Client_OnChannelMessage;
             client.OnRegistered += Client_OnRegistered;
+        }
+
+        private void Client_OnChannelMessage(object sender, IrcEventArgs e)
+        {
+            try
+            {
+                var data = (e.Data as IrcMessageData);
+                if (data.Nick != config.Nick)
+                    queueService.Push(QueuedChatMessage.FromChannelMessage(data));
+            }
+            catch (Exception) { }
         }
 
         private void Client_OnRegistered(object sender, EventArgs e)

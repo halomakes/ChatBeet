@@ -67,7 +67,7 @@ namespace ChatBeet.Queuing
 
         private void TrimHistory()
         {
-            var overflow = MAX_HISTORY - messageHistory.Count;
+            var overflow = messageHistory.Count - MAX_HISTORY;
             if (overflow > 0)
                 messageHistory = messageHistory.Skip(overflow).Take(MAX_HISTORY).ToList();
         }

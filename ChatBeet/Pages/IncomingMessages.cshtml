@@ -2,12 +2,12 @@
 @inject ChatBeet.Queuing.IMessageQueueService queueService
 @{
     ViewData["Title"] = "IncomingMessages";
-    var items = queueService.ViewAll();
+    var items = queueService.GetHistory();
 }
 
-<h1>IncomingMessages</h1>
+<h2>Message History</h2>
 
-@foreach (var i in items)
+@foreach (var i in items.OrderByDescending(i => i.TimeGenerated).Take(50))
 {
     <div class="my-3">
         <h3>@i.Title</h3>
