@@ -29,6 +29,7 @@ namespace ChatBeet.Smtp
 
             server = new SmtpServer.SmtpServer(options);
             await server.StartAsync(cancellationToken);
+            return;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

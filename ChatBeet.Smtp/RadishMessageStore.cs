@@ -24,7 +24,7 @@ namespace ChatBeet.Smtp
         public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction, CancellationToken cancellationToken)
         {
             var textMessage = (ITextMessage)transaction.Message;
-            var message = MimeKit.MimeMessage.Load(textMessage.Content);
+            var message = await MimeKit.MimeMessage.LoadAsync(textMessage.Content);
             queueService.Push(QueuedEmailMessage.FromMimeMessage(message));
 
             return SmtpResponse.Ok;
