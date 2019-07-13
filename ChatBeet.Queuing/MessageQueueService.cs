@@ -6,6 +6,13 @@ namespace ChatBeet.Queuing
 {
     public class MessageQueueService : IMessageQueueService
     {
+        private QueueConfigurationAccessor configurationAccessor;
+
+        public MessageQueueService(QueueConfigurationAccessor configurationAccessor)
+        {
+            this.configurationAccessor = configurationAccessor;
+        }
+
         private List<IQueuedMessageSource> queuedMessages = new List<IQueuedMessageSource>();
 
         public List<IQueuedMessageSource> ViewAll() => queuedMessages;

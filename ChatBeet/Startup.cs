@@ -33,6 +33,7 @@ namespace ChatBeet
             services.AddSingleton<IMessageQueueService, MessageQueueService>();
             services.AddIrcBot(Configuration.GetSection("Irc"));
             services.AddSmtpListener();
+            services.AddTransient<QueueConfigurationAccessor>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
