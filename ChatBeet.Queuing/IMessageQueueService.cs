@@ -5,9 +5,10 @@ namespace ChatBeet.Queuing
 {
     public interface IMessageQueueService
     {
-        List<IQueuedMessageSource> PopAll();
+        List<OutputMessage> PopAll();
         void Push(IQueuedMessageSource message);
-        List<IQueuedMessageSource> ViewAll();
+        List<OutputMessage> ViewAll();
         event EventHandler MessageAdded;
+        List<IQueuedMessageSource> GetHistory();
     }
 }
