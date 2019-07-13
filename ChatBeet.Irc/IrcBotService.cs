@@ -29,6 +29,7 @@ namespace ChatBeet.Irc
 
             Configure();
             Connect();
+            MonitorIncomingMessages();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -78,8 +79,6 @@ namespace ChatBeet.Irc
 
             var queue = queueService.PopAll();
             queue.ForEach(q => client.SendMessage(SendType.Notice, config.Channel, q.Title));
-
-            client.Listen();
         }
 
         public void JoinChannel()
@@ -96,6 +95,7 @@ namespace ChatBeet.Irc
                 client.Login(config.Nick, config.Identity);
             }
             JoinChannel();
+            Task.Run(() => client.Listen());
         }
 
         public void Dispose()
