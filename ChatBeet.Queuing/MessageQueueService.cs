@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ChatBeet.Queuing
 {
@@ -15,6 +14,8 @@ namespace ChatBeet.Queuing
 
         private List<IQueuedMessageSource> queuedMessages = new List<IQueuedMessageSource>();
 
+        public event EventHandler MessageAdded;
+
         public List<IQueuedMessageSource> ViewAll() => queuedMessages;
 
         public List<IQueuedMessageSource> PopAll()
@@ -27,6 +28,12 @@ namespace ChatBeet.Queuing
         public void Push(IQueuedMessageSource message)
         {
             queuedMessages.Add(message);
+            OnMessageAdded(EventArgs.Empty);
+        }
+
+        private void OnMessageAdded(EventArgs e)
+        {
+            MessageAdded?.Invoke(this, e);
         }
     }
 }
