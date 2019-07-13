@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace ChatBeet.Queuing
 {
@@ -13,10 +12,12 @@ namespace ChatBeet.Queuing
 
         public QueueConfigurationAccessor()
         {
-            Task.Run(() => Load());
+            Load();
         }
 
-        private async Task Load()
+        public List<Rule> GetRules() => Rules;
+
+        private void Load()
         {
             using (var file = File.OpenText(FileName))
             using (var jtr = new JsonTextReader(file))
@@ -27,7 +28,7 @@ namespace ChatBeet.Queuing
             }
         }
 
-        private async Task Save()
+        private void Save()
         {
             using (var file = File.Create(FileName))
             using (var fileWriter = new StreamWriter(file))
