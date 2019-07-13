@@ -1,71 +1,93 @@
 ﻿using ChatBeet.Queuing;
+using Meebey.SmartIrc4net;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NetIRC;
-using NetIRC.Connection;
-using NetIRC.Messages;
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ChatBeet.Irc
 {
     public class IrcBotService : IHostedService, IDisposable
     {
-        private readonly Client client;
+        private readonly IrcClient client = new IrcClient();
         private readonly IMessageQueueService queueService;
         private readonly ILogger<IrcBotService> logger;
         private Timer timer;
+        const string channelName = "#🥕";
 
         public IrcBotService(IMessageQueueService queueService, ILogger<IrcBotService> logger)
         {
             this.queueService = queueService;
             this.logger = logger;
-            var user = new User("ChatBeet", "A chat bot, but it's a root vegetable.");
-            client = new Client(user, new TcpClientConnection());
-            client.OnRawDataReceived += new IRCRawDataHandler((Client c, string msg) => logger.LogInformation(msg));
-            client.EventHub.RegistrationCompleted += new EventHandler(async (o, a) => await Hub_OnRegistrationCompleted());
+
+            Configure();
+            Connect();
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            await Connect();
-            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromSeconds(15));
+            Connect();
+            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+            return Task.CompletedTask;
+        }
+
+        private void Configure()
+        {
+            client.Encoding = Encoding.UTF8;
+            client.SendDelay = 1000;
+            client.ActiveChannelSyncing = true;
+            client.OnRawMessage += Client_OnRawMessage;
+            client.OnRegistered += Client_OnRegistered;
+        }
+
+        private void Client_OnRegistered(object sender, EventArgs e)
+        {
+            JoinChannel();
+        }
+
+        private void Client_OnRawMessage(object sender, IrcEventArgs e)
+        {
+            logger.LogInformation(e.Data.RawMessage);
         }
 
         private void ProcessQueue(object state)
         {
-            _ = Task.Run(() => SendQueuedMessages());
+            SendQueuedMessages();
             logger.LogInformation("trigger");
         }
 
-        private async Task Hub_OnRegistrationCompleted()
+        private void SendQueuedMessages()
         {
-            await JoinChannel();
+            JoinChannel();
+
+            var queue = queueService.PopAll();
+            queue.ForEach(q => client.SendMessage(SendType.Notice, channelName, q.Title));
+
+            client.ListenOnce();
         }
 
-        private async void SendQueuedMessages()
+        public void JoinChannel()
         {
-            var channels = client.Channels;
-            await JoinChannel();
-            //await client.SendRaw("messages! 1\r\n");
+            if (!client.JoinedChannels.Cast<string>().Any(c => c.Contains("carrots")))
+                client.RfcJoin(channelName);
         }
 
-        public async Task JoinChannel()
+        public void Connect()
         {
-            await client.SendAsync(new JoinMessage("#carrots"));
-        }
-
-        public async Task Connect()
-        {
-            await client.ConnectAsync("irc.dtella.net");
-            await client.SendAsync(new NickMessage("ChatBeet"));
-            await client.SendAsync(new UserMessage("ChatBeet", "A chat bot, but it's a root vegetable."));
+            if (!client.IsConnected)
+            {
+                client.Connect("irc.dtella.net", 6667);
+                client.Login("ChatBeet", "A chat bot, but it's a root vegetable.");
+            }
+            JoinChannel();
         }
 
         public void Dispose()
         {
-            client?.Dispose();
+            client?.Disconnect();
             timer?.Dispose();
         }
 
