@@ -10,5 +10,6 @@ namespace ChatBeet.Queuing
         List<OutputMessage> ViewAll();
         event EventHandler MessageAdded;
         List<IQueuedMessageSource> GetHistory();
+        List<OutputMessage> GetOutputHistory();
     }
 }

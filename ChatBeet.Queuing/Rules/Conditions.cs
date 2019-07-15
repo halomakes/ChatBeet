@@ -14,7 +14,7 @@ namespace ChatBeet.Queuing.Rules
     public abstract class PropertyCondition : ICondition
     {
         public string Match { get; set; }
-        protected virtual Expression<Func<IQueuedMessageSource, string>> Accessor { get; set; }
+        protected virtual Expression<Func<IQueuedMessageSource, string>> Accessor { get; }
         public bool Matches(IQueuedMessageSource message)
         {
             var method = Accessor.Compile();
@@ -24,22 +24,22 @@ namespace ChatBeet.Queuing.Rules
 
     public class SourceCondition : PropertyCondition, ICondition
     {
-        new readonly Expression<Func<IQueuedMessageSource, string>> Accessor = c => c.Source;
+        protected override Expression<Func<IQueuedMessageSource, string>> Accessor { get { return c => c.Source; } }
     }
 
     public class BodyCondition : PropertyCondition, ICondition
     {
-        new readonly Expression<Func<IQueuedMessageSource, string>> Accessor = c => c.Body;
+        protected override Expression<Func<IQueuedMessageSource, string>> Accessor { get { return c => c.Body; } }
     }
 
     public class TargetCondition : PropertyCondition, ICondition
     {
-        new readonly Expression<Func<IQueuedMessageSource, string>> Accessor = c => c.Target;
+        protected override Expression<Func<IQueuedMessageSource, string>> Accessor { get { return c => c.Target; } }
     }
 
     public class TitleCondition : PropertyCondition, ICondition
     {
-        new readonly Expression<Func<IQueuedMessageSource, string>> Accessor = c => c.Title;
+        protected override Expression<Func<IQueuedMessageSource, string>> Accessor { get { return c => c.Title; } }
     }
 
     public abstract class JoiningCondition : ICondition

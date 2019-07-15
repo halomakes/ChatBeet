@@ -16,11 +16,13 @@ namespace ChatBeet.Queuing
 
         private readonly List<OutputMessage> queuedMessages = new List<OutputMessage>();
         private List<IQueuedMessageSource> messageHistory = new List<IQueuedMessageSource>();
+        private List<OutputMessage> outputHistory = new List<OutputMessage>();
 
         public event EventHandler MessageAdded;
 
         public List<OutputMessage> ViewAll() => queuedMessages;
         public List<IQueuedMessageSource> GetHistory() => messageHistory;
+        public List<OutputMessage> GetOutputHistory() => outputHistory;
 
         private void ApplyRules(IQueuedMessageSource message)
         {
@@ -30,13 +32,12 @@ namespace ChatBeet.Queuing
                 {
                     if (rule.Condition.Matches(message))
                     {
-                        queuedMessages.Add(new OutputMessage
+                        AddOutput(new OutputMessage
                         {
                             Channel = rule.TargetChannel,
                             Content = rule.Output.GetOutput(message),
                             OutputType = rule.Type
                         });
-                        OnMessageAdded(EventArgs.Empty);
                     }
                 }
                 catch (Exception e)
@@ -51,6 +52,14 @@ namespace ChatBeet.Queuing
             var messages = queuedMessages;
             queuedMessages.Clear();
             return messages;
+        }
+
+        private void AddOutput(OutputMessage message)
+        {
+            queuedMessages.Add(message);
+            outputHistory.Add(message);
+            TrimOutputHistory();
+            OnMessageAdded(EventArgs.Empty);
         }
 
         public void Push(IQueuedMessageSource message)
@@ -70,6 +79,13 @@ namespace ChatBeet.Queuing
             var overflow = messageHistory.Count - MAX_HISTORY;
             if (overflow > 0)
                 messageHistory = messageHistory.Skip(overflow).Take(MAX_HISTORY).ToList();
+        }
+
+        private void TrimOutputHistory()
+        {
+            var overflow = outputHistory.Count - MAX_HISTORY;
+            if (overflow > 0)
+                outputHistory = outputHistory.Skip(overflow).Take(MAX_HISTORY).ToList();
         }
     }
 }
