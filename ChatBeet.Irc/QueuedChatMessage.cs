@@ -1,5 +1,7 @@
 ﻿using ChatBeet.Queuing;
+using NetIRC.Messages;
 using System;
+using System.Linq;
 
 namespace ChatBeet.Irc
 {
@@ -11,13 +13,13 @@ namespace ChatBeet.Irc
         public string Body { get; set; }
         public DateTime TimeGenerated { get; set; }
 
-        //public static QueuedChatMessage FromChannelMessage(IrcMessageData msg) => new QueuedChatMessage
-        //{
-        //    Body = msg.Message,
-        //    Source = $"irc:{msg.Nick}",
-        //    Target = msg.Channel,
-        //    TimeGenerated = DateTime.Now,
-        //    Title = msg.Ident
-        //};
+        public static QueuedChatMessage FromChannelMessage(PrivMsgMessage msg) => new QueuedChatMessage
+        {
+            Body = msg.Message,
+            Source = $"irc:{msg.From}",
+            Target = msg.To,
+            TimeGenerated = DateTime.Now,
+            Title = msg.Tokens.FirstOrDefault() ?? string.Empty
+        };
     }
 }
