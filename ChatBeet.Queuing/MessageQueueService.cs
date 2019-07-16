@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatBeet.Queuing.Rules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,7 +15,7 @@ namespace ChatBeet.Queuing
             this.configurationAccessor = configurationAccessor;
         }
 
-        private readonly List<OutputMessage> queuedMessages = new List<OutputMessage>();
+        private List<OutputMessage> queuedMessages = new List<OutputMessage>();
         private List<IQueuedMessageSource> messageHistory = new List<IQueuedMessageSource>();
         private List<OutputMessage> outputHistory = new List<OutputMessage>();
 
@@ -35,7 +36,7 @@ namespace ChatBeet.Queuing
                         AddOutput(new OutputMessage
                         {
                             Channel = rule.TargetChannel,
-                            Content = rule.Output.GetOutput(message),
+                            Content = GenerateContent(rule, message),
                             OutputType = rule.Type
                         });
                     }
@@ -47,10 +48,21 @@ namespace ChatBeet.Queuing
             }
         }
 
+        private string GenerateContent(Rule rule, IQueuedMessageSource message)
+        {
+            var text = rule.Output.GetOutput(message);
+            if (rule.Pipes != null)
+                foreach (var pipe in rule.Pipes)
+                {
+                    text = pipe.Transform(text);
+                }
+            return text;
+        }
+
         public List<OutputMessage> PopAll()
         {
             var messages = queuedMessages;
-            queuedMessages.Clear();
+            queuedMessages = new List<OutputMessage>();
             return messages;
         }
 

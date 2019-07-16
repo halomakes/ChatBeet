@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ChatBeet.Queuing.Rules
 {
@@ -11,6 +9,7 @@ namespace ChatBeet.Queuing.Rules
         public string TargetChannel { get; set; }
         public OutputType Type { get; set; }
         public IOutputGenerator Output { get; set; }
+        public IEnumerable<IOutputPipe> Pipes { get; set; }
     }
 
     public enum OutputType
