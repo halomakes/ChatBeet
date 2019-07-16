@@ -81,6 +81,8 @@ namespace ChatBeet.Queuing
             ApplyRules(message);
         }
 
+        public void PushRaw(OutputMessage message) => AddOutput(message);
+
         private void OnMessageAdded(EventArgs e)
         {
             MessageAdded?.Invoke(this, e);
