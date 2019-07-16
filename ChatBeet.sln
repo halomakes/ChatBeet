@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet.Queuing", "ChatBee
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet.Irc", "ChatBeet.Irc\ChatBeet.Irc.csproj", "{BC0911EE-9E5C-453F-8315-1088E3E0766D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetIRC", "..\..\..\Downloads\NetIRC-master\src\NetIRC\NetIRC.csproj", "{CA160DD2-3141-4FBF-AE3E-D35AF110D707}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetIRC", "NetIRC\NetIRC.csproj", "{0F579271-80F9-419A-BE01-CA6F6EC30601}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{BC0911EE-9E5C-453F-8315-1088E3E0766D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC0911EE-9E5C-453F-8315-1088E3E0766D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC0911EE-9E5C-453F-8315-1088E3E0766D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA160DD2-3141-4FBF-AE3E-D35AF110D707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA160DD2-3141-4FBF-AE3E-D35AF110D707}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA160DD2-3141-4FBF-AE3E-D35AF110D707}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA160DD2-3141-4FBF-AE3E-D35AF110D707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F579271-80F9-419A-BE01-CA6F6EC30601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F579271-80F9-419A-BE01-CA6F6EC30601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F579271-80F9-419A-BE01-CA6F6EC30601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F579271-80F9-419A-BE01-CA6F6EC30601}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

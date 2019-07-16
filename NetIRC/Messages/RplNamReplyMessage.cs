@@ -19,7 +19,7 @@ namespace NetIRC.Messages
 
             foreach (var nick in nicks)
             {
-                if (userStatuses.Contains(nick[0]))
+                if (!string.IsNullOrWhiteSpace(nick) && userStatuses.Contains(nick[0]))
                 {
                     Nicks.Add(nick.Substring(1), nick.Substring(0, 1));
                 }
