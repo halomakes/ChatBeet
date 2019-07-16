@@ -2,23 +2,21 @@
   {
     "Label": "Share finished torrents updated",
     "Condition": {
-      "$type": "ChatBeet.Queuing.Rules.OrCondition, ChatBeet.Queuing",
-      "Conditions": [
-        {
-          "$type": "ChatBeet.Queuing.Rules.BodyCondition, ChatBeet.Queuing",
-          "Match": ".*Deluge.*"
-        },
-        {
-          "$type": "ChatBeet.Queuing.Rules.SourceCondition, ChatBeet.Queuing",
-          "Match": ".*"
-        }
-      ]
+      "$type": "ChatBeet.Queuing.Rules.TitleCondition, ChatBeet.Queuing",
+      "Match": "^Finished Torrent \"(.*)\""
     },
     "TargetChannel": "#🥕",
     "Output": {
       "$type": "ChatBeet.Queuing.Rules.TemplatedOutputGenerator, ChatBeet.Queuing",
-      "Template": "Torrent finished: {0:Title}",
+      "Template": "{{Title}}"
     },
-    "Type": 1
+    "Type": 1,
+    "Pipes": [
+      {
+        "$type": "ChatBeet.Queuing.Rules.RegexPipe, ChatBeet.Queuing",
+        "Pattern": "^Finished Torrent \"(.*)\"",
+        "OutputTemplate": "Torrent finished downloading: $1"
+      }
+    ]
   }
 ]

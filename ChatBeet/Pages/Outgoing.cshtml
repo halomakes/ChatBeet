@@ -1,0 +1,24 @@
+﻿@page
+@inject ChatBeet.Queuing.IMessageQueueService queueService
+@{
+    ViewData["Title"] = "IncomingMessages";
+    var items = queueService.GetOutputHistory();
+    items.Reverse();
+}
+
+<h2>Output History</h2>
+
+@foreach (var i in items.Take(50))
+{
+    <div class="my-3">
+        <div>
+            <span>@i.Content</span>
+        </div>
+        <div>
+            <span>@i.OutputType.ToString()</span>
+        </div>
+        <div>
+            <span>@i.Channel</span>
+        </div>
+    </div>
+}

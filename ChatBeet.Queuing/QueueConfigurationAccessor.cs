@@ -1,7 +1,9 @@
 ﻿using ChatBeet.Queuing.Rules;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ChatBeet.Queuing
 {
@@ -17,15 +19,32 @@ namespace ChatBeet.Queuing
 
         public List<Rule> GetRules() => Rules;
 
-        private void Load()
+        public void Load()
         {
-            using (var file = File.OpenText(FileName))
-            using (var jtr = new JsonTextReader(file))
+            try
             {
-                var js = new JsonSerializer();
-                js.TypeNameHandling = TypeNameHandling.Auto;
-                Rules = js.Deserialize<List<Rule>>(jtr);
+                using (var file = File.OpenText(FileName))
+                using (var jtr = new JsonTextReader(file))
+                {
+                    var js = new JsonSerializer();
+                    js.TypeNameHandling = TypeNameHandling.Auto;
+                    Rules = js.Deserialize<List<Rule>>(jtr);
+                }
             }
+            catch (FileNotFoundException)
+            {
+                Save();
+            }
+            catch (Exception)
+            {
+                throw new ApplicationException("Rule configuration could not be read/written or is invalid.");
+            }
+        }
+
+        public void Set(IEnumerable<Rule> rules)
+        {
+            Rules = rules.ToList();
+            Save();
         }
 
         private void Save()

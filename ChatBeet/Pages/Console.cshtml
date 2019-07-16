@@ -1,0 +1,83 @@
+﻿@page
+@{
+    ViewData["Title"] = "Console";
+}
+
+<h1>Console</h1>
+@model ChatBeet.Queuing.OutputMessage
+
+<form onsubmit="sendMessage(event)" class="mb-5" asp-controller="Console" asp-action="SendMessage">
+    <h2>Send Message</h2>
+    <div class="form-group">
+        <label asp-for="Channel"></label>
+        <input asp-for="Channel" class="form-control" placeholder="#carrots">
+        <span asp-validation-for="Channel"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="OutputType"></label>
+        <select asp-for="OutputType" asp-items="Html.GetEnumSelectList<ChatBeet.Queuing.Rules.OutputType>()" class="custom-select"></select>
+        <span asp-validation-for="OutputType"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Content"></label>
+        <input asp-for="Content" class="form-control" placeholder="Hello world!">
+        <span asp-validation-for="Content"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+
+<h2>Manage Rules</h2>
+<a role="button" class="btn btn-outline-primary" asp-controller="Console" asp-action="GetRules" onclick="downloadConfig(event)">Download</a>
+<a role="button" class="btn btn-primary" asp-controller="Console" asp-action="ReloadRules" onclick="reloadConfig(event)">Reload</a>
+<form enctype="multipart/form-data" onsubmit="uploadConfig(event)" class="d-flex flex-row mt-2" asp-controller="Console" asp-action="SetRules">
+    <div class="custom-file">
+        <input type="file" class="custom-file-input" id="fileInput">
+        <label class="custom-file-label">Choose file</label>
+    </div>
+    <button role="button" class="btn btn-outline-primary ml-2">Upload</button>
+</form>
+
+<script>
+    const sendMessage = (event) => {
+        event.preventDefault();
+        $.ajax({
+            type: 'post',
+            url: event.target.action,
+            data: $(event.target).serialize(),
+            success: () => event.target.reset(),
+            dataType: 'application/x-www-form-urlencoded'
+        });
+    };
+
+    const downloadConfig = (event) => {
+        event.preventDefault();
+        window.location.href = event.target.href;
+    }
+
+    const reloadConfig = (event) => {
+        event.preventDefault();
+        $.ajax({
+            type: 'patch',
+            url: event.target.href,
+            success: () => alert('Config reloaded')
+        });
+    }
+
+    const uploadConfig = (event) => {
+        event.preventDefault();
+        const input = document.getElementById('fileInput');
+        const files = input.files;
+        const formData = new FormData();
+        formData.append('file', files[0]);
+
+        $.ajax({
+            url: event.target.action,
+            type: 'put',
+            data: formData,
+            success: () => alert('Config uploaded'),
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+</script>
