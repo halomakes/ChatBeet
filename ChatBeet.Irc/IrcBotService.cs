@@ -1,6 +1,5 @@
 ﻿using ChatBeet.Queuing;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NetIRC;
 using NetIRC.Connection;
@@ -16,23 +15,30 @@ namespace ChatBeet.Irc
     {
         private readonly Client client;
         private readonly IMessageQueueService queueService;
-        private readonly ILogger<IrcBotService> logger;
         private readonly IrcBotConfiguration config;
         private Timer timer;
 
         public IrcBotService(IMessageQueueService queueService,
-            ILogger<IrcBotService> logger,
             IOptions<IrcBotConfiguration> options)
         {
             this.queueService = queueService;
-            this.logger = logger;
             config = options.Value;
 
             var user = new User(config.Nick, config.Identity);
             client = new Client(user, new TcpClientConnection());
             client.OnRawDataReceived += Client_OnRawDataReceived;
             client.EventHub.RegistrationCompleted += Client_OnRegistered;
+            client.EventHub.PrivMsg += EventHub_PrivMsg;
             queueService.MessageAdded += QueueService_MessageAdded;
+        }
+
+        private void EventHub_PrivMsg(Client client, IRCMessageEventArgs<PrivMsgMessage> e)
+        {
+            try
+            {
+                queueService.Push(QueuedChatMessage.FromChannelMessage(e.IRCMessage));
+            }
+            catch (Exception) { }
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -85,7 +91,7 @@ namespace ChatBeet.Irc
 
         private void Client_OnRawDataReceived(Client client, string rawData)
         {
-            logger.LogInformation(rawData);
+            Console.WriteLine(rawData);
         }
 
         public void Dispose()
