@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatBeet.Queuing.Rules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,13 +15,15 @@ namespace ChatBeet.Queuing
             this.configurationAccessor = configurationAccessor;
         }
 
-        private readonly List<OutputMessage> queuedMessages = new List<OutputMessage>();
+        private List<OutputMessage> queuedMessages = new List<OutputMessage>();
         private List<IQueuedMessageSource> messageHistory = new List<IQueuedMessageSource>();
+        private List<OutputMessage> outputHistory = new List<OutputMessage>();
 
         public event EventHandler MessageAdded;
 
         public List<OutputMessage> ViewAll() => queuedMessages;
         public List<IQueuedMessageSource> GetHistory() => messageHistory;
+        public List<OutputMessage> GetOutputHistory() => outputHistory;
 
         private void ApplyRules(IQueuedMessageSource message)
         {
@@ -30,13 +33,12 @@ namespace ChatBeet.Queuing
                 {
                     if (rule.Condition.Matches(message))
                     {
-                        queuedMessages.Add(new OutputMessage
+                        AddOutput(new OutputMessage
                         {
                             Channel = rule.TargetChannel,
-                            Content = rule.Output.GetOutput(message),
+                            Content = GenerateContent(rule, message),
                             OutputType = rule.Type
                         });
-                        OnMessageAdded(EventArgs.Empty);
                     }
                 }
                 catch (Exception e)
@@ -46,11 +48,30 @@ namespace ChatBeet.Queuing
             }
         }
 
+        private string GenerateContent(Rule rule, IQueuedMessageSource message)
+        {
+            var text = rule.Output.GetOutput(message);
+            if (rule.Pipes != null)
+                foreach (var pipe in rule.Pipes)
+                {
+                    text = pipe.Transform(text);
+                }
+            return text;
+        }
+
         public List<OutputMessage> PopAll()
         {
             var messages = queuedMessages;
-            queuedMessages.Clear();
+            queuedMessages = new List<OutputMessage>();
             return messages;
+        }
+
+        private void AddOutput(OutputMessage message)
+        {
+            queuedMessages.Add(message);
+            outputHistory.Add(message);
+            TrimOutputHistory();
+            OnMessageAdded(EventArgs.Empty);
         }
 
         public void Push(IQueuedMessageSource message)
@@ -59,6 +80,8 @@ namespace ChatBeet.Queuing
             TrimHistory();
             ApplyRules(message);
         }
+
+        public void PushRaw(OutputMessage message) => AddOutput(message);
 
         private void OnMessageAdded(EventArgs e)
         {
@@ -70,6 +93,13 @@ namespace ChatBeet.Queuing
             var overflow = messageHistory.Count - MAX_HISTORY;
             if (overflow > 0)
                 messageHistory = messageHistory.Skip(overflow).Take(MAX_HISTORY).ToList();
+        }
+
+        private void TrimOutputHistory()
+        {
+            var overflow = outputHistory.Count - MAX_HISTORY;
+            if (overflow > 0)
+                outputHistory = outputHistory.Skip(overflow).Take(MAX_HISTORY).ToList();
         }
     }
 }

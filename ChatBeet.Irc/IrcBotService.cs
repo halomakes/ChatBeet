@@ -73,7 +73,7 @@ namespace ChatBeet.Irc
 
         private void Client_OnRegistered(object sender, EventArgs e)
         {
-            JoinChannel();
+            JoinChannel(config.Channel);
         }
 
         private void Client_OnRawMessage(object sender, IrcEventArgs e)
@@ -88,10 +88,14 @@ namespace ChatBeet.Irc
 
         private void SendQueuedMessages()
         {
-            JoinChannel();
+            JoinChannel(config.Channel);
 
             var queue = queueService.PopAll();
-            queue.ForEach(q => client.SendMessage(GetSendType(q), q.Channel, q.Content));
+            queue.ForEach(q =>
+            {
+                JoinChannel(q.Channel);
+                client.SendMessage(GetSendType(q), q.Channel, q.Content);
+            });
         }
 
         private SendType GetSendType(OutputMessage message)
@@ -104,10 +108,10 @@ namespace ChatBeet.Irc
             }
         }
 
-        public void JoinChannel()
+        public void JoinChannel(string channelName)
         {
-            if (!client.JoinedChannels.Cast<string>().Any(c => c.Contains(config.Channel)))
-                client.RfcJoin(config.Channel);
+            if (!client.JoinedChannels.Cast<string>().Any(c => c.Contains(channelName)))
+                client.RfcJoin(channelName);
         }
 
         public void Connect()
@@ -117,7 +121,7 @@ namespace ChatBeet.Irc
                 client.Connect(config.Server, config.Port);
                 client.Login(config.Nick, config.Identity);
             }
-            JoinChannel();
+            JoinChannel(config.Channel);
             Task.Run(() => client.Listen());
         }
 
