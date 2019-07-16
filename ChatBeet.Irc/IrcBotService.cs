@@ -70,7 +70,20 @@ namespace ChatBeet.Irc
             foreach (var q in queue)
             {
                 await JoinChannel(q.Channel);
-                await client.SendAsync(new NoticeMessage(q.Channel, q.Content));
+                await client.SendAsync(GenerateMessage(q));
+            }
+        }
+
+        private static IClientMessage GenerateMessage(OutputMessage q)
+        {
+            switch (q.OutputType)
+            {
+                case Queuing.Rules.OutputType.Announcement:
+                    return new NoticeMessage(q.Channel, q.Content);
+                case Queuing.Rules.OutputType.Activity:
+                    return new PrivMsgMessage(q.Channel, $"/me {q.Content}");
+                default:
+                    return new PrivMsgMessage(q.Channel, q.Content);
             }
         }
 
