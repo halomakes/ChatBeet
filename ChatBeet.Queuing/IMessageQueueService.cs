@@ -11,5 +11,6 @@ namespace ChatBeet.Queuing
         event EventHandler MessageAdded;
         List<IQueuedMessageSource> GetHistory();
         List<OutputMessage> GetOutputHistory();
+        void PushRaw(OutputMessage message);
     }
 }
