@@ -1,16 +1,14 @@
 ﻿using ChatBeet.Queuing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.Extensions.Options;
-using ChatBeet.Queuing.Rules;
 using NetIRC;
 using NetIRC.Connection;
 using NetIRC.Messages;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ChatBeet.Irc
 {
@@ -73,7 +71,9 @@ namespace ChatBeet.Irc
         public async Task JoinChannel(string channelName)
         {
             if (!client.Channels.Any(c => c.Name == channelName))
+            {
                 await client.SendAsync(new JoinMessage(channelName));
+            }
         }
 
         public async Task Connect()

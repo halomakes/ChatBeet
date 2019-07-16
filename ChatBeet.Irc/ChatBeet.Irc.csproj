@@ -9,10 +9,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
-    <PackageReference Include="NetIRC" Version="0.1.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Downloads\NetIRC-master\src\NetIRC\NetIRC.csproj" />
     <ProjectReference Include="..\ChatBeet.Queuing\ChatBeet.Queuing.csproj" />
   </ItemGroup>
 
