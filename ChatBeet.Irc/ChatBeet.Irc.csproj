@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Downloads\NetIRC-master\src\NetIRC\NetIRC.csproj" />
     <ProjectReference Include="..\ChatBeet.Queuing\ChatBeet.Queuing.csproj" />
+    <ProjectReference Include="..\NetIRC\NetIRC.csproj" />
   </ItemGroup>
 
 </Project>
