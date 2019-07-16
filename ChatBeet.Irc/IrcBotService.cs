@@ -1,5 +1,4 @@
 ﻿using ChatBeet.Queuing;
-using Meebey.SmartIrc4net;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,12 +8,15 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using ChatBeet.Queuing.Rules;
+using NetIRC;
+using NetIRC.Connection;
+using NetIRC.Messages;
 
 namespace ChatBeet.Irc
 {
     internal class IrcBotService : IHostedService, IDisposable
     {
-        private readonly IrcClient client = new IrcClient();
+        private readonly Client client;
         private readonly IMessageQueueService queueService;
         private readonly ILogger<IrcBotService> logger;
         private readonly IrcBotConfiguration config;
@@ -28,106 +30,67 @@ namespace ChatBeet.Irc
             this.logger = logger;
             config = options.Value;
 
-            Configure();
-            Connect();
-            MonitorIncomingMessages();
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            Connect();
-            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
-            return Task.CompletedTask;
-        }
-
-        private void MonitorIncomingMessages()
-        {
+            var user = new User(config.Nick, config.Identity);
+            client = new Client(user, new TcpClientConnection());
+            client.OnRawDataReceived += Client_OnRawDataReceived;
+            client.EventHub.RegistrationCompleted += Client_OnRegistered;
             queueService.MessageAdded += QueueService_MessageAdded;
         }
 
-        private void QueueService_MessageAdded(object sender, EventArgs e)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            SendQueuedMessages();
+            await Connect();
+            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
         }
 
-        private void Configure()
+        private async void QueueService_MessageAdded(object sender, EventArgs e)
         {
-            client.Encoding = Encoding.UTF8;
-            client.SendDelay = 1000;
-            client.ActiveChannelSyncing = true;
-            client.OnRawMessage += Client_OnRawMessage;
-            client.OnChannelMessage += Client_OnChannelMessage;
-            client.OnRegistered += Client_OnRegistered;
+            await SendQueuedMessages();
         }
 
-        private void Client_OnChannelMessage(object sender, IrcEventArgs e)
+        private async void Client_OnRegistered(object sender, EventArgs e)
         {
-            try
-            {
-                var data = (e.Data as IrcMessageData);
-                if (data.Nick != config.Nick)
-                    queueService.Push(QueuedChatMessage.FromChannelMessage(data));
-            }
-            catch (Exception) { }
+            await JoinChannel(config.Channel);
         }
 
-        private void Client_OnRegistered(object sender, EventArgs e)
+        private async void ProcessQueue(object state)
         {
-            JoinChannel(config.Channel);
+            await SendQueuedMessages();
         }
 
-        private void Client_OnRawMessage(object sender, IrcEventArgs e)
+        private async Task SendQueuedMessages()
         {
-            logger.LogInformation(e.Data.RawMessage);
-        }
-
-        private void ProcessQueue(object state)
-        {
-            SendQueuedMessages();
-        }
-
-        private void SendQueuedMessages()
-        {
-            JoinChannel(config.Channel);
+            await JoinChannel(config.Channel);
 
             var queue = queueService.PopAll();
-            queue.ForEach(q =>
+            foreach (var q in queue)
             {
-                JoinChannel(q.Channel);
-                client.SendMessage(GetSendType(q), q.Channel, q.Content);
-            });
-        }
-
-        private SendType GetSendType(OutputMessage message)
-        {
-            switch (message.OutputType)
-            {
-                case OutputType.Activity: return SendType.Action;
-                case OutputType.Announcement: return SendType.Notice;
-                default: return SendType.Message;
+                await JoinChannel(q.Channel);
+                await client.SendAsync(new NoticeMessage(q.Channel, q.Content));
             }
         }
 
-        public void JoinChannel(string channelName)
+        public async Task JoinChannel(string channelName)
         {
-            if (!client.JoinedChannels.Cast<string>().Any(c => c.Contains(channelName)))
-                client.RfcJoin(channelName);
+            if (!client.Channels.Any(c => c.Name == channelName))
+                await client.SendAsync(new JoinMessage(channelName));
         }
 
-        public void Connect()
+        public async Task Connect()
         {
-            if (!client.IsConnected)
-            {
-                client.Connect(config.Server, config.Port);
-                client.Login(config.Nick, config.Identity);
-            }
-            JoinChannel(config.Channel);
-            Task.Run(() => client.Listen());
+            await client.ConnectAsync(config.Server, config.Port);
+            await client.SendAsync(new NickMessage(config.Nick));
+            await client.SendAsync(new UserMessage(config.Nick, config.Identity));
+        }
+
+        private void Client_OnRawDataReceived(Client client, string rawData)
+        {
+            logger.LogInformation(rawData);
         }
 
         public void Dispose()
         {
-            client?.Disconnect();
+            client?.Dispose();
             timer?.Dispose();
         }
 
