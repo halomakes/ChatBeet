@@ -8,8 +8,15 @@
     "TargetChannel": "#🥕",
     "Output": {
       "$type": "ChatBeet.Queuing.Rules.TemplatedOutputGenerator, ChatBeet.Queuing",
-      "Template": "Torrent finished: {0:Title}"
+      "Template": "{{Title}}"
     },
-    "Type": 1
+    "Type": 1,
+    "Pipes": [
+      {
+        "$type": "ChatBeet.Queuing.Rules.RegexPipe, ChatBeet.Queuing",
+        "Pattern": "^Finished Torrent \"(.*)\"",
+        "OutputTemplate": "Torrent finished downloading: $1"
+      }
+    ]
   }
 ]
