@@ -30,6 +30,8 @@ namespace ChatBeet.Smtp
         {
             if (config.AllowAny)
                 return true;
+            if (config.AuthorizedUsers == null)
+                return false;
             return config.AuthorizedUsers.Any(u => u.Username.ToLower() == user.ToLower() && u.Password == password);
         }
     }
