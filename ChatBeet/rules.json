@@ -18,5 +18,41 @@
         "OutputTemplate": "Torrent finished downloading: $1"
       }
     ]
+  },
+  {
+    "Label": "Say hello",
+    "Condition": {
+      "$type": "ChatBeet.Queuing.Rules.AndCondition, ChatBeet.Queuing",
+      "Conditions": [
+        {
+          "$type": "ChatBeet.Queuing.Rules.TitleCondition, ChatBeet.Queuing",
+          "Match": "^PRIVMSG",
+          "IgnoreCase": true
+        },
+        {
+          "$type": "ChatBeet.Queuing.Rules.SourceCondition, ChatBeet.Queuing",
+          "Match": "^irc:(.*)",
+          "IgnoreCase": false
+        },
+        {
+          "$type": "ChatBeet.Queuing.Rules.BodyCondition, ChatBeet.Queuing",
+          "Match": "🥕 hello",
+          "IgnoreCase": true
+        }
+      ]
+    },
+    "TargetChannel": "#🥕",
+    "Output": {
+      "$type": "ChatBeet.Queuing.Rules.TemplatedOutputGenerator, ChatBeet.Queuing",
+      "Template": "{{Source}}"
+    },
+    "Type": 0,
+    "Pipes": [
+      {
+        "$type": "ChatBeet.Queuing.Rules.RegexPipe, ChatBeet.Queuing",
+        "Pattern": "^irc:(.*)",
+        "OutputTemplate": "Hello $1! 🙂"
+      }
+    ]
   }
 ]
