@@ -1,133 +1,115 @@
 ﻿using ChatBeet.Queuing;
-using Meebey.SmartIrc4net;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NetIRC;
+using NetIRC.Connection;
+using NetIRC.Messages;
 using System;
-using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.Extensions.Options;
-using ChatBeet.Queuing.Rules;
 
 namespace ChatBeet.Irc
 {
     internal class IrcBotService : IHostedService, IDisposable
     {
-        private readonly IrcClient client = new IrcClient();
+        private readonly Client client;
         private readonly IMessageQueueService queueService;
-        private readonly ILogger<IrcBotService> logger;
         private readonly IrcBotConfiguration config;
         private Timer timer;
 
         public IrcBotService(IMessageQueueService queueService,
-            ILogger<IrcBotService> logger,
             IOptions<IrcBotConfiguration> options)
         {
             this.queueService = queueService;
-            this.logger = logger;
             config = options.Value;
 
-            Configure();
-            Connect();
-            MonitorIncomingMessages();
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            Connect();
-            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
-            return Task.CompletedTask;
-        }
-
-        private void MonitorIncomingMessages()
-        {
+            var user = new User(config.Nick, config.Identity);
+            client = new Client(user, new TcpClientConnection());
+            client.OnRawDataReceived += Client_OnRawDataReceived;
+            client.EventHub.RegistrationCompleted += Client_OnRegistered;
+            client.EventHub.PrivMsg += EventHub_PrivMsg;
             queueService.MessageAdded += QueueService_MessageAdded;
         }
 
-        private void QueueService_MessageAdded(object sender, EventArgs e)
-        {
-            SendQueuedMessages();
-        }
-
-        private void Configure()
-        {
-            client.Encoding = Encoding.UTF8;
-            client.SendDelay = 1000;
-            client.ActiveChannelSyncing = true;
-            client.OnRawMessage += Client_OnRawMessage;
-            client.OnChannelMessage += Client_OnChannelMessage;
-            client.OnRegistered += Client_OnRegistered;
-        }
-
-        private void Client_OnChannelMessage(object sender, IrcEventArgs e)
+        private void EventHub_PrivMsg(Client client, IRCMessageEventArgs<PrivMsgMessage> e)
         {
             try
             {
-                var data = (e.Data as IrcMessageData);
-                if (data.Nick != config.Nick)
-                    queueService.Push(QueuedChatMessage.FromChannelMessage(data));
+                queueService.Push(QueuedChatMessage.FromChannelMessage(e.IRCMessage));
             }
             catch (Exception) { }
         }
 
-        private void Client_OnRegistered(object sender, EventArgs e)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            JoinChannel(config.Channel);
+            await Connect();
+            timer = new Timer(ProcessQueue, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
         }
 
-        private void Client_OnRawMessage(object sender, IrcEventArgs e)
+        private async void QueueService_MessageAdded(object sender, EventArgs e)
         {
-            logger.LogInformation(e.Data.RawMessage);
+            await SendQueuedMessages();
         }
 
-        private void ProcessQueue(object state)
+        private async void Client_OnRegistered(object sender, EventArgs e)
         {
-            SendQueuedMessages();
+            await JoinChannel(config.Channel);
         }
 
-        private void SendQueuedMessages()
+        private async void ProcessQueue(object state)
         {
-            JoinChannel(config.Channel);
+            await SendQueuedMessages();
+        }
+
+        private async Task SendQueuedMessages()
+        {
+            await JoinChannel(config.Channel);
 
             var queue = queueService.PopAll();
-            queue.ForEach(q =>
+            foreach (var q in queue)
             {
-                JoinChannel(q.Channel);
-                client.SendMessage(GetSendType(q), q.Channel, q.Content);
-            });
-        }
-
-        private SendType GetSendType(OutputMessage message)
-        {
-            switch (message.OutputType)
-            {
-                case OutputType.Activity: return SendType.Action;
-                case OutputType.Announcement: return SendType.Notice;
-                default: return SendType.Message;
+                await JoinChannel(q.Channel);
+                await client.SendAsync(GenerateMessage(q));
             }
         }
 
-        public void JoinChannel(string channelName)
+        private static IClientMessage GenerateMessage(OutputMessage q)
         {
-            if (!client.JoinedChannels.Cast<string>().Any(c => c.Contains(channelName)))
-                client.RfcJoin(channelName);
+            switch (q.OutputType)
+            {
+                case Queuing.Rules.OutputType.Announcement:
+                    return new NoticeMessage(q.Channel, q.Content);
+                case Queuing.Rules.OutputType.Activity:
+                    return new PrivMsgMessage(q.Channel, $"/me {q.Content}");
+                default:
+                    return new PrivMsgMessage(q.Channel, q.Content);
+            }
         }
 
-        public void Connect()
+        public async Task JoinChannel(string channelName)
         {
-            if (!client.IsConnected)
+            if (!client.Channels.Any(c => c.Name == channelName))
             {
-                client.Connect(config.Server, config.Port);
-                client.Login(config.Nick, config.Identity);
+                await client.SendAsync(new JoinMessage(channelName));
             }
-            JoinChannel(config.Channel);
-            Task.Run(() => client.Listen());
+        }
+
+        public async Task Connect()
+        {
+            await client.ConnectAsync(config.Server, config.Port);
+            await client.SendAsync(new NickMessage(config.Nick));
+            await client.SendAsync(new UserMessage(config.Nick, config.Identity));
+        }
+
+        private void Client_OnRawDataReceived(Client client, string rawData)
+        {
+            Console.WriteLine(rawData);
         }
 
         public void Dispose()
         {
-            client?.Disconnect();
+            client?.Dispose();
             timer?.Dispose();
         }
 

@@ -1,6 +1,7 @@
 ﻿using ChatBeet.Queuing;
-using Meebey.SmartIrc4net;
+using NetIRC.Messages;
 using System;
+using System.Linq;
 
 namespace ChatBeet.Irc
 {
@@ -12,13 +13,13 @@ namespace ChatBeet.Irc
         public string Body { get; set; }
         public DateTime TimeGenerated { get; set; }
 
-        public static QueuedChatMessage FromChannelMessage(IrcMessageData msg) => new QueuedChatMessage
+        public static QueuedChatMessage FromChannelMessage(PrivMsgMessage msg) => new QueuedChatMessage
         {
             Body = msg.Message,
-            Source = $"irc:{msg.Nick}",
-            Target = msg.Channel,
+            Source = $"irc:{msg.From}",
+            Target = msg.To,
             TimeGenerated = DateTime.Now,
-            Title = msg.Ident
+            Title = msg.Tokens.FirstOrDefault() ?? string.Empty
         };
     }
 }

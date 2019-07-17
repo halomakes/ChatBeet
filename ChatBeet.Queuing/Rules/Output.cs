@@ -36,8 +36,11 @@ namespace ChatBeet.Queuing.Rules
     {
         public string Pattern { get; set; }
         public string OutputTemplate { get; set; }
+        public bool IgnoreCase { get; set; } = true;
 
-        public string Transform(string input) => Regex.Replace(input, Pattern, OutputTemplate);
+        public string Transform(string input) => IgnoreCase
+            ? Regex.Replace(input, Pattern, OutputTemplate, RegexOptions.IgnoreCase)
+            : Regex.Replace(input, Pattern, OutputTemplate);
     }
 
     public class UppercasePipe : IOutputPipe
