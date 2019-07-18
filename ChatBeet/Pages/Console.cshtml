@@ -9,9 +9,9 @@
 <form onsubmit="sendMessage(event)" class="mb-5" asp-controller="Console" asp-action="SendMessage">
     <h2>Send Message</h2>
     <div class="form-group">
-        <label asp-for="Channel"></label>
-        <input asp-for="Channel" class="form-control" placeholder="#carrots">
-        <span asp-validation-for="Channel"></span>
+        <label asp-for="Target"></label>
+        <input asp-for="Target" class="form-control" placeholder="#carrots">
+        <span asp-validation-for="Target"></span>
     </div>
     <div class="form-group">
         <label asp-for="OutputType"></label>

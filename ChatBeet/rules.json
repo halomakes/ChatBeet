@@ -5,11 +5,17 @@
       "$type": "ChatBeet.Queuing.Rules.Conditions.TitleCondition, ChatBeet.Queuing",
       "Match": "^Finished Torrent \"(.*)\""
     },
-    "TargetChannel": "#🥕",
+    "TargetChannel": {
+      "Base": {
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
+        "Template": "#🥕"
+      },
+      "Pipes": []
+    },
     "Type": 1,
     "Output": {
       "Base": {
-        "$type": "ChatBeet.Queuing.Rules.OutputGenerators.TemplatedOutputGenerator, ChatBeet.Queuing",
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
         "Template": "{{Title}}"
       },
       "Pipes": [
@@ -43,11 +49,17 @@
         }
       ]
     },
-    "TargetChannel": "#🥕",
+    "Target": {
+      "Base": {
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
+        "Template": "{{Target}}"
+      },
+      "Pipes": []
+    },
     "Type": 0,
     "Output": {
       "Base": {
-        "$type": "ChatBeet.Queuing.Rules.OutputGenerators.TemplatedOutputGenerator, ChatBeet.Queuing",
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
         "Template": "{{Source}}"
       },
       "Pipes": [
@@ -81,11 +93,17 @@
         }
       ]
     },
-    "TargetChannel": "#🥕",
+    "Target": {
+      "Base": {
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
+        "Template": "{{Target}}"
+      },
+      "Pipes": []
+    },
     "Type": 0,
     "Output": {
       "Base": {
-        "$type": "ChatBeet.Queuing.Rules.OutputGenerators.TemplatedOutputGenerator, ChatBeet.Queuing",
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
         "Template": "{{Body}}"
       },
       "Pipes": [
@@ -115,11 +133,17 @@
         }
       ]
     },
-    "TargetChannel": "#🥕",
+    "Target": {
+      "Base": {
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
+        "Template": "#🥕"
+      },
+      "Pipes": []
+    },
     "Type": 0,
     "Output": {
       "Base": {
-        "$type": "ChatBeet.Queuing.Rules.OutputGenerators.TemplatedOutputGenerator, ChatBeet.Queuing",
+        "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
         "Template": "{{Body}}"
       },
       "Pipes": []
