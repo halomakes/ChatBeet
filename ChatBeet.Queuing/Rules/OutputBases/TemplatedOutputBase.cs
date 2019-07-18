@@ -1,6 +1,6 @@
-﻿namespace ChatBeet.Queuing.Rules.OutputGenerators
+﻿namespace ChatBeet.Queuing.Rules.OutputBases
 {
-    public class TemplatedOutputGenerator : IOutputGenerator
+    public class PropertyTemplateOutputBase : IOutputBase
     {
         public string Template { get; set; }
 
