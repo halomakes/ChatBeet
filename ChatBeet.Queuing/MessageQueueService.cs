@@ -35,8 +35,8 @@ namespace ChatBeet.Queuing
                     {
                         AddOutput(new OutputMessage
                         {
-                            Channel = rule.TargetChannel,
-                            Content = GenerateContent(rule, message),
+                            Target = rule.Target.GenerateOutput(message),
+                            Content = rule.Output.GenerateOutput(message),
                             OutputType = rule.Type
                         });
                     }
@@ -46,17 +46,6 @@ namespace ChatBeet.Queuing
                     Console.WriteLine("Failed to apply rule: ", e);
                 }
             }
-        }
-
-        private string GenerateContent(Rule rule, IQueuedMessageSource message)
-        {
-            var text = rule.Output.GetOutput(message);
-            if (rule.Pipes != null)
-                foreach (var pipe in rule.Pipes)
-                {
-                    text = pipe.Transform(text);
-                }
-            return text;
         }
 
         public List<OutputMessage> PopAll()

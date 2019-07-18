@@ -10,6 +10,6 @@ namespace ChatBeet.Queuing
         [Required]
         public OutputType OutputType { get; set; }
         [Required]
-        public string Channel { get; set; }
+        public string Target { get; set; }
     }
 }
