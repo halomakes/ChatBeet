@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ChatBeet.Queuing.Rules.Conditions;
+using ChatBeet.Queuing.Rules.OutputGenerators;
+using ChatBeet.Queuing.Rules.OutputPipes;
+using System.Collections.Generic;
 
 namespace ChatBeet.Queuing.Rules
 {
