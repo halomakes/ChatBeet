@@ -9,7 +9,7 @@ namespace ChatBeet.Queuing.Rules.Conditions
 
         public override ViewableNode ToNode() => new ViewableNode
         {
-            Text = $"Title matches {Match}"
+            Text = $"Title matches \"{Match}\""
         };
     }
 }
