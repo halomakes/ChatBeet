@@ -1,6 +1,6 @@
 ﻿namespace ChatBeet.Queuing.Rules.OutputBases
 {
-    public class TemplatedOutputBase : IOutputBase
+    public class TemplatedOutputBase : IOutputBase, IViewable
     {
         public string Template { get; set; }
 
@@ -18,5 +18,10 @@
                 input = input.Replace($"{{{{{prop.Name}}}}}", prop.GetValue(message)?.ToString() ?? string.Empty);
             return input;
         }
+
+        public ViewableNode ToNode() => new ViewableNode
+        {
+            Text = $"Interpolate {Template}"
+        };
     }
 }
