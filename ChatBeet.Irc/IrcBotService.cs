@@ -55,7 +55,7 @@ namespace ChatBeet.Irc
 
         private async void Client_OnRegistered(object sender, EventArgs e)
         {
-            await JoinChannel(config.Channel);
+            await JoinDefaultChannels();
             isRegistered = true;
         }
 
@@ -67,7 +67,7 @@ namespace ChatBeet.Irc
 
         private async Task SendQueuedMessages()
         {
-            await JoinChannel(config.Channel);
+            await JoinDefaultChannels();
 
             var queue = queueService.ViewAll().ToList();
             foreach (var q in queue)
@@ -77,6 +77,12 @@ namespace ChatBeet.Irc
                 await client.SendAsync(GenerateMessage(q));
                 queueService.Remove(q);
             }
+        }
+
+        private async Task JoinDefaultChannels()
+        {
+            foreach (var c in config.Channels)
+                await JoinChannel(c);
         }
 
         private static IClientMessage GenerateMessage(OutputMessage q)
