@@ -7,10 +7,11 @@ namespace ChatBeet.Queuing
     {
         List<OutputMessage> PopAll();
         void Push(IQueuedMessageSource message);
-        List<OutputMessage> ViewAll();
+        IEnumerable<OutputMessage> ViewAll();
         event EventHandler MessageAdded;
-        List<IQueuedMessageSource> GetHistory();
-        List<OutputMessage> GetOutputHistory();
+        IEnumerable<IQueuedMessageSource> GetHistory();
+        IEnumerable<OutputMessage> GetOutputHistory();
         void PushRaw(OutputMessage message);
+        void Remove(OutputMessage message);
     }
 }

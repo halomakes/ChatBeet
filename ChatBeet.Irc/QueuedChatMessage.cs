@@ -18,7 +18,7 @@ namespace ChatBeet.Irc
             Body = msg.Message,
             Source = $"irc:{msg.From}",
             Target = msg.To,
-            TimeGenerated = DateTime.Now,
+            TimeGenerated = DateTime.UtcNow,
             Title = msg.Tokens.FirstOrDefault() ?? string.Empty
         };
     }
