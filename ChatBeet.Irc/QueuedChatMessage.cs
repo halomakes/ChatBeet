@@ -17,7 +17,7 @@ namespace ChatBeet.Irc
         {
             Body = msg.Message,
             Source = $"irc:{msg.From}",
-            Target = msg.To,
+            Target = msg.To.StartsWith("#") ? msg.To : msg.From,
             TimeGenerated = DateTime.UtcNow,
             Title = msg.Tokens.FirstOrDefault() ?? string.Empty
         };
