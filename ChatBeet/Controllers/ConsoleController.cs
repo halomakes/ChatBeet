@@ -33,8 +33,13 @@ namespace ChatBeet.Controllers
             return Ok();
         }
 
-        [HttpGet("rules")]
-        public ActionResult<IEnumerable<Rule>> GetRules() => Ok(configurationAccessor.GetRules());
+        [HttpGet("rules.json")]
+        public ActionResult<IEnumerable<Rule>> GetRules()
+        {
+            var rules = configurationAccessor.GetRules();
+            var text = JsonConvert.SerializeObject(rules, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+            return Content(text, "application/json");
+        }
 
         [HttpPatch("rules")]
         public ActionResult ReloadRules()
