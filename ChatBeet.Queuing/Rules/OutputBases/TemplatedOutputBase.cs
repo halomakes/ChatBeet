@@ -21,7 +21,7 @@
 
         public ViewableNode ToNode() => new ViewableNode
         {
-            Text = $"Interpolate {Template}"
+            Text = $"Interpolate \"{Template}\""
         };
     }
 }

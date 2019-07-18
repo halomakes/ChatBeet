@@ -14,7 +14,7 @@ namespace ChatBeet.Queuing.Rules.OutputPipes
 
         public ViewableNode ToNode() => new ViewableNode
         {
-            Text = $"Then replace {Pattern} with {OutputTemplate}" + (IgnoreCase ? ", ignoring case" : string.Empty)
+            Text = $"Then replace \"{Pattern}\" with \"{OutputTemplate}\"" + (IgnoreCase ? ", ignoring case" : string.Empty)
         };
     }
 }

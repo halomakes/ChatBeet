@@ -5,7 +5,7 @@
       "$type": "ChatBeet.Queuing.Rules.Conditions.TitleCondition, ChatBeet.Queuing",
       "Match": "^Finished Torrent \"(.*)\""
     },
-    "TargetChannel": {
+    "Target": {
       "Base": {
         "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
         "Template": "#🥕"
