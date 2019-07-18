@@ -29,8 +29,8 @@
 <h2>Manage Rules</h2>
 <a role="button" class="btn btn-outline-primary" asp-controller="Console" asp-action="GetRules" target="_blank">Download</a>
 <a role="button" class="btn btn-primary" asp-controller="Console" asp-action="ReloadRules" onclick="reloadConfig(event)">Reload</a>
-<form enctype="multipart/form-data" onsubmit="uploadConfig(event)" class="d-flex flex-row mt-2" asp-controller="Console" asp-action="SetRules">
-    <div class="custom-file">
+<form enctype="multipart/form-data" onsubmit="uploadConfig(event)" class="d-flex flex-row mt-2 align-items-center" asp-controller="Console" asp-action="SetRules">
+    <div class="custom-file flex-grow-1" style="width: unset;">
         <input type="file" class="custom-file-input" id="fileInput">
         <label class="custom-file-label">Choose file</label>
     </div>
