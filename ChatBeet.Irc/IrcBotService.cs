@@ -72,7 +72,8 @@ namespace ChatBeet.Irc
             var queue = queueService.ViewAll().ToList();
             foreach (var q in queue)
             {
-                await JoinChannel(q.Channel);
+                if (q.Target.StartsWith("#"))
+                    await JoinChannel(q.Target);
                 await client.SendAsync(GenerateMessage(q));
                 queueService.Remove(q);
             }
@@ -83,20 +84,18 @@ namespace ChatBeet.Irc
             switch (q.OutputType)
             {
                 case Queuing.Rules.OutputType.Announcement:
-                    return new NoticeMessage(q.Channel, q.Content);
+                    return new NoticeMessage(q.Target, q.Content);
                 case Queuing.Rules.OutputType.Activity:
-                    return new PrivMsgMessage(q.Channel, $"/me {q.Content}");
+                    return new PrivMsgMessage(q.Target, $"/me {q.Content}");
                 default:
-                    return new PrivMsgMessage(q.Channel, q.Content);
+                    return new PrivMsgMessage(q.Target, q.Content);
             }
         }
 
         public async Task JoinChannel(string channelName)
         {
             if (!client.Channels.Any(c => c.Name == channelName))
-            {
                 await client.SendAsync(new JoinMessage(channelName));
-            }
         }
 
         public async Task Connect()
