@@ -35,9 +35,9 @@ namespace ChatBeet.Queuing
             {
                 Save();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new ApplicationException("Rule configuration could not be read/written or is invalid.");
+                throw new ApplicationException("Rule configuration could not be read/written or is invalid.", e);
             }
         }
 
