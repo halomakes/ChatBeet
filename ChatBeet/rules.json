@@ -54,5 +54,67 @@
         "OutputTemplate": "Hello $1! 🙂"
       }
     ]
+  },
+  {
+    "label": "Stop! Wait a minute",
+    "condition": {
+      "$type": "ChatBeet.Queuing.Rules.AndCondition, ChatBeet.Queuing",
+      "conditions": [
+        {
+          "$type": "ChatBeet.Queuing.Rules.TitleCondition, ChatBeet.Queuing",
+          "match": "^PRIVMSG",
+          "ignoreCase": true
+        },
+        {
+          "$type": "ChatBeet.Queuing.Rules.SourceCondition, ChatBeet.Queuing",
+          "match": "^irc:(.*)",
+          "ignoreCase": false
+        },
+        {
+          "$type": "ChatBeet.Queuing.Rules.BodyCondition, ChatBeet.Queuing",
+          "match": "stop([?!.]+)?",
+          "ignoreCase": true
+        }
+      ]
+    },
+    "targetChannel": "#🥕",
+    "type": 0,
+    "output": {
+      "$type": "ChatBeet.Queuing.Rules.TemplatedOutputGenerator, ChatBeet.Queuing",
+      "template": "{{Body}}"
+    },
+    "pipes": [
+      {
+        "$type": "ChatBeet.Queuing.Rules.RegexPipe, ChatBeet.Queuing",
+        "pattern": "^stop([?!.]+)?",
+        "outputTemplate": "Wait a minute$1",
+        "ignoreCase": true
+      }
+    ]
+  },
+  {
+    "label": "Startup",
+    "condition": {
+      "$type": "ChatBeet.Queuing.Rules.AndCondition, ChatBeet.Queuing",
+      "conditions": [
+        {
+          "$type": "ChatBeet.Queuing.Rules.TargetCondition, ChatBeet.Queuing",
+          "match": "system",
+          "ignoreCase": true
+        },
+        {
+          "$type": "ChatBeet.Queuing.Rules.SourceCondition, ChatBeet.Queuing",
+          "match": "startup",
+          "ignoreCase": false
+        }
+      ]
+    },
+    "targetChannel": "#🥕",
+    "type": 0,
+    "output": {
+      "$type": "ChatBeet.Queuing.Rules.TemplatedOutputGenerator, ChatBeet.Queuing",
+      "template": "{{Body}}"
+    },
+    "pipes": []
   }
 ]
