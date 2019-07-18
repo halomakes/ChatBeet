@@ -20,5 +20,7 @@ namespace ChatBeet.Queuing.Rules.Conditions
             var regex = IgnoreCase ? new Regex(Match, RegexOptions.IgnoreCase) : new Regex(Match);
             return regex.IsMatch(value);
         }
+
+        public abstract ViewableNode ToNode();
     }
 }
