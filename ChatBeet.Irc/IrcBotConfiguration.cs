@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ChatBeet.Irc
 {
@@ -8,7 +6,7 @@ namespace ChatBeet.Irc
     {
         public string Server { get; set; }
         public int Port { get; set; }
-        public string Channel { get; set; }
+        public IEnumerable<string> Channels { get; set; }
         public string Nick { get; set; }
         public string Identity { get; set; }
     }
