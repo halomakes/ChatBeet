@@ -17,6 +17,7 @@ namespace ChatBeet.Irc
         private readonly IMessageQueueService queueService;
         private readonly IrcBotConfiguration config;
         private Timer timer;
+        private bool isRegistered = false;
 
         public IrcBotService(IMessageQueueService queueService,
             IOptions<IrcBotConfiguration> options)
@@ -55,22 +56,25 @@ namespace ChatBeet.Irc
         private async void Client_OnRegistered(object sender, EventArgs e)
         {
             await JoinChannel(config.Channel);
+            isRegistered = true;
         }
 
         private async void ProcessQueue(object state)
         {
-            await SendQueuedMessages();
+            if (isRegistered)
+                await SendQueuedMessages();
         }
 
         private async Task SendQueuedMessages()
         {
             await JoinChannel(config.Channel);
 
-            var queue = queueService.PopAll();
+            var queue = queueService.ViewAll().ToList();
             foreach (var q in queue)
             {
                 await JoinChannel(q.Channel);
                 await client.SendAsync(GenerateMessage(q));
+                queueService.Remove(q);
             }
         }
 

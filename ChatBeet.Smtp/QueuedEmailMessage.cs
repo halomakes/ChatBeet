@@ -16,9 +16,9 @@ namespace ChatBeet.Smtp
         public static QueuedEmailMessage FromMimeMessage(MimeMessage msg) => new QueuedEmailMessage
         {
             Body = msg?.TextBody,
-            Source = ((MailboxAddress)msg.From?.FirstOrDefault())?.Address,
+            Source = "email:" + (((MailboxAddress)msg.From?.FirstOrDefault())?.Address ?? string.Empty),
             Target = ((MailboxAddress)msg.To?.FirstOrDefault())?.Address,
-            TimeGenerated = msg.Date.DateTime,
+            TimeGenerated = DateTime.Now,
             Title = msg.Subject
         };
     }
