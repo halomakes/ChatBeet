@@ -5,7 +5,7 @@
       "$type": "ChatBeet.Queuing.Rules.Conditions.TitleCondition, ChatBeet.Queuing",
       "Match": "^Finished Torrent \"(.*)\""
     },
-    "TargetChannel": {
+    "Target": {
       "Base": {
         "$type": "ChatBeet.Queuing.Rules.OutputBases.TemplatedOutputBase, ChatBeet.Queuing",
         "Template": "#🥕"
@@ -88,7 +88,7 @@
         },
         {
           "$type": "ChatBeet.Queuing.Rules.Conditions.BodyCondition, ChatBeet.Queuing",
-          "Match": "stop([?!.]+)?",
+          "Match": "st(o|ah)p([?!.]+)?",
           "IgnoreCase": true
         }
       ]
@@ -109,8 +109,14 @@
       "Pipes": [
         {
           "$type": "ChatBeet.Queuing.Rules.OutputPipes.RegexPipe, ChatBeet.Queuing",
-          "pattern": "^stop([?!.]+)?",
-          "outputTemplate": "Wait a minute$1",
+          "pattern": "st(o|ah)p([?!.]+)?",
+          "outputTemplate": "W$1it $1 minute$2",
+          "IgnoreCase": true
+        },
+        {
+          "$type": "ChatBeet.Queuing.Rules.OutputPipes.RegexPipe, ChatBeet.Queuing",
+          "pattern": "o",
+          "outputTemplate": "a",
           "IgnoreCase": true
         }
       ]

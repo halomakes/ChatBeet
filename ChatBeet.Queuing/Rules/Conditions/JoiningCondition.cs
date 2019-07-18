@@ -7,5 +7,7 @@ namespace ChatBeet.Queuing.Rules.Conditions
         public IEnumerable<ICondition> Conditions { get; set; }
 
         public abstract bool Matches(IQueuedMessageSource message);
+
+        public abstract ViewableNode ToNode();
     }
 }
