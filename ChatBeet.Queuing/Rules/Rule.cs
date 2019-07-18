@@ -24,17 +24,17 @@ namespace ChatBeet.Queuing.Rules
                 yield return new ViewableNode
                 {
                     Text = "If",
-                    Children = new List<ViewableNode> { Condition.ToNode() }
+                    Children = new List<ViewableNode> { Condition?.ToNode() }
                 };
                 yield return new ViewableNode
                 {
                     Text = "Send",
-                    Children = new List<ViewableNode> { Output.ToNode() }
+                    Children = new List<ViewableNode> { Output?.ToNode() }
                 };
                 yield return new ViewableNode
                 {
                     Text = "To",
-                    Children = new List<ViewableNode> { Target.ToNode() }
+                    Children = new List<ViewableNode> { Target?.ToNode() }
                 };
                 yield return new ViewableNode
                 {
