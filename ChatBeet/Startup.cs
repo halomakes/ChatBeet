@@ -1,4 +1,5 @@
 using ChatBeet.Irc;
+using ChatBeet.Models;
 using ChatBeet.Queuing;
 using ChatBeet.Smtp;
 using Microsoft.AspNetCore.Builder;
@@ -40,7 +41,7 @@ namespace ChatBeet
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
-                          ILoggerFactory loggerFactory)
+                          ILoggerFactory loggerFactory, IMessageQueueService queue)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +61,8 @@ namespace ChatBeet
             app.UseCookiePolicy();
 
             app.UseMvc();
+
+            queue.Push(new QueuedStartupMessage());
         }
     }
 }

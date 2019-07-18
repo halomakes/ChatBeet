@@ -21,9 +21,9 @@ namespace ChatBeet.Queuing
 
         public event EventHandler MessageAdded;
 
-        public List<OutputMessage> ViewAll() => queuedMessages;
-        public List<IQueuedMessageSource> GetHistory() => messageHistory;
-        public List<OutputMessage> GetOutputHistory() => outputHistory;
+        public IEnumerable<OutputMessage> ViewAll() => queuedMessages;
+        public IEnumerable<IQueuedMessageSource> GetHistory() => messageHistory;
+        public IEnumerable<OutputMessage> GetOutputHistory() => outputHistory;
 
         private void ApplyRules(IQueuedMessageSource message)
         {
@@ -65,6 +65,8 @@ namespace ChatBeet.Queuing
             queuedMessages = new List<OutputMessage>();
             return messages;
         }
+
+        public void Remove(OutputMessage message) => queuedMessages.Remove(message);
 
         private void AddOutput(OutputMessage message)
         {
