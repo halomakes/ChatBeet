@@ -21,6 +21,12 @@ namespace ChatBeet.DefaultRules.Rules
                 Target = config.LogChannel
             };
 
+            yield return new OutboundIrcMessage
+            {
+                Content = $"Base exception: {incomingMessage.Exception.Message}",
+                Target = config.LogChannel
+            };
+
             var depth = 0;
             var currentException = incomingMessage.Exception;
 
@@ -32,7 +38,6 @@ namespace ChatBeet.DefaultRules.Rules
                 yield return new OutboundIrcMessage
                 {
                     Content = $"Inner exception: {currentException.Message}",
-                    OutputType = IrcMessageType.Message,
                     Target = config.LogChannel
                 };
             }

@@ -2,11 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>c79cf495-2496-4295-ad2d-49b3d2c73886</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ChatBeet.DefaultRules\ChatBeet.DefaultRules.csproj" />
     <ProjectReference Include="..\ChatBeet.Irc\ChatBeet.Irc.csproj" />
+    <ProjectReference Include="..\DtellaRules\DtellaRules.csproj" />
   </ItemGroup>
 
   <ItemGroup>
