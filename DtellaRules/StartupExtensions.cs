@@ -1,7 +1,9 @@
 ﻿using ChatBeet;
+using DtellaRules.Data;
 using DtellaRules.Rules;
 using DtellaRules.Services;
 using IF.Lastfm.Core.Api;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -18,6 +20,7 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, AutoYatoRule>();
             services.AddTransient<IMessageRule, ArtistRule>();
             services.AddTransient<IMessageRule, TrackRule>();
+            services.AddTransient<IMessageRule, MemoryCellRule>();
 
             services.Configure<DtellaRuleConfiguration>(c => adminConfigSection.Bind(c));
             services.AddTransient<RecentTweetsService>();
@@ -27,6 +30,7 @@ namespace DtellaRules
                 return new LastfmClient(config.ClientId, config.ClientSecret);
             });
             services.AddTransient<LastFmService>();
+            services.AddDbContext<DtellaContext>(ServiceLifetime.Transient);
 
             return services;
         }

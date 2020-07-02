@@ -1,6 +1,7 @@
 using ChatBeet.DefaultRules;
 using ChatBeet.Irc;
 using DtellaRules;
+using DtellaRules.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -30,7 +31,7 @@ namespace ChatBeet.Server
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DtellaContext db)
         {
             if (env.IsDevelopment())
             {
@@ -47,6 +48,8 @@ namespace ChatBeet.Server
             {
                 endpoints.MapControllers();
             });
+
+            db.Database.EnsureCreated();
         }
     }
 }

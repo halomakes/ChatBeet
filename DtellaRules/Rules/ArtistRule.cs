@@ -94,11 +94,11 @@ namespace DtellaRules.Rules
                     if (track.Duration.HasValue)
                         result += $" ({track.Duration})";
                     if (!string.IsNullOrEmpty(track.AlbumName) || !string.IsNullOrEmpty(track.ArtistName))
-                        result += " | ";
+                        result += " |";
                     if (!string.IsNullOrEmpty(track.AlbumName))
-                        result += $"from {track.AlbumName}";
+                        result += $" from {track.AlbumName}";
                     if (!string.IsNullOrEmpty(track.ArtistName))
-                        result += $"by {track.ArtistName}";
+                        result += $" by {track.ArtistName}";
                     result += $" | {track.Url}";
                     yield return new OutboundIrcMessage
                     {
