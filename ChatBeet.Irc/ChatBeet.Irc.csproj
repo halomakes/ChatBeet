@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ChatBeet.Queuing\ChatBeet.Queuing.csproj" />
+    <ProjectReference Include="..\ChatBeet\ChatBeet.csproj" />
     <ProjectReference Include="..\NetIRC\NetIRC.csproj" />
   </ItemGroup>
 
