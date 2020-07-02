@@ -1,20 +1,27 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace ChatBeet
 {
     public interface IMessageRule
     {
-        Task<List<OutboundIrcMessage>> Respond(IInboundMessage incomingMessage);
+        IAsyncEnumerable<OutboundIrcMessage> Respond(IInboundMessage incomingMessage);
     }
 
     public interface IMessageRule<TMessage> : IMessageRule where TMessage : IInboundMessage
     {
-        Task<List<OutboundIrcMessage>> Respond(TMessage incomingMessage);
+        IAsyncEnumerable<OutboundIrcMessage> Respond(TMessage incomingMessage);
+    }
 
-        new Task<List<OutboundIrcMessage>> Respond(IInboundMessage incomingMessage) =>
+    public abstract class MessageRuleBase<TMessage> : IMessageRule<TMessage>, IMessageRule where TMessage : IInboundMessage
+    {
+        public abstract IAsyncEnumerable<OutboundIrcMessage> Respond(TMessage incomingMessage);
+
+        public IAsyncEnumerable<OutboundIrcMessage> Respond(IInboundMessage incomingMessage) =>
             incomingMessage is TMessage message
             ? Respond(message)
-            : Task.FromResult(new List<OutboundIrcMessage>());
+            : EmptyResult();
+
+        protected IAsyncEnumerable<OutboundIrcMessage> EmptyResult() => AsyncEnumerable.Empty<OutboundIrcMessage>();
     }
 }
