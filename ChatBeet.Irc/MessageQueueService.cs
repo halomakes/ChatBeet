@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,13 +13,13 @@ namespace ChatBeet.Irc
         private List<OutboundIrcMessage> queuedMessages = new List<OutboundIrcMessage>();
         private List<IInboundMessage> messageHistory = new List<IInboundMessage>();
         private List<OutboundIrcMessage> outputHistory = new List<OutboundIrcMessage>();
-        private readonly IEnumerable<IMessageRule> rules;
+        private readonly IServiceProvider serviceProvider;
 
         public event EventHandler MessageAdded;
 
-        public MessageQueueService(IEnumerable<IMessageRule> rules)
+        public MessageQueueService(IServiceProvider serviceProvider)
         {
-            this.rules = rules;
+            this.serviceProvider = serviceProvider;
         }
 
         public IEnumerable<OutboundIrcMessage> ViewAll() => queuedMessages;
@@ -27,6 +28,7 @@ namespace ChatBeet.Irc
 
         private Task ApplyRules(IInboundMessage message)
         {
+            var rules = serviceProvider.GetServices<IMessageRule>();
             var matchingRuleType = typeof(IMessageRule<>).MakeGenericType(message.GetType());
             var applicableRules = rules.Where(r => matchingRuleType.IsAssignableFrom(r.GetType()));
             var ruleTasks = applicableRules.Select(ExecuteRuleAsync);

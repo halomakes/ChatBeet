@@ -1,7 +1,6 @@
 ﻿using ChatBeet;
-using LinqToTwitter;
+using DtellaRules.Services;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,12 +8,12 @@ namespace DtellaRules.Rules
 {
     public class AstolfoRule : MessageRuleBase<IrcMessage>
     {
-        private readonly DtellaRuleConfiguration.TwitterConfiguration twitterConfig;
         private readonly ChatBeetConfiguration config;
+        private readonly TwitterImageService twitterImageService;
 
-        public AstolfoRule(IOptions<DtellaRuleConfiguration> twitterOptions, IOptions<ChatBeetConfiguration> options)
+        public AstolfoRule(TwitterImageService twitterImageService, IOptions<ChatBeetConfiguration> options)
         {
-            twitterConfig = twitterOptions.Value.Twitter;
+            this.twitterImageService = twitterImageService;
             config = options.Value;
         }
 
@@ -22,27 +21,7 @@ namespace DtellaRules.Rules
         {
             if (incomingMessage.Content == $"{config.CommandPrefix}astolfo")
             {
-                var auth = new ApplicationOnlyAuthorizer
-                {
-                    CredentialStore = new InMemoryCredentialStore()
-                    {
-                        ConsumerKey = twitterConfig.ConsumerKey,
-                        ConsumerSecret = twitterConfig.ConsumerSecret
-                    }
-                };
-
-                await auth.AuthorizeAsync();
-                var twitterContext = new TwitterContext(auth);
-                var random = new Random();
-
-                var tweets = await twitterContext.Status
-                    .Where(s => s.Type == StatusType.User)
-                    .Where(s => s.ScreenName == "astolfomedia")
-                    .Where(s => s.Entities.MediaEntities.Any())
-                    .Take(10)
-                    .ToListAsync();
-
-                var tweet = tweets.OrderBy(_ => random.Next()).FirstOrDefault();
+                var tweet = await twitterImageService.GetImageTweet("astolfomedia");
 
                 var imageUrl = tweet.Entities?.MediaEntities?.FirstOrDefault()?.MediaUrlHttps;
                 if (!string.IsNullOrEmpty(imageUrl))
