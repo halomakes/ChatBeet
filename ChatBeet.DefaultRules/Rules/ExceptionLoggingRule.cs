@@ -5,9 +5,9 @@ namespace ChatBeet.DefaultRules.Rules
 {
     public class ExceptionLoggingRule : MessageRuleBase<ExceptionMessage>, IMessageRule<ExceptionMessage>
     {
-        private readonly BotAdminConfiguration config;
+        private readonly DefaultRulesConfiguration config;
 
-        public ExceptionLoggingRule(IOptions<BotAdminConfiguration> options)
+        public ExceptionLoggingRule(IOptions<DefaultRulesConfiguration> options)
         {
             config = options.Value;
         }

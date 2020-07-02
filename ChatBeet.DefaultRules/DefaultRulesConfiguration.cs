@@ -1,6 +1,6 @@
 ﻿namespace ChatBeet.DefaultRules
 {
-    public class BotAdminConfiguration
+    public class DefaultRulesConfiguration
     {
         public string LogChannel { get; set; }
     }
