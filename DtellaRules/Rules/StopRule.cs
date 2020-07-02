@@ -8,7 +8,7 @@ namespace DtellaRules.Rules
     {
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex(@"st(o|ah)p([?!.]+)?", RegexOptions.IgnoreCase);
+            var rgx = new Regex(@"^st(o|ah)p([?!.]+)?$", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Content))
             {
                 yield return new OutboundIrcMessage

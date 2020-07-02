@@ -19,7 +19,7 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($@"{config.BotName}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
+            var rgx = new Regex($@"^{config.BotName}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Content))
             {
                 var topic = rgx.Replace(incomingMessage.Content, @"$1");
