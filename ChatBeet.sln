@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet.Server", "ChatBeet
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet.DefaultRules", "ChatBeet.DefaultRules\ChatBeet.DefaultRules.csproj", "{81313962-B833-4B39-83D6-58AF62D55CAA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet.Irc", "ChatBeet.Irc\ChatBeet.Irc.csproj", "{928421D6-48C2-4277-9029-E647A38FBF0B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetIRC", "NetIRC\NetIRC.csproj", "{808516C7-3455-4684-977A-AC2C87A23038}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{81313962-B833-4B39-83D6-58AF62D55CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81313962-B833-4B39-83D6-58AF62D55CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81313962-B833-4B39-83D6-58AF62D55CAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{928421D6-48C2-4277-9029-E647A38FBF0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{928421D6-48C2-4277-9029-E647A38FBF0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{928421D6-48C2-4277-9029-E647A38FBF0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{928421D6-48C2-4277-9029-E647A38FBF0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{808516C7-3455-4684-977A-AC2C87A23038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{808516C7-3455-4684-977A-AC2C87A23038}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{808516C7-3455-4684-977A-AC2C87A23038}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{808516C7-3455-4684-977A-AC2C87A23038}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

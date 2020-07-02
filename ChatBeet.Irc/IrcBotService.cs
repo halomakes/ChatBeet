@@ -1,5 +1,4 @@
-﻿using ChatBeet.Queuing;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NetIRC;
 using NetIRC.Connection;
@@ -14,12 +13,12 @@ namespace ChatBeet.Irc
     internal class IrcBotService : IHostedService, IDisposable
     {
         private readonly Client client;
-        private readonly IMessageQueueService queueService;
+        private readonly MessageQueueService queueService;
         private readonly IrcBotConfiguration config;
         private Timer timer;
         private bool isRegistered = false;
 
-        public IrcBotService(IMessageQueueService queueService,
+        public IrcBotService(MessageQueueService queueService,
             IOptions<IrcBotConfiguration> options)
         {
             this.queueService = queueService;
@@ -37,7 +36,7 @@ namespace ChatBeet.Irc
         {
             try
             {
-                queueService.Push(QueuedChatMessage.FromChannelMessage(e.IRCMessage));
+                queueService.Push(ConvertInboundIrcMessage(e.IRCMessage));
             }
             catch (Exception) { }
         }
@@ -85,18 +84,26 @@ namespace ChatBeet.Irc
                 await JoinChannel(c);
         }
 
-        private static IClientMessage GenerateMessage(OutputMessage q)
+        private static IClientMessage GenerateMessage(OutboundIrcMessage message)
         {
-            switch (q.OutputType)
+            switch (message.OutputType)
             {
-                case Queuing.Rules.OutputType.Announcement:
-                    return new NoticeMessage(q.Target, q.Content);
-                case Queuing.Rules.OutputType.Activity:
-                    return new PrivMsgMessage(q.Target, $"/me {q.Content}");
+                case IrcMessageType.Announcement:
+                    return new NoticeMessage(message.Target, message.Content);
+                case IrcMessageType.Activity:
+                    return new PrivMsgMessage(message.Target, $"/me {message.Content}");
                 default:
-                    return new PrivMsgMessage(q.Target, q.Content);
+                    return new PrivMsgMessage(message.Target, message.Content);
             }
         }
+
+        private static IInboundMessage ConvertInboundIrcMessage(PrivMsgMessage message) => new IrcMessage
+        {
+            DateRecieved = DateTime.Now,
+            Channel = message.To,
+            Sender = message.From,
+            Content = message.Message
+        };
 
         public async Task JoinChannel(string channelName)
         {
