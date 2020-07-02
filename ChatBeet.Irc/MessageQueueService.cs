@@ -37,9 +37,8 @@ namespace ChatBeet.Irc
             {
                 try
                 {
-                    var resultingMessages = await rule.Respond(message);
-                    if (resultingMessages != null)
-                        resultingMessages.ForEach(AddOutput);
+                    await foreach (var responseMessage in rule.Respond(message))
+                        AddOutput(responseMessage);
                 }
                 catch (Exception e)
                 {
