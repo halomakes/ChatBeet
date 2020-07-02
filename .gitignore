@@ -217,3 +217,5 @@ FakesAssemblies/
 _Pvt_Extensions
 Logs/
 ChatBeet.Server/dtella.db
+
+ChatBeet.Server/appsettings.json
