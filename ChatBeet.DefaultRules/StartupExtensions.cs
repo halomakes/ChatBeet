@@ -7,8 +7,8 @@ namespace ChatBeet.DefaultRules
     {
         public static IServiceCollection AddDefaultRules(this IServiceCollection services)
         {
-            services.AddSingleton<IMessageRule, HelloRule>();
-            services.AddSingleton<IMessageRule, ExceptionLoggingRule>();
+            services.AddTransient<IMessageRule, HelloRule>();
+            services.AddTransient<IMessageRule, ExceptionLoggingRule>();
 
             return services;
         }
