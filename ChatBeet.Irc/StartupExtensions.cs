@@ -9,7 +9,7 @@ namespace ChatBeet.Irc
         public static IServiceCollection AddIrcBot(this IServiceCollection services, IConfigurationSection configSection)
         {
             services.Configure<IrcBotConfiguration>(c => configSection.Bind(c));
-
+            services.AddSingleton<MessageQueueService>();
             services.AddHostedService<IrcBotService>();
             return services;
         }
@@ -22,6 +22,7 @@ namespace ChatBeet.Irc
             }
 
             services.Configure(configure);
+            services.AddSingleton<MessageQueueService>();
             services.AddHostedService<IrcBotService>();
             return services;
         }
