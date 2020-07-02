@@ -65,4 +65,42 @@ namespace DtellaRules.Rules
             }
         }
     }
+
+    public class TrackRule : MessageRuleBase<IrcMessage>
+    {
+        private readonly ChatBeetConfiguration config;
+        private readonly LastFmService lastFm;
+
+        public TrackRule(LastFmService lastFm, IOptions<ChatBeetConfiguration> options)
+        {
+            this.lastFm = lastFm;
+            config = options.Value;
+        }
+
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        {
+            var rgx = new Regex($"^{config.CommandPrefix}track (.*) by (.*)");
+            var match = rgx.Match(incomingMessage.Content);
+            if (match.Success)
+            {
+                var trackName = match.Groups[1].Value;
+                var artistName = match.Groups[2].Value;
+
+                var track = await lastFm.GetTrackInfo(trackName, artistName);
+
+                if (track != null)
+                    yield return new OutboundIrcMessage
+                    {
+                        Content = $"{track.Name} ({track.Duration}) - from {track.AlbumName} by {track.ArtistName} - {track.Url}",
+                        Target = incomingMessage.Channel
+                    };
+                else
+                    yield return new OutboundIrcMessage
+                    {
+                        Content = "Sorry, couldn't find that track.",
+                        Target = incomingMessage.Channel
+                    };
+            }
+        }
+    }
 }

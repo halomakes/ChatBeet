@@ -17,6 +17,7 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, RecentTweetRule>();
             services.AddTransient<IMessageRule, AutoYatoRule>();
             services.AddTransient<IMessageRule, ArtistRule>();
+            services.AddTransient<IMessageRule, TrackRule>();
 
             services.Configure<DtellaRuleConfiguration>(c => adminConfigSection.Bind(c));
             services.AddTransient<RecentTweetsService>();
