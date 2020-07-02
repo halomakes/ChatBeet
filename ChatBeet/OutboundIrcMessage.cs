@@ -8,7 +8,7 @@ namespace ChatBeet
 
         public string Content { get; set; }
 
-        public IrcMessageType OutputType { get; set; }
+        public IrcMessageType OutputType { get; set; } = IrcMessageType.Message;
 
         public DateTime DateGenerated { get; set; } = DateTime.Now;
     }
