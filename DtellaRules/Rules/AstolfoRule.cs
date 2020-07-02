@@ -9,9 +9,9 @@ namespace DtellaRules.Rules
     public class AstolfoRule : MessageRuleBase<IrcMessage>
     {
         private readonly ChatBeetConfiguration config;
-        private readonly TwitterImageService twitterImageService;
+        private readonly RecentTweetsService twitterImageService;
 
-        public AstolfoRule(TwitterImageService twitterImageService, IOptions<ChatBeetConfiguration> options)
+        public AstolfoRule(RecentTweetsService twitterImageService, IOptions<ChatBeetConfiguration> options)
         {
             this.twitterImageService = twitterImageService;
             config = options.Value;
@@ -21,7 +21,7 @@ namespace DtellaRules.Rules
         {
             if (incomingMessage.Content == $"{config.CommandPrefix}astolfo")
             {
-                var tweet = await twitterImageService.GetImageTweet("astolfomedia");
+                var tweet = await twitterImageService.GetRecentTweet("astolfomedia");
 
                 var imageUrl = tweet.Entities?.MediaEntities?.FirstOrDefault()?.MediaUrlHttps;
                 if (!string.IsNullOrEmpty(imageUrl))

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace DtellaRules.Services
 {
-    public class TwitterImageService
+    public class RecentTweetsService
     {
         private readonly DtellaRuleConfiguration.TwitterConfiguration twitterConfig;
 
-        public TwitterImageService(IOptions<DtellaRuleConfiguration> twitterOptions)
+        public RecentTweetsService(IOptions<DtellaRuleConfiguration> twitterOptions)
         {
             twitterConfig = twitterOptions.Value.Twitter;
         }
@@ -19,8 +19,10 @@ namespace DtellaRules.Services
         /// Get a random recent tweet with an image from an account on Twitter
         /// </summary>
         /// <param name="handle">Handle of username to look up</param>
+        /// <param name="count">Number of results to fetch</param>
+        /// <param name="randomize">Whether or not to pick a random result from the set</param>
         /// <returns>Recent tweet with an image attached</returns>
-        public async Task<Status> GetImageTweet(string handle)
+        public async Task<Status> GetRecentTweet(string handle, bool mediaOnly = true, int count = 10, bool randomize = true)
         {
             var auth = new ApplicationOnlyAuthorizer
             {
@@ -38,11 +40,15 @@ namespace DtellaRules.Services
             var tweets = await twitterContext.Status
                 .Where(s => s.Type == StatusType.User)
                 .Where(s => s.ScreenName == handle)
-                .Where(s => s.Entities.MediaEntities.Any())
-                .Take(10)
+                .Where(s => s.RetweetedStatus.StatusID == 0)
+                .Where(s => s.InReplyToStatusID == 0)
+                .Where(s => !mediaOnly || s.Entities.MediaEntities.Any())
+                .Take(count)
                 .ToListAsync();
 
-            return tweets.OrderBy(_ => random.Next()).FirstOrDefault();
+            return randomize
+                ? tweets.OrderBy(_ => random.Next()).FirstOrDefault()
+                : tweets.FirstOrDefault();
         }
     }
 }

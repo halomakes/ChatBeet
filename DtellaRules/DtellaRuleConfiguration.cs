@@ -1,8 +1,11 @@
-﻿namespace DtellaRules
+﻿using System.Collections.Generic;
+
+namespace DtellaRules
 {
     public class DtellaRuleConfiguration
     {
         public TwitterConfiguration Twitter { get; set; }
+        public Dictionary<string, string> Urls { get; set; }
 
         public class TwitterConfiguration
         {
