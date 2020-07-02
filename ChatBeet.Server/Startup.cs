@@ -24,7 +24,8 @@ namespace ChatBeet.Server
             services.AddControllers();
 
             services.AddIrcBot(Configuration.GetSection("Irc"));
-            services.AddDefaultRules(Configuration.GetSection("Rules:Default"));
+            services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Bot"));
+            services.AddDefaultRules();
             services.AddDtellaRules(Configuration.GetSection("Rules:Dtella"));
         }
 
