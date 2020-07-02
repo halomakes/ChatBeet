@@ -89,11 +89,23 @@ namespace DtellaRules.Rules
                 var track = await lastFm.GetTrackInfo(trackName, artistName);
 
                 if (track != null)
+                {
+                    var result = track.Name;
+                    if (track.Duration.HasValue)
+                        result += $" ({track.Duration})";
+                    if (!string.IsNullOrEmpty(track.AlbumName) || !string.IsNullOrEmpty(track.ArtistName))
+                        result += " | ";
+                    if (!string.IsNullOrEmpty(track.AlbumName))
+                        result += $"from {track.AlbumName}";
+                    if (!string.IsNullOrEmpty(track.ArtistName))
+                        result += $"by {track.ArtistName}";
+                    result += $" | {track.Url}";
                     yield return new OutboundIrcMessage
                     {
-                        Content = $"{track.Name} ({track.Duration}) - from {track.AlbumName} by {track.ArtistName} - {track.Url}",
+                        Content = result,
                         Target = incomingMessage.Channel
                     };
+                }
                 else
                     yield return new OutboundIrcMessage
                     {
