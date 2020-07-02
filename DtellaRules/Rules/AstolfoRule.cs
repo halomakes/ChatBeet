@@ -10,15 +10,17 @@ namespace DtellaRules.Rules
     public class AstolfoRule : MessageRuleBase<IrcMessage>
     {
         private readonly DtellaRuleConfiguration.TwitterConfiguration twitterConfig;
+        private readonly ChatBeetConfiguration config;
 
-        public AstolfoRule(IOptions<DtellaRuleConfiguration> options)
+        public AstolfoRule(IOptions<DtellaRuleConfiguration> twitterOptions, IOptions<ChatBeetConfiguration> options)
         {
-            twitterConfig = options.Value.Twitter;
+            twitterConfig = twitterOptions.Value.Twitter;
+            config = options.Value;
         }
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            if (incomingMessage.Content == "🥕 astolfo")
+            if (incomingMessage.Content == $"{config.CommandPrefix}astolfo")
             {
                 var auth = new ApplicationOnlyAuthorizer
                 {
@@ -37,7 +39,7 @@ namespace DtellaRules.Rules
                     .Where(s => s.Type == StatusType.User)
                     .Where(s => s.ScreenName == "astolfomedia")
                     .Where(s => s.Entities.MediaEntities.Any())
-                    .Take(5)
+                    .Take(10)
                     .ToListAsync();
 
                 var tweet = tweets.OrderBy(_ => random.Next()).FirstOrDefault();
