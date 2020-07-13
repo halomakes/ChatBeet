@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ChatBeet\ChatBeet.csproj" />
     <ProjectReference Include="..\NetIRC\NetIRC.csproj" />
+    <ProjectReference Include="..\ChatBeet.Irc\ChatBeet.Irc.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,6 @@ using DtellaRules.Data;
 using DtellaRules.Rules;
 using DtellaRules.Services;
 using IF.Lastfm.Core.Api;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,6 +20,7 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, ArtistRule>();
             services.AddTransient<IMessageRule, TrackRule>();
             services.AddTransient<IMessageRule, MemoryCellRule>();
+            services.AddTransient<IMessageRule, KerningRule>();
 
             services.Configure<DtellaRuleConfiguration>(c => adminConfigSection.Bind(c));
             services.AddTransient<RecentTweetsService>();
