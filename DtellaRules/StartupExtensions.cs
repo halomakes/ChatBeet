@@ -21,6 +21,7 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, TrackRule>();
             services.AddTransient<IMessageRule, MemoryCellRule>();
             services.AddTransient<IMessageRule, KerningRule>();
+            services.AddTransient<IMessageRule, MockingTextRule>();
 
             services.Configure<DtellaRuleConfiguration>(c => adminConfigSection.Bind(c));
             services.AddTransient<RecentTweetsService>();
