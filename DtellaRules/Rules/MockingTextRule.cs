@@ -21,7 +21,7 @@ namespace DtellaRules.Rules
 
             yield return new OutboundIrcMessage
             {
-                Content = $"<{nick}> {stupidifyalized}",
+                Content = $"<{lookupMessage.Sender}> {stupidifyalized}",
                 Target = incomingMessage.Channel
             };
 
