@@ -2,41 +2,25 @@ using ChatBeet;
 using ChatBeet.Irc;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class KerningRule : MessageRuleBase<IrcMessage>
+    public class KerningRule : NickLookupRule
     {
-        private readonly ChatBeetConfiguration config;
-        private readonly MessageQueueService messageQueueService;
-
-        public KerningRule(MessageQueueService messageQueueService, IOptions<ChatBeetConfiguration> options)
+        public KerningRule(MessageQueueService messageQueueService, IOptions<ChatBeetConfiguration> options) : base(messageQueueService, options)
         {
-            this.messageQueueService = messageQueueService;
-            config = options.Value;
+            CommandName = "kern";
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        protected override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage, string nick, IrcMessage lookupMessage)
         {
-            var rgx = new Regex($@"^{config.CommandPrefix}kern ([A-z0-9-\[\]\\\^\{{\}}]*)$");
-            var match = rgx.Match(incomingMessage.Content);
-            if (match.Success)
+            var spaced = string.Join(" ", lookupMessage.Content.ToCharArray()).ToUpper();
+
+            yield return new OutboundIrcMessage
             {
-                var nick = match.Groups[1].Value;
-                var message = messageQueueService.GetLatestMessage(nick, incomingMessage);
-
-                if (message != null)
-                {
-                    var spaced = string.Join(" ", message.Content.ToCharArray()).ToUpper();
-
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"<{nick}> {spaced}",
-                        Target = incomingMessage.Channel
-                    };
-                }
-            }
+                Content = $"<{nick}> {spaced}",
+                Target = incomingMessage.Channel
+            };
         }
     }
 }
