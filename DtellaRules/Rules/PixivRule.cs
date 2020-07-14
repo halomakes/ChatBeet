@@ -42,11 +42,11 @@ namespace DtellaRules.Rules
                     return await pixiv.GetSearchIllustAsync(search);
                 });
 
-                var uri = PickUri(results);
-                if (uri != null)
+                var text = PickImage(results);
+                if (text != null)
                     yield return new OutboundIrcMessage
                     {
-                        Content = uri.ToString(),
+                        Content = text,
                         Target = incomingMessage.Channel
                     };
                 else
@@ -56,12 +56,12 @@ namespace DtellaRules.Rules
                         Target = incomingMessage.Channel
                     };
 
-                static Uri PickUri(SearchIllustResult searchResults)
+                static string PickImage(SearchIllustResult searchResults)
                 {
                     if (searchResults?.Illusts?.Any() ?? false)
                     {
-                        var urls = searchResults.Illusts.PickRandom()?.ImageUrls;
-                        return urls.Original ?? urls.Large ?? urls.Medium ?? urls.SquareMedium;
+                        var id = searchResults.Illusts.PickRandom()?.Id;
+                        return $"https://www.pixiv.net/en/artworks/{id}";
                     }
                     return null;
                 }
