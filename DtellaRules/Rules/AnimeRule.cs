@@ -37,12 +37,6 @@ namespace DtellaRules.Rules
                         Content = $"{IrcValues.BOLD}{media.EnglishTitle}{IrcValues.RESET} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {score} • {media.Url}",
                         Target = incomingMessage.Channel
                     };
-
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = media.Description?.StripMarkdown(),
-                        Target = incomingMessage.Channel
-                    };
                 }
                 else
                 {
