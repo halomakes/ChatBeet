@@ -40,6 +40,8 @@ namespace DtellaRules
             services.AddTransient<LastFmService>();
             services.AddDbContext<DtellaContext>(ServiceLifetime.Transient);
 
+            services.AddMemoryCache();
+
             return services;
         }
     }
