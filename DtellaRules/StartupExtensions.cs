@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Miki.Anilist;
+using PixivCS;
 
 namespace DtellaRules
 {
@@ -25,7 +26,11 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, MockingTextRule>();
             services.AddTransient<IMessageRule, WaifuRule>();
             services.AddTransient<IMessageRule, AnimeRule>();
+            services.AddTransient<IMessageRule, DeviantartRule>();
+            services.AddTransient<IMessageRule, PixivRule>();
 
+            services.AddTransient<PixivAppAPI>();
+            services.AddTransient<DeviantartService>();
             services.AddTransient<AnilistClient>();
             services.AddTransient<AnilistService>();
             services.Configure<DtellaRuleConfiguration>(c => adminConfigSection.Bind(c));
@@ -37,6 +42,8 @@ namespace DtellaRules
             });
             services.AddTransient<LastFmService>();
             services.AddDbContext<DtellaContext>(ServiceLifetime.Transient);
+
+            services.AddMemoryCache();
 
             return services;
         }

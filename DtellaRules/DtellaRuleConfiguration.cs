@@ -6,6 +6,7 @@ namespace DtellaRules
     {
         public TwitterConfiguration Twitter { get; set; }
         public LastFmConfiguration LastFm { get; set; }
+        public PixivConfiguration Pixiv { get; set; }
         public Dictionary<string, string> Urls { get; set; }
 
         public class TwitterConfiguration
@@ -20,6 +21,12 @@ namespace DtellaRules
         {
             public string ClientId { get; set; }
             public string ClientSecret { get; set; }
+        }
+
+        public class PixivConfiguration
+        {
+            public string UserId { get; set; }
+            public string Password { get; set; }
         }
     }
 }
