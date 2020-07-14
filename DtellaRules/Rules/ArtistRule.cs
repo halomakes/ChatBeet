@@ -21,7 +21,7 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}artist (.*)");
+            var rgx = new Regex($"^{config.CommandPrefix}artist (.*)", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Content))
             {
                 var artistName = rgx.Replace(incomingMessage.Content, @"$1");

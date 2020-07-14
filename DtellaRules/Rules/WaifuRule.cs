@@ -20,7 +20,7 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(waifu|husbando) (.*)");
+            var rgx = new Regex($"^{config.CommandPrefix}(waifu|husbando) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Content);
             if (match.Success)
             {

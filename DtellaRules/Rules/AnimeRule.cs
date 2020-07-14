@@ -20,7 +20,7 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(anime|manga|ln|light novel|ova) (.*)");
+            var rgx = new Regex($"^{config.CommandPrefix}(anime|manga|ln|light novel|ova) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Content);
             if (match.Success)
             {

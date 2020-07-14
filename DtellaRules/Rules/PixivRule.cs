@@ -28,7 +28,7 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(pixiv) (.*)");
+            var rgx = new Regex($"^{config.CommandPrefix}(pixiv) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Content);
             if (match.Success)
             {
@@ -60,8 +60,8 @@ namespace DtellaRules.Rules
                 {
                     if (searchResults?.Illusts?.Any() ?? false)
                     {
-                        var id = searchResults.Illusts.PickRandom()?.Id;
-                        return $"https://www.pixiv.net/en/artworks/{id}";
+                        var img = searchResults.Illusts.PickRandom();
+                        return $"{img.Title} by {img.User?.Name} - https://www.pixiv.net/en/artworks/{img.Id}";
                     }
                     return null;
                 }

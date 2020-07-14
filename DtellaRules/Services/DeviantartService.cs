@@ -22,7 +22,7 @@ namespace DtellaRules.Services
             this.cache = cache;
         }
 
-        public async Task<string> GetRecentImageAsync(string search)
+        public async Task<SyndicationItem> GetRecentImageAsync(string search)
         {
             var items = await cache.GetOrCreateAsync($"deviantart:{search}", async e =>
             {
@@ -32,7 +32,7 @@ namespace DtellaRules.Services
                 var response = await client.GetAsync(url);
                 var reader = XmlReader.Create(new StringReader(await response.Content.ReadAsStringAsync()));
                 var feed = SyndicationFeed.Load(reader);
-                return feed.Items.Select(i => i.Id).ToList();
+                return feed.Items.ToList();
             });
 
             return items.PickRandom();

@@ -26,7 +26,7 @@ namespace DtellaRules.Rules
         {
             if (!string.IsNullOrEmpty(CommandName))
             {
-                var rgx = new Regex($@"^{config.CommandPrefix}{CommandName} ([A-z0-9-\[\]\\\^\{{\}}]*)");
+                var rgx = new Regex($@"^{config.CommandPrefix}{CommandName} ([A-z0-9-\[\]\\\^\{{\}}]*)", RegexOptions.IgnoreCase);
                 var match = rgx.Match(incomingMessage.Content);
                 if (match.Success)
                 {
