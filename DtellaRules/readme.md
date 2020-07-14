@@ -1,7 +1,7 @@
 # ChatBeet
 Basically a chatbot, but it's also a root vegetable.
 
-## Included Commands
+## Included Commands for Dtella
 
 ### Hello
 *The most basic rule.  ChatBeet will say hi back to you.*
