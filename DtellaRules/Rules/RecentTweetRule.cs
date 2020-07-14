@@ -24,7 +24,7 @@ namespace DtellaRules.Rules
             {
                 var username = rgx.Replace(incomingMessage.Content, @"$1");
 
-                var tweet = await tweetService.GetRecentTweet(username, false, 10, false);
+                var tweet = await tweetService.GetRecentTweet(username, false, false);
 
                 yield return new OutboundIrcMessage
                 {
