@@ -29,7 +29,7 @@ namespace DtellaRules.Rules
                 yield return new OutboundIrcMessage
                 {
                     Content = tweet != null
-                        ? $"{tweet.User?.Name} at {tweet.CreatedAt} - {tweet.Text}"
+                        ? $"{IrcValues.BOLD}{tweet.User?.Name}{IrcValues.RESET} at {tweet.CreatedAt} - {tweet.Text}"
                         : "Sorry, couldn't find anything recent.",
                     OutputType = IrcMessageType.Message,
                     Target = incomingMessage.Channel

@@ -54,7 +54,7 @@ namespace DtellaRules.Rules
                 if (existingCell != null)
                     yield return new OutboundIrcMessage
                     {
-                        Content = $"Previous value was \"{existingCell.Value}\", set by {existingCell.Author}.",
+                        Content = $"Previous value was {IrcValues.BOLD}{existingCell.Value}{IrcValues.RESET}, set by {existingCell.Author}.",
                         Target = incomingMessage.Channel
                     };
             }
@@ -70,13 +70,13 @@ namespace DtellaRules.Rules
                 if (cell != null)
                     yield return new OutboundIrcMessage
                     {
-                        Content = $"{caseSensitiveKey}: {cell.Value}",
+                        Content = $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}: {cell.Value}",
                         Target = incomingMessage.Channel
                     };
                 else
                     yield return new OutboundIrcMessage
                     {
-                        Content = $"I don't have anything for \"{caseSensitiveKey}\".",
+                        Content = $"I don't have anything for {IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}.",
                         Target = incomingMessage.Channel
                     };
             }

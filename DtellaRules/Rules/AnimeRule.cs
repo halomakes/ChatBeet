@@ -30,9 +30,11 @@ namespace DtellaRules.Rules
 
                 if (media != null)
                 {
+                    var score = $"{media.Score}%".Colorize(media.Score);
+
                     yield return new OutboundIrcMessage
                     {
-                        Content = $"{media.EnglishTitle} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} -  {media.Score}% • {media.Url}",
+                        Content = $"{IrcValues.BOLD}{media.EnglishTitle}{IrcValues.RESET} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {score} • {media.Url}",
                         Target = incomingMessage.Channel
                     };
 

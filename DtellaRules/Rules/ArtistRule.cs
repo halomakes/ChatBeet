@@ -43,7 +43,7 @@ namespace DtellaRules.Rules
                     if (artist?.Tags?.Any() == true)
                         yield return new OutboundIrcMessage
                         {
-                            Content = $"Related tags: { string.Join(", ", artist.Tags.Select(t => t.Name))}",
+                            Content = $"{IrcValues.BOLD}Related tags{IrcValues.RESET}: { string.Join(", ", artist.Tags.Select(t => t.Name))}",
                             Target = incomingMessage.Channel
                         };
 
