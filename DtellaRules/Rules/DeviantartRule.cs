@@ -35,7 +35,7 @@ namespace DtellaRules.Rules
                 {
                     yield return new OutboundIrcMessage
                     {
-                        Content = $"{media.Title?.Text} - {media.Id}",
+                        Content = $"{IrcValues.BOLD}{media.Title?.Text}{IrcValues.RESET} - {media.Id}",
                         Target = incomingMessage.Channel
                     };
                 }

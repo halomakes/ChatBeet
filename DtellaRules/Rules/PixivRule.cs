@@ -61,7 +61,7 @@ namespace DtellaRules.Rules
                     if (searchResults?.Illusts?.Any() ?? false)
                     {
                         var img = searchResults.Illusts.PickRandom();
-                        return $"{img.Title} by {img.User?.Name} - https://www.pixiv.net/en/artworks/{img.Id}";
+                        return $"{IrcValues.BOLD}{img.Title}{IrcValues.RESET} by {IrcValues.BOLD}{img.User?.Name}{IrcValues.RESET} - https://www.pixiv.net/en/artworks/{img.Id}";
                     }
                     return null;
                 }
