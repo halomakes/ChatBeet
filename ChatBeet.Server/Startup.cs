@@ -28,6 +28,7 @@ namespace ChatBeet.Server
             services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Bot"));
             services.AddDefaultRules();
             services.AddDtellaRules(Configuration.GetSection("Rules:Dtella"));
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

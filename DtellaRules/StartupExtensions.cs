@@ -25,7 +25,9 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, MockingTextRule>();
             services.AddTransient<IMessageRule, WaifuRule>();
             services.AddTransient<IMessageRule, AnimeRule>();
+            services.AddTransient<IMessageRule, DeviantartRule>();
 
+            services.AddTransient<DeviantartService>();
             services.AddTransient<AnilistClient>();
             services.AddTransient<AnilistService>();
             services.Configure<DtellaRuleConfiguration>(c => adminConfigSection.Bind(c));
