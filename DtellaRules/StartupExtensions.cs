@@ -6,6 +6,7 @@ using IF.Lastfm.Core.Api;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Miki.Anilist;
 
 namespace DtellaRules
 {
@@ -22,7 +23,11 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, MemoryCellRule>();
             services.AddTransient<IMessageRule, KerningRule>();
             services.AddTransient<IMessageRule, MockingTextRule>();
+            services.AddTransient<IMessageRule, WaifuRule>();
+            services.AddTransient<IMessageRule, AnimeRule>();
 
+            services.AddTransient<AnilistClient>();
+            services.AddTransient<AnilistService>();
             services.Configure<DtellaRuleConfiguration>(c => adminConfigSection.Bind(c));
             services.AddTransient<RecentTweetsService>();
             services.AddTransient(provider =>
