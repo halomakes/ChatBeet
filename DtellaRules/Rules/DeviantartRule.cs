@@ -42,7 +42,7 @@ namespace DtellaRules.Rules
                 {
                     yield return new OutboundIrcMessage
                     {
-                        Content = $"Sorry, couldn't find that {match.Groups[1].Value}.",
+                        Content = $"Sorry, couldn't find anything matching {match.Groups[2].Value}.",
                         Target = incomingMessage.Channel
                     };
                 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Miki.Anilist;
+using PixivCS;
 
 namespace DtellaRules
 {
@@ -26,7 +27,9 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, WaifuRule>();
             services.AddTransient<IMessageRule, AnimeRule>();
             services.AddTransient<IMessageRule, DeviantartRule>();
+            services.AddTransient<IMessageRule, PixivRule>();
 
+            services.AddTransient<PixivAppAPI>();
             services.AddTransient<DeviantartService>();
             services.AddTransient<AnilistClient>();
             services.AddTransient<AnilistService>();
