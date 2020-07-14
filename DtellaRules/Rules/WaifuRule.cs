@@ -36,11 +36,29 @@ namespace DtellaRules.Rules
                     };
                     var description = character.GetSimplifiedDescription();
                     if (!string.IsNullOrEmpty(description))
-                        yield return new OutboundIrcMessage
+                    {
+                        if (description.ExceedsMaxLength())
                         {
-                            Content = description,
-                            Target = incomingMessage.Channel
-                        };
+                            yield return new OutboundIrcMessage
+                            {
+                                Content = description.TruncateMessage(),
+                                Target = incomingMessage.Channel
+                            };
+                            yield return new OutboundIrcMessage
+                            {
+                                Content = $"See more at {character.SiteUrl}",
+                                Target = incomingMessage.Channel
+                            };
+                        }
+                        else
+                        {
+                            yield return new OutboundIrcMessage
+                            {
+                                Content = description,
+                                Target = incomingMessage.Channel
+                            };
+                        }
+                    }
                 }
                 else
                 {

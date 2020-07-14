@@ -1,6 +1,5 @@
-﻿using ChatBeet;
+﻿using Markdig;
 using Miki.Anilist;
-using System.Text.RegularExpressions;
 
 namespace DtellaRules.Utilities
 {
@@ -10,9 +9,12 @@ namespace DtellaRules.Utilities
         {
             if (!string.IsNullOrEmpty(@char.Description))
             {
-                var singleLine = @char.Description.Replace("\n", " • ");
-                var labelRegex = new Regex(@"__([A-z ]*):__");
-                return labelRegex.Replace(singleLine, $"{IrcValues.BOLD}$1{IrcValues.RESET}: ");
+                var pipeline = new MarkdownPipelineBuilder()
+                    .UseAdvancedExtensions()
+                    .UseEmphasisExtras()
+                    .Build();
+
+                return Markdown.ToPlainText(@char.Description, pipeline);
             }
             return null;
         }

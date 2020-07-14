@@ -22,6 +22,6 @@
         public static string PINK = "\x0313";
         public static string GREY = "\x0314";
         public static string SILVER = "\x0315";
-        public static int MAX_LENGTH = 255;
+        public static int MAX_BYTES = 460;
     }
 }
