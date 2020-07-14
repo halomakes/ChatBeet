@@ -56,7 +56,7 @@ Example Output:
 🥕 kern {targetNick}
 ```
 Example Output:
-> <carrots> W I L L  U  S U C C  M E ?
+> &lt;carrots&gt; W I L L  U  S U C C  M E ?
 
 ### Memory
 *Stash a bit of text for later. It's like defs for poor people with no op.*
@@ -80,7 +80,7 @@ Example Output:
 🥕 mock {targetNick}
 ```
 Example Output:
-> I NeEd hEaLtHcArE bEcAuSe I hAvE caNcEr aNd iM dYinG
+> &lt;carrots&gt; I NeEd hEaLtHcArE bEcAuSe I hAvE caNcEr aNd iM dYinG
 
 ### Pixiv
 *Find some gourmet anime fanart*
