@@ -31,7 +31,7 @@ namespace DtellaRules.Rules
                 if (match.Success)
                 {
                     var nick = match.Groups[1].Value;
-                    var message = messageQueueService.GetLatestMessage(nick, incomingMessage);
+                    var message = messageQueueService.GetLatestMessage(nick, incomingMessage.Channel, incomingMessage);
 
                     if (message != null)
                         return Respond(incomingMessage, nick, message);
