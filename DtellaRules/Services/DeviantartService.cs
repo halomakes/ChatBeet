@@ -1,5 +1,4 @@
 ﻿using DtellaRules.Utilities;
-using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -27,19 +26,7 @@ namespace DtellaRules.Services
             var reader = XmlReader.Create(new StringReader(await response.Content.ReadAsStringAsync()));
             var feed = SyndicationFeed.Load(reader);
 
-            var imageUrl = feed.Items
-                .PickRandom()
-                .ElementExtensions
-                .Where(i => i.OuterName == "thumbnail")
-                .Select(i => i.GetObject<XElement>())
-                .OrderByDescending(i => int.TryParse(i.Attribute("height")?.Value, out var num) ? num : 0)
-                .Select(i => i.Attribute("url").Value)
-                .FirstOrDefault();
-
-            if (Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
-                return uri.GetLeftPart(UriPartial.Path);
-
-            return null;
+            return feed.Items.PickRandom().Id;
         }
     }
 }
