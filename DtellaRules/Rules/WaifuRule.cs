@@ -1,7 +1,7 @@
 ﻿using ChatBeet;
+using DtellaRules.Services;
 using DtellaRules.Utilities;
 using Microsoft.Extensions.Options;
-using Miki.Anilist;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -10,9 +10,9 @@ namespace DtellaRules.Rules
     public class WaifuRule : MessageRuleBase<IrcMessage>
     {
         private readonly ChatBeetConfiguration config;
-        private readonly AnilistClient client;
+        private readonly AnilistService client;
 
-        public WaifuRule(IOptions<ChatBeetConfiguration> options, AnilistClient client)
+        public WaifuRule(IOptions<ChatBeetConfiguration> options, AnilistService client)
         {
             config = options.Value;
             this.client = client;
@@ -25,6 +25,7 @@ namespace DtellaRules.Rules
             if (match.Success)
             {
                 var characterName = match.Groups[2].Value;
+                // use ID instead of name if provided
                 var character = await client.GetCharacterAsync(characterName);
 
                 if (character != null)
@@ -34,7 +35,7 @@ namespace DtellaRules.Rules
                         Content = $"{character.FirstName} {character.LastName} ({character.NativeName}) - {character.LargeImageUrl}",
                         Target = incomingMessage.Channel
                     };
-                    var description = character.GetSimplifiedDescription();
+                    var description = character.Description?.StripMarkdown();
                     if (!string.IsNullOrEmpty(description))
                     {
                         if (description.ExceedsMaxLength())
