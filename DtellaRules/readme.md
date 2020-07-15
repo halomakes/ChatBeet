@@ -116,3 +116,11 @@ ChatBeet, tell me a dad joke.
 ```
 Example Output:
 > How does the moon cut his hair? Eclipse it.
+
+### Year Progress
+*How long until this round of suffering ends?*
+```
+🥕 year progress
+```
+Example Output:
+> █████████████░░░░░░░░░░░░ **2020** is **53.55%** complete.

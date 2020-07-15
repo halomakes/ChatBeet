@@ -29,6 +29,7 @@ namespace DtellaRules
             services.AddTransient<IMessageRule, DeviantartRule>();
             services.AddTransient<IMessageRule, PixivRule>();
             services.AddTransient<IMessageRule, DadJokeRule>();
+            services.AddTransient<IMessageRule, YearProgressRule>();
 
             services.AddTransient<DadJokeService>();
             services.AddTransient<PixivAppAPI>();
