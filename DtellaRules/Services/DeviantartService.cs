@@ -35,7 +35,7 @@ namespace DtellaRules.Services
                 return feed.Items.ToList();
             });
 
-            return items.PickRandom();
+            return items?.Any() ?? false ? items.PickRandom() : null;
         }
     }
 }
