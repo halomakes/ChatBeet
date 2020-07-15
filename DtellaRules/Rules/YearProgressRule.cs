@@ -24,8 +24,8 @@ namespace DtellaRules.Rules
             if (rgx.IsMatch(incomingMessage.Content))
             {
                 var now = DateTime.Now;
-                var end = new DateTime(now.Year, 12, 31);
                 var start = new DateTime(now.Year, 1, 1, 0, 0, 0);
+                var end = start.AddYears(1);
 
                 var ratio = (now - start) / (end - start);
                 var segments = Convert.ToInt32(ratio * barLength);
