@@ -76,7 +76,7 @@ namespace DtellaRules.Rules
                     start = new DateTime(now.Year - (now.Year % 100), 1, 1);
                     end = start.AddYears(100);
                     var century = (now.Year / 100) + 1;
-                    return GetProgressBar(now, start, end, $"{IrcValues.BOLD}The {century.Ordinalize(new CultureInfo("en-US"))} century{IrcValues.RESET} is");
+                    return GetProgressBar(now, start, end, $"{IrcValues.BOLD}The {century.Ordinalize(DtellaRuleConfiguration.Culture)} century{IrcValues.RESET} is");
                 case "millenium":
                     start = new DateTime(now.Year - (now.Year % 1000), 1, 1);
                     end = start.AddYears(1000);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace DtellaRules
 {
@@ -8,6 +9,7 @@ namespace DtellaRules
         public LastFmConfiguration LastFm { get; set; }
         public PixivConfiguration Pixiv { get; set; }
         public Dictionary<string, string> Urls { get; set; }
+        public static CultureInfo Culture = new CultureInfo("en-US");
 
         public class TwitterConfiguration
         {
