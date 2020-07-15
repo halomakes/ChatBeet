@@ -6,7 +6,7 @@ Basically a chatbot, but it's also a root vegetable.
 ### Hello
 *The most basic rule.  ChatBeet will say hi back to you.*
 ```
-🥕 hello
+.cb hello
 ```
 Example Output:
 > Hello, {nick}!
@@ -14,11 +14,11 @@ Example Output:
 ### Anime
 *Look up a piece of media on AniList*
 ```
-🥕 anime {name|id}
-🥕 manga {name|id}
-🥕 light novel {name|id}
-🥕 ln {name|id}
-🥕 ova {name|id}
+.cb anime {name|id}
+.cb manga {name|id}
+.cb light novel {name|id}
+.cb ln {name|id}
+.cb ova {name|id}
 ```
 Example Output:
 > **Violet Evergarden** / Violet Evergarden (ヴァイオレット・エヴァーガーデン) - FINISHED - 84% • https://anilist.co/anime/21827
@@ -26,7 +26,7 @@ Example Output:
 ### Artist
 *Look up an artist on Last.fm*
 ```
-🥕 artist Fall Out Boy
+.cb artist Fall Out Boy
 ```
 Example Output:
 > Fall Out Boy is a band formed in 2001 in Glenview, Illinois after good friends Joe Trohman and Pete Wentz met high schooler Patrick Stump. Stump originally auditioned as a drummer, but soon became the lead singer. The following year, the band debuted with a self-released demo and followed it up with the May 28, 2002 release of Split EP, which featured Project Rocket, on Uprising Records. The group released a mini-LP, Evening Out With Your Gir
@@ -35,7 +35,7 @@ Example Output:
 ### Astolfo
 *Fill the void in your soul with a top-tier Fate waifu*
 ```
-🥕 astolfo
+.cb astolfo
 ```
 Example Output:
 > https://pbs.twimg.com/media/EczfPtwWsAYvs07.png
@@ -43,9 +43,9 @@ Example Output:
 ### DeviantArt
 *Explore the depths of degeneracy on DeviantArt*
 ```
-🥕 da Mudkips
-🥕 deviantart fella
-🥕 degenerate sonicXshadow
+.cb da Mudkips
+.cb deviantart fella
+.cb degenerate sonicXshadow
 ```
 Example Output:
 > vocaloid - https://www.deviantart.com/biriisayama/art/vocaloid-309761211
@@ -53,7 +53,7 @@ Example Output:
 ### Kerning
 *Space out someone's message when it just doesn't have enough impact.*
 ```
-🥕 kern {targetNick}
+.cb kern {targetNick}
 ```
 Example Output:
 > &lt;carrots&gt; W I L L  U  S U C C  M E ?
@@ -62,7 +62,7 @@ Example Output:
 *Stash a bit of text for later. It's like defs for poor people with no op.*
 ```
 ChatBeet, remember {id} = {value}
-🥕 remember {id} = {value}
+.cb remember {id} = {value}
 ```
 Example Output:
 > Got it! 👍
@@ -77,7 +77,7 @@ Example Output:
 ### Mocking
 *DiSsMIsS sOmeOnES oPiNIoN*
 ```
-🥕 mock {targetNick}
+.cb mock {targetNick}
 ```
 Example Output:
 > &lt;carrots&gt; I NeEd hEaLtHcArE bEcAuSe I hAvE caNcEr aNd iM dYinG
@@ -85,7 +85,7 @@ Example Output:
 ### Pixiv
 *Find some gourmet anime fanart*
 ```
-🥕 pixiv {query}
+.cb pixiv {query}
 ```
 Example Output:
 > **mordred** by **nyungsep** - https://www.pixiv.net/en/artworks/82454601
@@ -101,8 +101,8 @@ Example Output:
 ### Waifu
 *Get information about best girl from AniList*
 ```
-🥕 waifu {query}
-🥕 husbando {query}
+.cb waifu {query}
+.cb husbando {query}
 ```
 Example Output:
 > Kouko Kaga (加賀香子) - https://s4.anilist.co/file/anilistcdn/character/large/43669.jpg
@@ -112,7 +112,7 @@ Example Output:
 *Maybe you can't revive a dead channel, but you **can** spam it with bad jokes*
 ```
 ChatBeet, tell me a dad joke.
-🥕 dad joke
+.cb dad joke
 ```
 Example Output:
 > How does the moon cut his hair? Eclipse it.
@@ -120,15 +120,15 @@ Example Output:
 ### Year Progress
 *How long until this round of suffering ends?*
 ```
-🥕 millenium progress
-🥕 century progress
-🥕 decade progress
-🥕 year progress
-🥕 month progress
-🥕 week progress
-🥕 day progress
-🥕 hour progress
-🥕 minute progress
+.cb millenium progress
+.cb century progress
+.cb decade progress
+.cb year progress
+.cb month progress
+.cb week progress
+.cb day progress
+.cb hour progress
+.cb minute progress
 ```
 Example Output:
 > █████████████░░░░░░░░░░░░ **2020** is **53.55%** complete.
