@@ -25,8 +25,9 @@ namespace DtellaRules.Rules
             {
                 var now = DateTime.Now;
                 var end = new DateTime(now.Year, 12, 31);
+                var start = new DateTime(now.Year, 1, 1, 0, 0, 0);
 
-                var ratio = now.DayOfYear / (decimal)end.DayOfYear;
+                var ratio = (now - start) / (end - start);
                 var segments = Convert.ToInt32(ratio * barLength);
                 var percentage = ratio * 100;
 
