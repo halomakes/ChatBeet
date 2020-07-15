@@ -54,6 +54,8 @@ namespace ChatBeet.Irc
 
         private async void Client_OnRegistered(object sender, EventArgs e)
         {
+            await client.SendAsync(new PrivMsgMessage("NickServ", $"identify {config.NickServ}"));
+            await client.SendAsync(new ModeMessage(config.Nick, "+B"));
             await JoinDefaultChannels();
             isRegistered = true;
         }

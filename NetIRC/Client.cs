@@ -18,7 +18,7 @@ namespace NetIRC
         /// <summary>
         /// Represents the user used to connect to the server
         /// </summary>
-        public User User { get;}
+        public User User { get; }
 
         /// <summary>
         /// An observable collection representing the channels we joined
@@ -213,7 +213,9 @@ namespace NetIRC
         /// <returns>The task object representing the asynchronous operation</returns>
         public async Task SendAsync(IClientMessage message)
         {
-            await connection.SendAsync(message.ToString());
+            var content = message.ToString();
+            Console.WriteLine($"> {content}");
+            await connection.SendAsync(content);
         }
 
         /// <summary>

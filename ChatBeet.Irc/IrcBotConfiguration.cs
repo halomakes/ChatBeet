@@ -9,5 +9,6 @@ namespace ChatBeet.Irc
         public IEnumerable<string> Channels { get; set; }
         public string Nick { get; set; }
         public string Identity { get; set; }
+        public string NickServ { get; set; }
     }
 }
