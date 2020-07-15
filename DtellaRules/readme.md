@@ -107,3 +107,12 @@ Example Output:
 Example Output:
 > Kouko Kaga (加賀香子) - https://s4.anilist.co/file/anilistcdn/character/large/43669.jpg
 > Age: 18-19 • Birth Date: July 7 • She had a perfect future planned with Mitsuo Yanagisawa as her husband, and nothing will get in her way!   She has a side of her that is not violent as Mitsuo has described.
+
+### Dad Jokes
+*Maybe you can't revive a dead channel, but you **can** spam it with bad jokes*
+```
+ChatBeet, tell me a dad joke.
+🥕 dad joke
+```
+Example Output:
+> How does the moon cut his hair? Eclipse it.
