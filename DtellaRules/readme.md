@@ -120,7 +120,7 @@ Example Output:
 ### Year Progress
 *How long until this round of suffering ends?*
 ```
-.cb millenium progress
+.cb millennium progress
 .cb century progress
 .cb decade progress
 .cb year progress
