@@ -23,7 +23,7 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(year|day|hour|minute|month|decade|century|millenium|week).?progress", RegexOptions.IgnoreCase);
+            var rgx = new Regex($"^{config.CommandPrefix}(year|day|hour|minute|month|decade|century|millennium|week).?progress", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Content);
             if (match.Success)
             {
@@ -77,10 +77,10 @@ namespace DtellaRules.Rules
                     end = start.AddYears(100);
                     var century = (now.Year / 100) + 1;
                     return GetProgressBar(now, start, end, $"{IrcValues.BOLD}The {century.Ordinalize(DtellaRuleConfiguration.Culture)} century{IrcValues.RESET} is");
-                case "millenium":
+                case "millennium":
                     start = new DateTime(now.Year - (now.Year % 1000), 1, 1);
                     end = start.AddYears(1000);
-                    return GetProgressBar(now, start, end, $"{IrcValues.BOLD}This millenium{IrcValues.RESET} is");
+                    return GetProgressBar(now, start, end, $"{IrcValues.BOLD}This millennium{IrcValues.RESET} is");
                 default:
                     return null;
             };
