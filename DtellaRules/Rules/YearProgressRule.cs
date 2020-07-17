@@ -21,7 +21,7 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix} progress (year|day|hour|minute|month|decade|century|millennium|week|second)", RegexOptions.IgnoreCase);
+            var rgx = new Regex($"^{config.CommandPrefix}progress (year|day|hour|minute|month|decade|century|millennium|week|second)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Content);
             if (match.Success)
             {
