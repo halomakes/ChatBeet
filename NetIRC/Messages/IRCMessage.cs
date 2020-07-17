@@ -19,7 +19,7 @@ namespace NetIRC.Messages
                 { "JOIN", typeof(JoinMessage) },
                 { "PART", typeof(PartMessage) },
                 { "QUIT", typeof(QuitMessage) },
-                //{ "MODE", typeof(ModeMessage) },
+                { "KICK", typeof(KickMessage) },
                 { "001", typeof(RplWelcomeMessage) },
                 { "002", typeof(RplYourHostMessage) },
                 { "003", typeof(RplCreatedMessage) },

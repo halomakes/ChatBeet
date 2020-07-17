@@ -141,5 +141,14 @@ namespace NetIRC
         {
             Quit?.Invoke(client, e);
         }
+
+        /// <summary>
+        /// Indicates that the bot has been kicked from a channel
+        /// </summary>
+        public event IRCMessageEventHandler<KickMessage> Kick;
+        internal void OnKick(IRCMessageEventArgs<KickMessage> e)
+        {
+            Kick?.Invoke(client, e);
+        }
     }
 }

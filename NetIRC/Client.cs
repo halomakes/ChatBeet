@@ -84,6 +84,7 @@ namespace NetIRC
             EventHub.Join += EventHub_Join;
             EventHub.Part += EventHub_Part;
             EventHub.Quit += EventHub_Quit;
+            EventHub.Kick += EventHub_Kick;
             EventHub.PrivMsg += EventHub_PrivMsg;
             EventHub.RplNamReply += EventHub_RplNamReply;
             EventHub.Nick += EventHub_Nick;
@@ -133,6 +134,18 @@ namespace NetIRC
                 if (user != null)
                 {
                     channel.Users.Remove(user);
+                }
+            }
+        }
+
+        private void EventHub_Kick(Client client, IRCMessageEventArgs<KickMessage> e)
+        {
+            if (e.IRCMessage.Nick == User.Nick)
+            {
+                var channel = Channels.FirstOrDefault(c => c.Name == e.IRCMessage.Channel);
+                if (channel != null)
+                {
+                    Channels.Remove(channel);
                 }
             }
         }
