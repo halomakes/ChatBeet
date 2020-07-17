@@ -120,15 +120,15 @@ Example Output:
 ### Year Progress
 *How long until this round of suffering ends?*
 ```
-.cb millennium progress
-.cb century progress
-.cb decade progress
-.cb year progress
-.cb month progress
-.cb week progress
-.cb day progress
-.cb hour progress
-.cb minute progress
+.cb progress millennium
+.cb progress century
+.cb progress decade
+.cb progress year
+.cb progress month
+.cb progress week
+.cb progress day
+.cb progress hour
+.cb progress minute
 ```
 Example Output:
 > █████████████░░░░░░░░░░░░ **2020** is **53.55%** complete.

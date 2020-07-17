@@ -1,11 +1,9 @@
 ﻿using ChatBeet;
 using DtellaRules.Utilities;
 using Humanizer;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -23,17 +21,19 @@ namespace DtellaRules.Rules
 
         public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(year|day|hour|minute|month|decade|century|millennium|week).?progress", RegexOptions.IgnoreCase);
+            var rgx = new Regex($"^{config.CommandPrefix} progress (year|day|hour|minute|month|decade|century|millennium|week|second)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Content);
             if (match.Success)
             {
                 var bar = GetProgressBar(match.Groups[1].Value);
                 if (!string.IsNullOrEmpty(bar))
+                {
                     yield return new OutboundIrcMessage
                     {
                         Content = bar,
                         Target = incomingMessage.Channel
                     };
+                }
             }
         }
 
@@ -81,14 +81,18 @@ namespace DtellaRules.Rules
                     start = new DateTime(now.Year - (now.Year % 1000), 1, 1);
                     end = start.AddYears(1000);
                     return GetProgressBar(now, start, end, $"{IrcValues.BOLD}This millennium{IrcValues.RESET} is");
+                case "second":
+                    return GetProgressBar((double)now.Millisecond / 1000, $"{IrcValues.BOLD}This second{IrcValues.RESET} is");
                 default:
                     return null;
             };
         }
 
-        private static string GetProgressBar(DateTime now, DateTime start, DateTime end, string periodDescription)
+        private static string GetProgressBar(DateTime now, DateTime start, DateTime end, string periodDescription) =>
+            GetProgressBar((now - start) / (end - start), periodDescription);
+
+        private static string GetProgressBar(double ratio, string periodDescription)
         {
-            var ratio = (now - start) / (end - start);
             var segments = Convert.ToInt32(ratio * barLength);
             var percentage = ratio * 100;
 
