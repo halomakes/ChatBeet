@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using GravyIrc;
+using GravyIrc.Connection;
+using GravyIrc.Messages;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using NetIRC;
-using NetIRC.Connection;
-using NetIRC.Messages;
 using System;
 using System.Linq;
 using System.Threading;
@@ -27,16 +27,16 @@ namespace ChatBeet.Irc
             var user = new User(config.Nick, config.Identity);
             client = new Client(user, new TcpClientConnection());
             client.OnRawDataReceived += Client_OnRawDataReceived;
-            client.EventHub.RegistrationCompleted += Client_OnRegistered;
-            client.EventHub.PrivMsg += EventHub_PrivMsg;
+            client.EventHub.Subscribe<RplWelcomeMessage>(Client_OnRegistered);
+            client.EventHub.Subscribe<PrivateMessage>(EventHub_PrivMsg);
             queueService.MessageAdded += QueueService_MessageAdded;
         }
 
-        private void EventHub_PrivMsg(Client client, IRCMessageEventArgs<PrivMsgMessage> e)
+        private void EventHub_PrivMsg(Client client, IrcMessageEventArgs<PrivateMessage> e)
         {
             try
             {
-                queueService.Push(ConvertInboundIrcMessage(e.IRCMessage));
+                queueService.Push(ConvertInboundIrcMessage(e.IrcMessage));
             }
             catch (Exception) { }
         }
@@ -54,8 +54,8 @@ namespace ChatBeet.Irc
 
         private async void Client_OnRegistered(object sender, EventArgs e)
         {
-            await client.SendAsync(new PrivMsgMessage("NickServ", $"identify {config.NickServ}"));
-            await client.SendAsync(new ModeMessage(config.Nick, "+B"));
+            await client.SendAsync(new PrivateMessage("NickServ", $"identify {config.NickServ}"));
+            await client.SendAsync(new UserModeMessage(config.Nick, "+B"));
             await JoinDefaultChannels();
             isRegistered = true;
         }
@@ -93,13 +93,13 @@ namespace ChatBeet.Irc
                 case IrcMessageType.Announcement:
                     return new NoticeMessage(message.Target, message.Content);
                 case IrcMessageType.Activity:
-                    return new PrivMsgMessage(message.Target, $"/me {message.Content}");
+                    return new PrivateMessage(message.Target, $"/me {message.Content}");
                 default:
-                    return new PrivMsgMessage(message.Target, message.Content);
+                    return new PrivateMessage(message.Target, message.Content);
             }
         }
 
-        private static IInboundMessage ConvertInboundIrcMessage(PrivMsgMessage message) => new IrcMessage
+        private static IInboundMessage ConvertInboundIrcMessage(PrivateMessage message) => new IrcMessage
         {
             DateRecieved = DateTime.Now,
             Channel = message.To,

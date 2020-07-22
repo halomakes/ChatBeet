@@ -8,12 +8,12 @@ namespace ChatBeet
         IAsyncEnumerable<OutboundIrcMessage> Respond(IInboundMessage incomingMessage);
     }
 
-    public interface IMessageRule<TMessage> : IMessageRule where TMessage : IInboundMessage
+    public interface IMessageRule<TMessage> : IMessageRule
     {
         IAsyncEnumerable<OutboundIrcMessage> Respond(TMessage incomingMessage);
     }
 
-    public abstract class MessageRuleBase<TMessage> : IMessageRule<TMessage>, IMessageRule where TMessage : IInboundMessage
+    public abstract class MessageRuleBase<TMessage> : IMessageRule<TMessage>, IMessageRule
     {
         public abstract IAsyncEnumerable<OutboundIrcMessage> Respond(TMessage incomingMessage);
 

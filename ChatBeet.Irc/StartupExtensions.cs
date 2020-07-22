@@ -26,5 +26,10 @@ namespace ChatBeet.Irc
             services.AddHostedService<IrcBotService>();
             return services;
         }
+
+        public static void RegisterRule<TRule, TMessage>(this IServiceCollection services) where TRule : class, IMessageRule<TMessage>, IMessageRule
+        {
+            services.AddTransient<IMessageRule, TRule>();
+        }
     }
 }

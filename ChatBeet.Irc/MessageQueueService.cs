@@ -11,7 +11,7 @@ namespace ChatBeet.Irc
         private const int MAX_HISTORY = 300;
 
         private List<OutboundIrcMessage> queuedMessages = new List<OutboundIrcMessage>();
-        private List<IInboundMessage> messageHistory = new List<IInboundMessage>();
+        private List<object> messageHistory = new List<object>();
         private List<OutboundIrcMessage> outputHistory = new List<OutboundIrcMessage>();
         private readonly IServiceProvider serviceProvider;
 
@@ -23,7 +23,7 @@ namespace ChatBeet.Irc
         }
 
         public IEnumerable<OutboundIrcMessage> ViewAll() => queuedMessages;
-        public IEnumerable<IInboundMessage> GetHistory() => messageHistory;
+        public IEnumerable<object> GetHistory() => messageHistory;
         public IEnumerable<OutboundIrcMessage> GetOutputHistory() => outputHistory;
 
         private Task ApplyRules(IInboundMessage message)
