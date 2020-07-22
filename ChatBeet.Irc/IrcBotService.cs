@@ -38,9 +38,7 @@ namespace ChatBeet.Irc
         private void SubscribeToEvents()
         {
             var method = typeof(IrcBotService).GetMethod(nameof(IrcBotService.SubscribeToEvent), BindingFlags.NonPublic | BindingFlags.Instance);
-            var eligibleTypes = pipeline.SubscribedTypes
-                .Where(t => typeof(IServerMessage).IsAssignableFrom(t))
-                .Where(t => t.IsSubclassOf(typeof(IrcMessage)));
+            var eligibleTypes = pipeline.SubscribedTypes.Where(t => typeof(IServerMessage).IsAssignableFrom(t));
 
             foreach (var type in eligibleTypes)
             {

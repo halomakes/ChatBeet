@@ -31,8 +31,7 @@ namespace ChatBeet.Irc
             services.AddSingleton<MessageQueueService>();
 
             var pipeline = new BotRulePipeline(services);
-            if (configurePipeline != null)
-                configurePipeline(pipeline);
+            configurePipeline?.Invoke(pipeline);
 
             services.AddHostedService(p => new IrcBotService(
                 p.GetRequiredService<MessageQueueService>(),

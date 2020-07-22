@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+﻿using GravyIrc.Messages;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 
 namespace ChatBeet.DefaultRules.Rules
 {
-    public class HelloRule : MessageRuleBase<IrcMessage>, IMessageRule<IrcMessage>
+    public class HelloRule : MessageRuleBase<PrivateMessage>, IMessageRule<PrivateMessage>
     {
         private readonly ChatBeetConfiguration config;
 
@@ -12,15 +13,15 @@ namespace ChatBeet.DefaultRules.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
-            if (incomingMessage.Content == $"{config.CommandPrefix}hello")
+            if (incomingMessage.Message == $"{config.CommandPrefix}hello")
             {
                 yield return new OutboundIrcMessage
                 {
-                    Content = $"Hello, {incomingMessage.Sender}!",
+                    Content = $"Hello, {incomingMessage.From}!",
                     OutputType = IrcMessageType.Message,
-                    Target = incomingMessage.Channel
+                    Target = incomingMessage.To
                 };
             }
         }
