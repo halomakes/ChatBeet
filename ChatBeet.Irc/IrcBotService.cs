@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,28 +18,40 @@ namespace ChatBeet.Irc
         private readonly IrcBotConfiguration config;
         private Timer timer;
         private bool isRegistered = false;
+        private readonly BotRulePipeline pipeline;
 
-        public IrcBotService(MessageQueueService queueService,
-            IOptions<IrcBotConfiguration> options)
+        public IrcBotService(MessageQueueService queueService, IOptions<IrcBotConfiguration> options, BotRulePipeline pipeline)
         {
             this.queueService = queueService;
+            this.pipeline = pipeline;
             config = options.Value;
 
             var user = new User(config.Nick, config.Identity);
             client = new Client(user, new TcpClientConnection());
             client.OnRawDataReceived += Client_OnRawDataReceived;
             client.EventHub.Subscribe<RplWelcomeMessage>(Client_OnRegistered);
-            client.EventHub.Subscribe<PrivateMessage>(EventHub_PrivMsg);
             queueService.MessageAdded += QueueService_MessageAdded;
+
+            SubscribeToEvents();
         }
 
-        private void EventHub_PrivMsg(Client client, IrcMessageEventArgs<PrivateMessage> e)
+        private void SubscribeToEvents()
         {
-            try
+            var method = typeof(IrcBotService).GetMethod(nameof(IrcBotService.SubscribeToEvent), BindingFlags.NonPublic | BindingFlags.Instance);
+            var eligibleTypes = pipeline.SubscribedTypes
+                .Where(t => typeof(IServerMessage).IsAssignableFrom(t))
+                .Where(t => t.IsSubclassOf(typeof(IrcMessage)));
+
+            foreach (var type in eligibleTypes)
             {
-                queueService.Push(ConvertInboundIrcMessage(e.IrcMessage));
+                var genericMethod = method.MakeGenericMethod(type);
+                genericMethod.Invoke(this, new object[] { });
             }
-            catch (Exception) { }
+        }
+
+        private void SubscribeToEvent<TMessage>() where TMessage : GravyIrc.Messages.IrcMessage, IServerMessage
+        {
+            client.EventHub.Subscribe<TMessage>((client, args) => queueService.Push(args.IrcMessage));
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

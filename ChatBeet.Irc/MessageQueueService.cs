@@ -26,7 +26,7 @@ namespace ChatBeet.Irc
         public IEnumerable<object> GetHistory() => messageHistory;
         public IEnumerable<OutboundIrcMessage> GetOutputHistory() => outputHistory;
 
-        private Task ApplyRules(IInboundMessage message)
+        private Task ApplyRules<TMessage>(TMessage message)
         {
             var rules = serviceProvider.GetServices<IMessageRule>();
             var matchingRuleType = typeof(IMessageRule<>).MakeGenericType(message.GetType());
@@ -67,7 +67,7 @@ namespace ChatBeet.Irc
             OnMessageAdded(EventArgs.Empty);
         }
 
-        public void Push(IInboundMessage message)
+        public void Push<TMessage>(TMessage message)
         {
             messageHistory.Add(message);
             TrimHistory();

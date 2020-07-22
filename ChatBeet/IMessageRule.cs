@@ -5,7 +5,7 @@ namespace ChatBeet
 {
     public interface IMessageRule
     {
-        IAsyncEnumerable<OutboundIrcMessage> Respond(IInboundMessage incomingMessage);
+        IAsyncEnumerable<OutboundIrcMessage> Respond(object incomingMessage);
     }
 
     public interface IMessageRule<TMessage> : IMessageRule
@@ -17,7 +17,7 @@ namespace ChatBeet
     {
         public abstract IAsyncEnumerable<OutboundIrcMessage> Respond(TMessage incomingMessage);
 
-        public IAsyncEnumerable<OutboundIrcMessage> Respond(IInboundMessage incomingMessage) =>
+        public IAsyncEnumerable<OutboundIrcMessage> Respond(object incomingMessage) =>
             incomingMessage is TMessage message
             ? Respond(message)
             : EmptyResult();
