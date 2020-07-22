@@ -1,5 +1,7 @@
 using ChatBeet;
 using ChatBeet.Irc;
+using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 
@@ -12,14 +14,14 @@ namespace DtellaRules.Rules
             CommandName = "kern";
         }
 
-        protected override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage, string nick, IrcMessage lookupMessage)
+        protected override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
-            var spaced = string.Join(" ", lookupMessage.Content.ToCharArray()).ToUpper();
+            var spaced = string.Join(" ", lookupMessage.Message.ToCharArray()).ToUpper();
 
             yield return new OutboundIrcMessage
             {
-                Content = $"<{lookupMessage.Sender}> {spaced}",
-                Target = incomingMessage.Channel
+                Content = $"<{lookupMessage.From}> {spaced}",
+                Target = incomingMessage.GetResponseTarget()
             };
         }
     }

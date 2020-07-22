@@ -1,7 +1,9 @@
-﻿using ChatBeet;
+﻿using ChatBeet.Irc;
 using DtellaRules.Data;
+using DtellaRules.Models;
 using DtellaRules.Rules;
 using DtellaRules.Services;
+using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,25 +15,30 @@ namespace DtellaRules
 {
     public static class StartupExtensions
     {
+        public static BotRulePipeline AddDtellaRules(this BotRulePipeline pipeline)
+        {
+            pipeline.RegisterRule<AstolfoRule, PrivateMessage>();
+            pipeline.RegisterRule<StopRule, PrivateMessage>();
+            pipeline.RegisterRule<RecentTweetRule, PrivateMessage>();
+            pipeline.RegisterRule<AutoYatoRule, PrivateMessage>();
+            pipeline.RegisterRule<ArtistRule, PrivateMessage>();
+            pipeline.RegisterRule<TrackRule, PrivateMessage>();
+            pipeline.RegisterRule<MemoryCellRule, PrivateMessage>();
+            pipeline.RegisterRule<KerningRule, PrivateMessage>();
+            pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
+            pipeline.RegisterRule<WaifuRule, PrivateMessage>();
+            pipeline.RegisterRule<AnimeRule, PrivateMessage>();
+            pipeline.RegisterRule<DeviantartRule, PrivateMessage>();
+            pipeline.RegisterRule<PixivRule, PrivateMessage>();
+            pipeline.RegisterRule<DadJokeRule, PrivateMessage>();
+            pipeline.RegisterRule<YearProgressRule, PrivateMessage>();
+            pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
+
+            return pipeline;
+        }
+
         public static IServiceCollection AddDtellaRules(this IServiceCollection services, IConfigurationSection adminConfigSection)
         {
-            services.AddTransient<IMessageRule, AstolfoRule>();
-            services.AddTransient<IMessageRule, StopRule>();
-            services.AddTransient<IMessageRule, RecentTweetRule>();
-            services.AddTransient<IMessageRule, AutoYatoRule>();
-            services.AddTransient<IMessageRule, ArtistRule>();
-            services.AddTransient<IMessageRule, TrackRule>();
-            services.AddTransient<IMessageRule, MemoryCellRule>();
-            services.AddTransient<IMessageRule, KerningRule>();
-            services.AddTransient<IMessageRule, MockingTextRule>();
-            services.AddTransient<IMessageRule, WaifuRule>();
-            services.AddTransient<IMessageRule, AnimeRule>();
-            services.AddTransient<IMessageRule, DeviantartRule>();
-            services.AddTransient<IMessageRule, PixivRule>();
-            services.AddTransient<IMessageRule, DadJokeRule>();
-            services.AddTransient<IMessageRule, YearProgressRule>();
-            services.AddTransient<IMessageRule, DownloadCompleteRule>();
-
             services.AddTransient<DadJokeService>();
             services.AddTransient<PixivAppAPI>();
             services.AddTransient<DeviantartService>();

@@ -1,12 +1,14 @@
 ﻿using ChatBeet;
 using DtellaRules.Services;
+using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class RecentTweetRule : MessageRuleBase<IrcMessage>
+    public class RecentTweetRule : MessageRuleBase<PrivateMessage>
     {
         private readonly ChatBeetConfiguration config;
         private readonly RecentTweetsService tweetService;
@@ -17,12 +19,12 @@ namespace DtellaRules.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.BotName}, what(?:'|’)?s new from @?([a-zA-Z0-9_]{{1,15}})\\??", RegexOptions.IgnoreCase);
-            if (rgx.IsMatch(incomingMessage.Content))
+            if (rgx.IsMatch(incomingMessage.Message))
             {
-                var username = rgx.Replace(incomingMessage.Content, @"$1");
+                var username = rgx.Replace(incomingMessage.Message, @"$1");
 
                 var tweet = await tweetService.GetRecentTweet(username, false, false);
 
@@ -32,7 +34,7 @@ namespace DtellaRules.Rules
                         ? $"{IrcValues.BOLD}{tweet.User?.Name}{IrcValues.RESET} at {tweet.CreatedAt} - {tweet.Text}"
                         : "Sorry, couldn't find anything recent.",
                     OutputType = IrcMessageType.Message,
-                    Target = incomingMessage.Channel
+                    Target = incomingMessage.GetResponseTarget()
                 };
             }
         }

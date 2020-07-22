@@ -1,14 +1,15 @@
 ﻿using ChatBeet;
 using DtellaRules.Services;
+using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class ArtistRule : MessageRuleBase<IrcMessage>
+    public class ArtistRule : MessageRuleBase<PrivateMessage>
     {
         private readonly ChatBeetConfiguration config;
         private readonly LastFmService lastFm;
@@ -19,12 +20,12 @@ namespace DtellaRules.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}artist (.*)", RegexOptions.IgnoreCase);
-            if (rgx.IsMatch(incomingMessage.Content))
+            if (rgx.IsMatch(incomingMessage.Message))
             {
-                var artistName = rgx.Replace(incomingMessage.Content, @"$1");
+                var artistName = rgx.Replace(incomingMessage.Message, @"$1");
 
                 var artist = await lastFm.GetArtistInfo(artistName);
 
@@ -34,84 +35,40 @@ namespace DtellaRules.Rules
                     bool hasBio = !string.IsNullOrEmpty(artist?.Bio?.Summary) && !artist.Bio.Summary.StartsWith("<a href");
 
                     if (hasBio)
+                    {
                         yield return new OutboundIrcMessage
                         {
                             Content = $"{artist.Bio?.Summary}",
-                            Target = incomingMessage.Channel
+                            Target = incomingMessage.GetResponseTarget()
                         };
+                    }
 
                     if (artist?.Tags?.Any() == true)
+                    {
                         yield return new OutboundIrcMessage
                         {
                             Content = $"{IrcValues.BOLD}Related tags{IrcValues.RESET}: { string.Join(", ", artist.Tags.Select(t => t.Name))}",
-                            Target = incomingMessage.Channel
+                            Target = incomingMessage.GetResponseTarget()
                         };
+                    }
 
                     if (!hasBio)
+                    {
                         yield return new OutboundIrcMessage
                         {
                             Content = $"I found the artist but they don't have a biography.  Check here for more: {artist.Url}",
-                            Target = incomingMessage.Channel
+                            Target = incomingMessage.GetResponseTarget()
                         };
+                    }
                 }
                 else
                 {
                     yield return new OutboundIrcMessage
                     {
                         Content = "Sorry, couldn't find that artist.",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
                 }
-            }
-        }
-    }
-
-    public class TrackRule : MessageRuleBase<IrcMessage>
-    {
-        private readonly ChatBeetConfiguration config;
-        private readonly LastFmService lastFm;
-
-        public TrackRule(LastFmService lastFm, IOptions<ChatBeetConfiguration> options)
-        {
-            this.lastFm = lastFm;
-            config = options.Value;
-        }
-
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
-        {
-            var rgx = new Regex($"^{config.CommandPrefix}track (.*) by (.*)");
-            var match = rgx.Match(incomingMessage.Content);
-            if (match.Success)
-            {
-                var trackName = match.Groups[1].Value;
-                var artistName = match.Groups[2].Value;
-
-                var track = await lastFm.GetTrackInfo(trackName, artistName);
-
-                if (track != null)
-                {
-                    var result = track.Name;
-                    if (track.Duration.HasValue)
-                        result += $" ({track.Duration})";
-                    if (!string.IsNullOrEmpty(track.AlbumName) || !string.IsNullOrEmpty(track.ArtistName))
-                        result += " |";
-                    if (!string.IsNullOrEmpty(track.AlbumName))
-                        result += $" from {track.AlbumName}";
-                    if (!string.IsNullOrEmpty(track.ArtistName))
-                        result += $" by {track.ArtistName}";
-                    result += $" | {track.Url}";
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = result,
-                        Target = incomingMessage.Channel
-                    };
-                }
-                else
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = "Sorry, couldn't find that track.",
-                        Target = incomingMessage.Channel
-                    };
             }
         }
     }

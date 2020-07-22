@@ -1,12 +1,14 @@
 ﻿using ChatBeet;
 using DtellaRules.Services;
+using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class DadJokeRule : MessageRuleBase<IrcMessage>
+    public class DadJokeRule : MessageRuleBase<PrivateMessage>
     {
         private readonly DadJokeService jokeService;
         private readonly ChatBeetConfiguration config;
@@ -17,10 +19,10 @@ namespace DtellaRules.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^({config.BotName},? ?tell.*joke)|({config.CommandPrefix}(dad )?joke)", RegexOptions.IgnoreCase);
-            var match = rgx.Match(incomingMessage.Content);
+            var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
                 var joke = await jokeService.GetDadJokeAsync();
@@ -30,7 +32,7 @@ namespace DtellaRules.Rules
                     yield return new OutboundIrcMessage
                     {
                         Content = joke.Trim(),
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
                 }
                 else
@@ -38,7 +40,7 @@ namespace DtellaRules.Rules
                     yield return new OutboundIrcMessage
                     {
                         Content = $"I'm the joke. 😢",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
                 }
             }
