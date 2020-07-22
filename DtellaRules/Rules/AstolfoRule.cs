@@ -1,12 +1,14 @@
 ﻿using ChatBeet;
 using DtellaRules.Services;
+using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DtellaRules.Rules
 {
-    public class AstolfoRule : MessageRuleBase<IrcMessage>
+    public class AstolfoRule : MessageRuleBase<PrivateMessage>
     {
         private readonly ChatBeetConfiguration config;
         private readonly RecentTweetsService twitterImageService;
@@ -17,9 +19,9 @@ namespace DtellaRules.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
-            if (incomingMessage.Content == $"{config.CommandPrefix}astolfo")
+            if (incomingMessage.Message == $"{config.CommandPrefix}astolfo")
             {
                 var tweet = await twitterImageService.GetRecentTweet("astolfomedia");
 
@@ -30,7 +32,7 @@ namespace DtellaRules.Rules
                     {
                         Content = imageUrl,
                         OutputType = IrcMessageType.Message,
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
                 }
             }

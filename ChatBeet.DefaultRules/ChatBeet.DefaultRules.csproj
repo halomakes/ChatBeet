@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ChatBeet.Irc\ChatBeet.Irc.csproj" />
     <ProjectReference Include="..\ChatBeet\ChatBeet.csproj" />
   </ItemGroup>
 

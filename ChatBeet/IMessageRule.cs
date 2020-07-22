@@ -5,19 +5,19 @@ namespace ChatBeet
 {
     public interface IMessageRule
     {
-        IAsyncEnumerable<OutboundIrcMessage> Respond(IInboundMessage incomingMessage);
+        IAsyncEnumerable<OutboundIrcMessage> Respond(object incomingMessage);
     }
 
-    public interface IMessageRule<TMessage> : IMessageRule where TMessage : IInboundMessage
+    public interface IMessageRule<TMessage> : IMessageRule
     {
         IAsyncEnumerable<OutboundIrcMessage> Respond(TMessage incomingMessage);
     }
 
-    public abstract class MessageRuleBase<TMessage> : IMessageRule<TMessage>, IMessageRule where TMessage : IInboundMessage
+    public abstract class MessageRuleBase<TMessage> : IMessageRule<TMessage>, IMessageRule
     {
         public abstract IAsyncEnumerable<OutboundIrcMessage> Respond(TMessage incomingMessage);
 
-        public IAsyncEnumerable<OutboundIrcMessage> Respond(IInboundMessage incomingMessage) =>
+        public IAsyncEnumerable<OutboundIrcMessage> Respond(object incomingMessage) =>
             incomingMessage is TMessage message
             ? Respond(message)
             : EmptyResult();

@@ -1,5 +1,6 @@
 ﻿using ChatBeet;
 using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using PixivCS;
@@ -11,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class PixivRule : MessageRuleBase<IrcMessage>
+    public class PixivRule : MessageRuleBase<PrivateMessage>
     {
         private readonly ChatBeetConfiguration config;
         private readonly DtellaRuleConfiguration.PixivConfiguration pixivConfig;
@@ -26,14 +27,14 @@ namespace DtellaRules.Rules
             this.cache = cache;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}(pixiv) (.*)", RegexOptions.IgnoreCase);
-            var match = rgx.Match(incomingMessage.Content);
+            var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
                 var search = match.Groups[2].Value;
-                // use ID instead of name if provided
+
                 var results = await cache.GetOrCreateAsync($"pixiv:{search}", async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
@@ -44,17 +45,21 @@ namespace DtellaRules.Rules
 
                 var text = PickImage(results);
                 if (text != null)
+                {
                     yield return new OutboundIrcMessage
                     {
                         Content = text,
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
+                }
                 else
+                {
                     yield return new OutboundIrcMessage
                     {
                         Content = $"Sorry, couldn't find that anything for {match.Groups[2].Value}, ya perv.",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
+                }
 
                 static string PickImage(SearchIllustResult searchResults)
                 {

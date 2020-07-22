@@ -1,16 +1,15 @@
 ﻿using ChatBeet;
 using DtellaRules.Data;
 using DtellaRules.Data.Entities;
+using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class MemoryCellRule : MessageRuleBase<IrcMessage>
+    public class MemoryCellRule : MessageRuleBase<PrivateMessage>
     {
         private readonly DtellaContext ctx;
         private readonly ChatBeetConfiguration config;
@@ -21,10 +20,10 @@ namespace DtellaRules.Rules
             this.ctx = ctx;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
             var setRgx = new Regex($"^({config.BotName}, |{config.CommandPrefix})remember (.*)=(.*)", RegexOptions.IgnoreCase);
-            var setMatch = setRgx.Match(incomingMessage.Content);
+            var setMatch = setRgx.Match(incomingMessage.Message);
             if (setMatch.Success)
             {
                 var key = setMatch.Groups[2].Value.Trim().ToLower();
@@ -39,7 +38,7 @@ namespace DtellaRules.Rules
 
                 ctx.MemoryCells.Add(new MemoryCell
                 {
-                    Author = incomingMessage.Sender,
+                    Author = incomingMessage.From,
                     Key = key,
                     Value = value
                 });
@@ -48,19 +47,21 @@ namespace DtellaRules.Rules
                 yield return new OutboundIrcMessage
                 {
                     Content = "Got it! 👍",
-                    Target = incomingMessage.Channel
+                    Target = incomingMessage.GetResponseTarget()
                 };
 
                 if (existingCell != null)
+                {
                     yield return new OutboundIrcMessage
                     {
                         Content = $"Previous value was {IrcValues.BOLD}{existingCell.Value}{IrcValues.RESET}, set by {existingCell.Author}.",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
+                }
             }
 
             var getRgx = new Regex($"^({config.BotName}, |{config.CommandPrefix})recall (.*)", RegexOptions.IgnoreCase);
-            var getMatch = getRgx.Match(incomingMessage.Content);
+            var getMatch = getRgx.Match(incomingMessage.Message);
             if (getMatch.Success)
             {
                 var caseSensitiveKey = getMatch.Groups[2].Value.Trim();
@@ -68,17 +69,21 @@ namespace DtellaRules.Rules
                 var cell = await ctx.MemoryCells.FindAsync(caseSensitiveKey.ToLower());
 
                 if (cell != null)
+                {
                     yield return new OutboundIrcMessage
                     {
                         Content = $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}: {cell.Value}",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
+                }
                 else
+                {
                     yield return new OutboundIrcMessage
                     {
                         Content = $"I don't have anything for {IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}.",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
+                }
             }
         }
     };

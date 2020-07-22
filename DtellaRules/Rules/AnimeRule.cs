@@ -1,13 +1,14 @@
 ﻿using ChatBeet;
 using DtellaRules.Services;
 using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class AnimeRule : MessageRuleBase<IrcMessage>
+    public class AnimeRule : MessageRuleBase<PrivateMessage>
     {
         private readonly ChatBeetConfiguration config;
         private readonly AnilistService client;
@@ -18,10 +19,10 @@ namespace DtellaRules.Rules
             this.client = client;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}(anime|manga|ln|light novel|ova) (.*)", RegexOptions.IgnoreCase);
-            var match = rgx.Match(incomingMessage.Content);
+            var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
                 var mediaName = match.Groups[2].Value;
@@ -35,7 +36,7 @@ namespace DtellaRules.Rules
                     yield return new OutboundIrcMessage
                     {
                         Content = $"{IrcValues.BOLD}{media.EnglishTitle}{IrcValues.RESET} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {score} • {media.Url}",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
                 }
                 else
@@ -43,7 +44,7 @@ namespace DtellaRules.Rules
                     yield return new OutboundIrcMessage
                     {
                         Content = $"Sorry, couldn't find that {match.Groups[1].Value}.",
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
                 }
             }

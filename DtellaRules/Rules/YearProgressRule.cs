@@ -1,5 +1,6 @@
 ﻿using ChatBeet;
 using DtellaRules.Utilities;
+using GravyIrc.Messages;
 using Humanizer;
 using Microsoft.Extensions.Options;
 using System;
@@ -9,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace DtellaRules.Rules
 {
-    public class YearProgressRule : MessageRuleBase<IrcMessage>
+    public class YearProgressRule : MessageRuleBase<PrivateMessage>
     {
         private readonly ChatBeetConfiguration config;
         private static readonly int barLength = 25;
@@ -19,10 +20,10 @@ namespace DtellaRules.Rules
             config = opts.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(IrcMessage incomingMessage)
+        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}progress (year|day|hour|minute|month|decade|century|millennium|week|second)", RegexOptions.IgnoreCase);
-            var match = rgx.Match(incomingMessage.Content);
+            var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
                 var bar = GetProgressBar(match.Groups[1].Value);
@@ -31,7 +32,7 @@ namespace DtellaRules.Rules
                     yield return new OutboundIrcMessage
                     {
                         Content = bar,
-                        Target = incomingMessage.Channel
+                        Target = incomingMessage.GetResponseTarget()
                     };
                 }
             }

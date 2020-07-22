@@ -24,9 +24,13 @@ namespace ChatBeet.Server
         {
             services.AddControllers();
 
-            services.AddIrcBot(Configuration.GetSection("Irc"));
+            services.AddIrcBot(Configuration.GetSection("Irc"), pipeline =>
+            {
+                pipeline.AddDefaultRules();
+                pipeline.AddDtellaRules();
+            });
+
             services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Bot"));
-            services.AddDefaultRules();
             services.AddDtellaRules(Configuration.GetSection("Rules:Dtella"));
             services.AddHttpClient();
         }

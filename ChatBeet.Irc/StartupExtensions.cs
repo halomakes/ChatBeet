@@ -1,20 +1,20 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 
 namespace ChatBeet.Irc
 {
     public static class StartupExtensions
     {
-        public static IServiceCollection AddIrcBot(this IServiceCollection services, IConfigurationSection configSection)
+        public static IServiceCollection AddIrcBot(this IServiceCollection services, IConfigurationSection configSection, Action<BotRulePipeline> configurePipeline = null)
         {
             services.Configure<IrcBotConfiguration>(c => configSection.Bind(c));
-            services.AddSingleton<MessageQueueService>();
-            services.AddHostedService<IrcBotService>();
+            ConfigureIrcBot(services, configurePipeline);
             return services;
         }
 
-        public static IServiceCollection AddIrcBot(this IServiceCollection services, Action<IrcBotConfiguration> configure)
+        public static IServiceCollection AddIrcBot(this IServiceCollection services, Action<IrcBotConfiguration> configure, Action<BotRulePipeline> configurePipeline = null)
         {
             if (configure == null)
             {
@@ -22,9 +22,22 @@ namespace ChatBeet.Irc
             }
 
             services.Configure(configure);
-            services.AddSingleton<MessageQueueService>();
-            services.AddHostedService<IrcBotService>();
+            ConfigureIrcBot(services, configurePipeline);
             return services;
+        }
+
+        private static void ConfigureIrcBot(IServiceCollection services, Action<BotRulePipeline> configurePipeline)
+        {
+            services.AddSingleton<MessageQueueService>();
+
+            var pipeline = new BotRulePipeline(services);
+            configurePipeline?.Invoke(pipeline);
+
+            services.AddHostedService(p => new IrcBotService(
+                p.GetRequiredService<MessageQueueService>(),
+                p.GetRequiredService<IOptions<IrcBotConfiguration>>(),
+                pipeline
+            ));
         }
     }
 }
