@@ -4,6 +4,7 @@ using GravyIrc.Messages;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -19,6 +20,7 @@ namespace ChatBeet.Irc
         private Timer timer;
         private bool isRegistered = false;
         private readonly BotRulePipeline pipeline;
+        readonly List<Type> registeredSubscriptionTypes = new List<Type>();
 
         public IrcBotService(MessageQueueService queueService, IOptions<IrcBotConfiguration> options, BotRulePipeline pipeline)
         {
@@ -38,12 +40,16 @@ namespace ChatBeet.Irc
         private void SubscribeToEvents()
         {
             var method = typeof(IrcBotService).GetMethod(nameof(IrcBotService.SubscribeToEvent), BindingFlags.NonPublic | BindingFlags.Instance);
-            var eligibleTypes = pipeline.SubscribedTypes.Where(t => typeof(IServerMessage).IsAssignableFrom(t));
+            var eligibleTypes = pipeline.SubscribedTypes.Where(t => typeof(IServerMessage).IsAssignableFrom(t)).Distinct();
 
             foreach (var type in eligibleTypes)
             {
-                var genericMethod = method.MakeGenericMethod(type);
-                genericMethod.Invoke(this, new object[] { });
+                if (!registeredSubscriptionTypes.Contains(type))
+                {
+                    registeredSubscriptionTypes.Add(type);
+                    var genericMethod = method.MakeGenericMethod(type);
+                    genericMethod.Invoke(this, new object[] { });
+                }
             }
         }
 
