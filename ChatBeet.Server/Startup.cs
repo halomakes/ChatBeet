@@ -45,6 +45,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<MemoryCellRule, PrivateMessage>();
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
+                pipeline.RegisterRule<EmojifyRule, PrivateMessage>();
                 pipeline.RegisterRule<WaifuRule, PrivateMessage>();
                 pipeline.RegisterRule<AnimeRule, PrivateMessage>();
                 pipeline.RegisterRule<DeviantartRule, PrivateMessage>();

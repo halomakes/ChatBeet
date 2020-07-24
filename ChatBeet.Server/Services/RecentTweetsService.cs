@@ -1,4 +1,5 @@
-﻿using ChatBeet.Utilities;
+﻿using ChatBeet.Configuration;
+using ChatBeet.Utilities;
 using LinqToTwitter;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;

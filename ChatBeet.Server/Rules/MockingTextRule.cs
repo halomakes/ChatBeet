@@ -18,11 +18,11 @@ namespace ChatBeet.Rules
         protected override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
             var rng = new Random();
-            var stupidifyalized = string.Concat(lookupMessage.Message.ToCharArray().Select(c => GetCase() ? char.ToUpper(c) : char.ToLower(c)));
+            var stupefied = string.Concat(lookupMessage.Message.ToCharArray().Select(RandomizeCase));
 
-            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {stupidifyalized}");
+            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {stupefied}");
 
-            bool GetCase() => rng.Next(0, 2) > 0;
+            char RandomizeCase(char c) => rng.Next(0, 2) > 0 ? char.ToUpper(c) : char.ToLower(c);
         }
     }
 }

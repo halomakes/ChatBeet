@@ -1,4 +1,4 @@
-﻿using ChatBeet;
+﻿using GravyBot;
 
 namespace ChatBeet.Utilities
 {
