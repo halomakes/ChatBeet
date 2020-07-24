@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet", "ChatBeet.Server\ChatBeet.csproj", "{F32866D2-C2D4-47E8-B1E6-27C510A264AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet", "ChatBeet\ChatBeet.csproj", "{F32866D2-C2D4-47E8-B1E6-27C510A264AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
