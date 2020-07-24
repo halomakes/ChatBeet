@@ -7,7 +7,6 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["ChatBeet.Server/ChatBeet.Server.csproj", "ChatBeet.Server/"]
 COPY ["DtellaRules/DtellaRules.csproj", "DtellaRules/"]
-COPY ["NetIRC/NetIRC.csproj", "NetIRC/"]
 COPY ["ChatBeet/ChatBeet.csproj", "ChatBeet/"]
 COPY ["ChatBeet.DefaultRules/ChatBeet.DefaultRules.csproj", "ChatBeet.DefaultRules/"]
 COPY ["ChatBeet.Irc/ChatBeet.Irc.csproj", "ChatBeet.Irc/"]

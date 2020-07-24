@@ -1,8 +1,8 @@
-﻿using ChatBeet.Irc;
-using DtellaRules.Models;
+﻿using ChatBeet.Models;
+using GravyBot;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ChatBeet.Server.Controllers
+namespace ChatBeet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

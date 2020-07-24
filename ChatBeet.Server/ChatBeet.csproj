@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>c79cf495-2496-4295-ad2d-49b3d2c73886</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GravyBot" Version="1.0.0" />
+    <PackageReference Include="GravyBot.SampleRules" Version="1.0.0" />
+    <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
+    <PackageReference Include="linqtotwitter" Version="5.1.2" />
+    <PackageReference Include="Markdig" Version="0.20.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.6" />
+    <PackageReference Include="Miki.Anilist" Version="0.6.3" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="PixivCS" Version="0.5.11" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
+  </ItemGroup>
+
+
+</Project>
