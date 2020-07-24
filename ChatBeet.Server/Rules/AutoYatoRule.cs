@@ -1,5 +1,6 @@
-﻿using ChatBeet;
+﻿using ChatBeet.Configuration;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($@"^{config.BotName}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Message))
@@ -27,12 +28,7 @@ namespace ChatBeet.Rules
                 var topic = rgx.Replace(incomingMessage.Message, @"$1");
                 var url = $"{autoYatoUrl}/{WebUtility.UrlEncode(topic)}";
 
-                yield return new OutboundIrcMessage
-                {
-                    Content = $"Here's what yato thinks of {topic}: {url}",
-                    OutputType = IrcMessageType.Message,
-                    Target = incomingMessage.GetResponseTarget()
-                };
+                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Here's what yato thinks of {topic}: {url}");
             }
         }
     }

@@ -4,6 +4,7 @@ using ChatBeet.Models;
 using ChatBeet.Rules;
 using ChatBeet.Services;
 using GravyBot;
+using GravyBot.DefaultRules;
 using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
 using Microsoft.AspNetCore.Builder;

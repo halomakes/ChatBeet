@@ -1,6 +1,6 @@
-﻿using ChatBeet;
-using ChatBeet.Services;
+﻿using ChatBeet.Services;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             if (incomingMessage.Message == $"{config.CommandPrefix}astolfo")
             {
@@ -28,12 +28,7 @@ namespace ChatBeet.Rules
                 var imageUrl = tweet.Entities?.MediaEntities?.FirstOrDefault()?.MediaUrlHttps;
                 if (!string.IsNullOrEmpty(imageUrl))
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = imageUrl,
-                        OutputType = IrcMessageType.Message,
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), imageUrl);
                 }
             }
         }

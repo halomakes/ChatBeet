@@ -1,6 +1,5 @@
-using ChatBeet;
-using ChatBeet.Irc;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -14,15 +13,11 @@ namespace ChatBeet.Rules
             CommandName = "kern";
         }
 
-        protected override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
+        protected override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
             var spaced = string.Join(" ", lookupMessage.Message.ToCharArray()).ToUpper();
 
-            yield return new OutboundIrcMessage
-            {
-                Content = $"<{lookupMessage.From}> {spaced}",
-                Target = incomingMessage.GetResponseTarget()
-            };
+            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {spaced}");
         }
     }
 }

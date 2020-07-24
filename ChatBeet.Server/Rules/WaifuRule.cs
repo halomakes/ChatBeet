@@ -1,6 +1,6 @@
-﻿using ChatBeet;
-using ChatBeet.Services;
+﻿using ChatBeet.Services;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
             this.client = client;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}(waifu|husbando) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
@@ -30,19 +30,17 @@ namespace ChatBeet.Rules
 
                 if (character != null)
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"{character.FirstName} {character.LastName} ({character.NativeName}) - {character.LargeImageUrl} | {character.SiteUrl}",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        $"{character.FirstName} {character.LastName} ({character.NativeName}) - {character.LargeImageUrl} | {character.SiteUrl}"
+                    );
                 }
                 else
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"Sorry, couldn't find that {match.Groups[1].Value}.",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        $"Sorry, couldn't find that {match.Groups[1].Value}."
+                    );
                 }
             }
         }

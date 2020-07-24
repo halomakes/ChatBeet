@@ -1,5 +1,6 @@
-﻿using ChatBeet;
-using ChatBeet.Models;
+﻿using ChatBeet.Models;
+using GravyBot;
+using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -15,7 +16,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(DownloadCompleteMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(DownloadCompleteMessage incomingMessage)
         {
             if (incomingMessage.Source == "deluge" && !string.IsNullOrEmpty(incomingMessage.Name))
             {
@@ -23,11 +24,7 @@ namespace ChatBeet.Rules
                 downloadTitle = new Regex(@"(\[.*?\])").Replace(downloadTitle, $"{IrcValues.ORANGE}$1{IrcValues.RESET}");
                 downloadTitle = new Regex(@"(\.[A-z0-9]{3})$").Replace(downloadTitle, $"{IrcValues.GREY}$1{IrcValues.RESET}");
 
-                yield return new OutboundIrcMessage
-                {
-                    Content = $"{IrcValues.BOLD}{IrcValues.LIME}Download Complete{IrcValues.RESET}: {downloadTitle}",
-                    Target = config.NotifyChannel
-                };
+                yield return new PrivateMessage(config.NotifyChannel, $"{IrcValues.BOLD}{IrcValues.LIME}Download Complete{IrcValues.RESET}: {downloadTitle}");
             }
         }
     }

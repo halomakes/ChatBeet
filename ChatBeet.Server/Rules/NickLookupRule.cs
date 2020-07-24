@@ -1,5 +1,5 @@
-﻿using ChatBeet;
-using ChatBeet.Irc;
+﻿using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -20,10 +20,12 @@ namespace ChatBeet.Rules
         }
 
         protected string CommandName;
+        private MessageQueueService messageQueueService1;
+        private IOptions<ChatBeetConfiguration> options;
 
-        protected abstract IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
+        protected abstract IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
 
-        public override IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             if (!string.IsNullOrEmpty(CommandName))
             {
@@ -35,11 +37,13 @@ namespace ChatBeet.Rules
                     var message = messageQueueService.GetLatestMessage(nick, incomingMessage.To, incomingMessage);
 
                     if (message != null)
+                    {
                         return Respond(incomingMessage, nick, message);
+                    }
                 }
             }
 
-            return AsyncEnumerable.Empty<OutboundIrcMessage>();
+            return AsyncEnumerable.Empty<IClientMessage>();
         }
     }
 }

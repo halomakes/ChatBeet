@@ -1,6 +1,6 @@
-﻿using ChatBeet;
-using ChatBeet.Services;
+﻿using ChatBeet.Services;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^({config.BotName},? ?tell.*joke)|({config.CommandPrefix}(dad )?joke)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
@@ -29,19 +29,11 @@ namespace ChatBeet.Rules
 
                 if (!string.IsNullOrEmpty(joke))
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = joke.Trim(),
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), joke.Trim());
                 }
                 else
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"I'm the joke. 😢",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"I'm the joke. 😢");
                 }
             }
         }

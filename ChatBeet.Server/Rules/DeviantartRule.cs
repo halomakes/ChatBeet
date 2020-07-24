@@ -1,6 +1,6 @@
-﻿using ChatBeet;
-using ChatBeet.Services;
+﻿using ChatBeet.Services;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}(da|deviantart|degenerate) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
@@ -31,19 +31,11 @@ namespace ChatBeet.Rules
 
                 if (media != null)
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"{IrcValues.BOLD}{media.Title?.Text}{IrcValues.RESET} - {media.Id}",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{IrcValues.BOLD}{media.Title?.Text}{IrcValues.RESET} - {media.Id}");
                 }
                 else
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"Sorry, couldn't find anything matching {match.Groups[2].Value}.",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything matching {match.Groups[2].Value}.");
                 }
             }
         }

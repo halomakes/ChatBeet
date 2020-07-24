@@ -1,6 +1,5 @@
-﻿using ChatBeet;
-using ChatBeet.Irc;
-using ChatBeet.Utilities;
+﻿using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System;
@@ -16,16 +15,12 @@ namespace ChatBeet.Rules
             CommandName = "mock";
         }
 
-        protected override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
+        protected override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
             var rng = new Random();
             var stupidifyalized = string.Concat(lookupMessage.Message.ToCharArray().Select(c => GetCase() ? char.ToUpper(c) : char.ToLower(c)));
 
-            yield return new OutboundIrcMessage
-            {
-                Content = $"<{lookupMessage.From}> {stupidifyalized}",
-                Target = incomingMessage.GetResponseTarget()
-            };
+            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {stupidifyalized}");
 
             bool GetCase() => rng.Next(0, 2) > 0;
         }

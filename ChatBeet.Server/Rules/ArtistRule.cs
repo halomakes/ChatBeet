@@ -1,6 +1,6 @@
-﻿using ChatBeet;
-using ChatBeet.Services;
+﻿using ChatBeet.Services;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}artist (.*)", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Message))
@@ -36,38 +36,34 @@ namespace ChatBeet.Rules
 
                     if (hasBio)
                     {
-                        yield return new OutboundIrcMessage
-                        {
-                            Content = $"{artist.Bio?.Summary}",
-                            Target = incomingMessage.GetResponseTarget()
-                        };
+                        yield return new PrivateMessage(
+                            incomingMessage.GetResponseTarget(),
+                            $"{artist.Bio?.Summary}"
+                        );
                     }
 
                     if (artist?.Tags?.Any() == true)
                     {
-                        yield return new OutboundIrcMessage
-                        {
-                            Content = $"{IrcValues.BOLD}Related tags{IrcValues.RESET}: { string.Join(", ", artist.Tags.Select(t => t.Name))}",
-                            Target = incomingMessage.GetResponseTarget()
-                        };
+                        yield return new PrivateMessage(
+                            incomingMessage.GetResponseTarget(),
+                            $"{IrcValues.BOLD}Related tags{IrcValues.RESET}: { string.Join(", ", artist.Tags.Select(t => t.Name))}"
+                        );
                     }
 
                     if (!hasBio)
                     {
-                        yield return new OutboundIrcMessage
-                        {
-                            Content = $"I found the artist but they don't have a biography.  Check here for more: {artist.Url}",
-                            Target = incomingMessage.GetResponseTarget()
-                        };
+                        yield return new PrivateMessage(
+                            incomingMessage.GetResponseTarget(),
+                            $"I found the artist but they don't have a biography.  Check here for more: {artist.Url}"
+                        );
                     }
                 }
                 else
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = "Sorry, couldn't find that artist.",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        "Sorry, couldn't find that artist."
+                    );
                 }
             }
         }

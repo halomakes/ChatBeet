@@ -1,7 +1,7 @@
-﻿using ChatBeet;
-using ChatBeet.Data;
+﻿using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace ChatBeet.Rules
             this.ctx = ctx;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var setRgx = new Regex($"^({config.BotName}, |{config.CommandPrefix})remember (.*)=(.*)", RegexOptions.IgnoreCase);
             var setMatch = setRgx.Match(incomingMessage.Message);
@@ -44,19 +44,14 @@ namespace ChatBeet.Rules
                 });
                 await ctx.SaveChangesAsync();
 
-                yield return new OutboundIrcMessage
-                {
-                    Content = "Got it! 👍",
-                    Target = incomingMessage.GetResponseTarget()
-                };
+                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), "Got it! 👍");
 
                 if (existingCell != null)
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"Previous value was {IrcValues.BOLD}{existingCell.Value}{IrcValues.RESET}, set by {existingCell.Author}.",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        $"Previous value was {IrcValues.BOLD}{existingCell.Value}{IrcValues.RESET}, set by {existingCell.Author}."
+                    );
                 }
             }
 
@@ -70,19 +65,17 @@ namespace ChatBeet.Rules
 
                 if (cell != null)
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}: {cell.Value}",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}: {cell.Value}"
+                    );
                 }
                 else
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"I don't have anything for {IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}.",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        $"I don't have anything for {IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}."
+                    );
                 }
             }
         }

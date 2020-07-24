@@ -1,5 +1,6 @@
-﻿using ChatBeet;
+﻿using ChatBeet.Configuration;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Humanizer;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,7 @@ namespace ChatBeet.Rules
             config = opts.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}progress (year|day|hour|minute|month|decade|century|millennium|week|second)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
@@ -29,11 +30,7 @@ namespace ChatBeet.Rules
                 var bar = GetProgressBar(match.Groups[1].Value);
                 if (!string.IsNullOrEmpty(bar))
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = bar,
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), bar);
                 }
             }
         }

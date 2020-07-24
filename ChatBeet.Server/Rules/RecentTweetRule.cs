@@ -1,6 +1,6 @@
-﻿using ChatBeet;
-using ChatBeet.Services;
+﻿using ChatBeet.Services;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.BotName}, what(?:'|’)?s new from @?([a-zA-Z0-9_]{{1,15}})\\??", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Message))
@@ -28,14 +28,12 @@ namespace ChatBeet.Rules
 
                 var tweet = await tweetService.GetRecentTweet(username, false, false);
 
-                yield return new OutboundIrcMessage
-                {
-                    Content = tweet != null
+                yield return new PrivateMessage(
+                    incomingMessage.GetResponseTarget(),
+                    tweet != null
                         ? $"{IrcValues.BOLD}{tweet.User?.Name}{IrcValues.RESET} at {tweet.CreatedAt} - {tweet.Text}"
-                        : "Sorry, couldn't find anything recent.",
-                    OutputType = IrcMessageType.Message,
-                    Target = incomingMessage.GetResponseTarget()
-                };
+                        : "Sorry, couldn't find anything recent."
+                );
             }
         }
     }

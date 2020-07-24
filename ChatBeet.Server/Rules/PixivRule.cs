@@ -1,5 +1,6 @@
-﻿using ChatBeet;
+﻿using ChatBeet.Configuration;
 using ChatBeet.Utilities;
+using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -27,7 +28,7 @@ namespace ChatBeet.Rules
             this.cache = cache;
         }
 
-        public override async IAsyncEnumerable<OutboundIrcMessage> Respond(PrivateMessage incomingMessage)
+        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}(pixiv) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
@@ -46,19 +47,11 @@ namespace ChatBeet.Rules
                 var text = PickImage(results);
                 if (text != null)
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = text,
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), text);
                 }
                 else
                 {
-                    yield return new OutboundIrcMessage
-                    {
-                        Content = $"Sorry, couldn't find that anything for {match.Groups[2].Value}, ya perv.",
-                        Target = incomingMessage.GetResponseTarget()
-                    };
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {match.Groups[2].Value}, ya perv.");
                 }
 
                 static string PickImage(SearchIllustResult searchResults)
