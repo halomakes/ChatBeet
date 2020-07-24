@@ -14,7 +14,7 @@ namespace ChatBeet.Irc
 {
     internal class IrcBotService : IHostedService, IDisposable
     {
-        private readonly Client client;
+        private readonly IrcClient client;
         private readonly MessageQueueService queueService;
         private readonly IrcBotConfiguration config;
         private Timer timer;
@@ -29,7 +29,7 @@ namespace ChatBeet.Irc
             config = options.Value;
 
             var user = new User(config.Nick, config.Identity);
-            client = new Client(user, new TcpClientConnection());
+            client = new IrcClient(user, new TcpClientConnection());
             client.OnRawDataReceived += Client_OnRawDataReceived;
             client.EventHub.Subscribe<RplWelcomeMessage>(Client_OnRegistered);
             queueService.MessageAdded += QueueService_MessageAdded;
@@ -69,7 +69,7 @@ namespace ChatBeet.Irc
             await SendQueuedMessages();
         }
 
-        private async void Client_OnRegistered(object sender, EventArgs e)
+        private async void Client_OnRegistered(object sender, IrcMessageEventArgs<RplWelcomeMessage> e)
         {
             await client.SendAsync(new PrivateMessage("NickServ", $"identify {config.NickServ}"));
             await client.SendAsync(new UserModeMessage(config.Nick, "+B"));
@@ -137,7 +137,7 @@ namespace ChatBeet.Irc
             await client.SendAsync(new UserMessage(config.Nick, config.Identity));
         }
 
-        private void Client_OnRawDataReceived(Client client, string rawData)
+        private void Client_OnRawDataReceived(IrcClient client, string rawData)
         {
             Console.WriteLine(rawData);
         }
