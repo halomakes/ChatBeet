@@ -3,15 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet", "ChatBeet\ChatBeet.csproj", "{0963F19C-986E-493F-9D77-043F330E0175}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet.Server", "ChatBeet.Server\ChatBeet.Server.csproj", "{F32866D2-C2D4-47E8-B1E6-27C510A264AB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet.DefaultRules", "ChatBeet.DefaultRules\ChatBeet.DefaultRules.csproj", "{81313962-B833-4B39-83D6-58AF62D55CAA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet.Irc", "ChatBeet.Irc\ChatBeet.Irc.csproj", "{928421D6-48C2-4277-9029-E647A38FBF0B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DtellaRules", "DtellaRules\DtellaRules.csproj", "{2AD709FB-ADAF-45FA-AD92-C202AA55F315}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet", "ChatBeet\ChatBeet.csproj", "{F32866D2-C2D4-47E8-B1E6-27C510A264AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,26 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0963F19C-986E-493F-9D77-043F330E0175}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0963F19C-986E-493F-9D77-043F330E0175}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0963F19C-986E-493F-9D77-043F330E0175}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0963F19C-986E-493F-9D77-043F330E0175}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F32866D2-C2D4-47E8-B1E6-27C510A264AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F32866D2-C2D4-47E8-B1E6-27C510A264AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F32866D2-C2D4-47E8-B1E6-27C510A264AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F32866D2-C2D4-47E8-B1E6-27C510A264AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{81313962-B833-4B39-83D6-58AF62D55CAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{81313962-B833-4B39-83D6-58AF62D55CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{81313962-B833-4B39-83D6-58AF62D55CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{81313962-B833-4B39-83D6-58AF62D55CAA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{928421D6-48C2-4277-9029-E647A38FBF0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{928421D6-48C2-4277-9029-E647A38FBF0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{928421D6-48C2-4277-9029-E647A38FBF0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{928421D6-48C2-4277-9029-E647A38FBF0B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2AD709FB-ADAF-45FA-AD92-C202AA55F315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2AD709FB-ADAF-45FA-AD92-C202AA55F315}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2AD709FB-ADAF-45FA-AD92-C202AA55F315}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2AD709FB-ADAF-45FA-AD92-C202AA55F315}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
