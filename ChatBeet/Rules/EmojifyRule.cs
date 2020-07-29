@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
             {"in","➡" },
             {"netflix","🎥🍿" },
             {"chill","❄" },
-            { "dick","🍆"},
+            {"dick","🍆"},
             {"oral","😮" },
             {"poop","💩" },
             {"ready", "🚀" },
