@@ -11,9 +11,9 @@ namespace ChatBeet.Rules
     public class DadJokeRule : MessageRuleBase<PrivateMessage>
     {
         private readonly DadJokeService jokeService;
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
 
-        public DadJokeRule(DadJokeService jokeService, IOptions<ChatBeetConfiguration> options)
+        public DadJokeRule(DadJokeService jokeService, IOptions<IrcBotConfiguration> options)
         {
             this.jokeService = jokeService;
             config = options.Value;
@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
 
         public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^({config.BotName},? ?tell.*joke)|({config.CommandPrefix}(dad )?joke)", RegexOptions.IgnoreCase);
+            var rgx = new Regex($"^({config.Nick},? ?tell.*joke)|({config.CommandPrefix}(dad )?joke)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {

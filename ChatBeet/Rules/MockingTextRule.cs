@@ -10,7 +10,7 @@ namespace ChatBeet.Rules
 {
     public class MockingTextRule : NickLookupRule
     {
-        public MockingTextRule(MessageQueueService messageQueueService, IOptions<ChatBeetConfiguration> options) : base(messageQueueService, options)
+        public MockingTextRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, options)
         {
             CommandName = "mock";
         }

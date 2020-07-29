@@ -4,11 +4,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>c79cf495-2496-4295-ad2d-49b3d2c73886</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GravyBot" Version="1.0.0" />
-    <PackageReference Include="GravyBot.SampleRules" Version="1.0.0" />
+    <PackageReference Include="GravyBot" Version="1.0.2" />
+    <PackageReference Include="GravyBot.SampleRules" Version="1.0.1" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
     <PackageReference Include="linqtotwitter" Version="5.1.2" />

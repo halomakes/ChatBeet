@@ -15,12 +15,12 @@ namespace ChatBeet.Rules
 {
     public class PixivRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private readonly DtellaRuleConfiguration.PixivConfiguration pixivConfig;
         private readonly PixivAppAPI pixiv;
         private readonly IMemoryCache cache;
 
-        public PixivRule(IOptions<ChatBeetConfiguration> options, IOptions<DtellaRuleConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
+        public PixivRule(IOptions<IrcBotConfiguration> options, IOptions<DtellaRuleConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
         {
             config = options.Value;
             pixivConfig = dtlaOptions.Value.Pixiv;

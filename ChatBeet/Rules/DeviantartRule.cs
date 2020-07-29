@@ -11,9 +11,9 @@ namespace ChatBeet.Rules
     public class DeviantartRule : MessageRuleBase<PrivateMessage>
     {
         private readonly DeviantartService daService;
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
 
-        public DeviantartRule(DeviantartService daService, IOptions<ChatBeetConfiguration> options)
+        public DeviantartRule(DeviantartService daService, IOptions<IrcBotConfiguration> options)
         {
             this.daService = daService;
             config = options.Value;

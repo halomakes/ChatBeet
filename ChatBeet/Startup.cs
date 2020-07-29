@@ -55,7 +55,6 @@ namespace ChatBeet
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
             });
 
-            services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Bot"));
             services.AddHttpClient();
 
             services.AddTransient<DadJokeService>();

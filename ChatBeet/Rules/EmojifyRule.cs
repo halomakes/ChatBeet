@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
             {"in","➡" },
             {"netflix","🎥🍿" },
             {"chill","❄" },
-            { "dick","🍆"},
+            {"dick","🍆"},
             {"oral","😮" },
             {"poop","💩" },
             {"ready", "🚀" },
@@ -55,7 +55,7 @@ namespace ChatBeet.Rules
             {"down","👇"}
         };
 
-        public EmojifyRule(MessageQueueService messageQueueService, IOptions<ChatBeetConfiguration> options) : base(messageQueueService, options)
+        public EmojifyRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, options)
         {
             CommandName = "emojify";
         }

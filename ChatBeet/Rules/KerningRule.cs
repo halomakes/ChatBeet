@@ -8,7 +8,7 @@ namespace ChatBeet.Rules
 {
     public class KerningRule : NickLookupRule
     {
-        public KerningRule(MessageQueueService messageQueueService, IOptions<ChatBeetConfiguration> options) : base(messageQueueService, options)
+        public KerningRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, options)
         {
             CommandName = "kern";
         }

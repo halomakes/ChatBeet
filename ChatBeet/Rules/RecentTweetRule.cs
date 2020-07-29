@@ -10,10 +10,10 @@ namespace ChatBeet.Rules
 {
     public class RecentTweetRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private readonly RecentTweetsService tweetService;
 
-        public RecentTweetRule(RecentTweetsService tweetService, IOptions<ChatBeetConfiguration> options)
+        public RecentTweetRule(RecentTweetsService tweetService, IOptions<IrcBotConfiguration> options)
         {
             this.tweetService = tweetService;
             config = options.Value;
@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
 
         public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.BotName}, what(?:'|’)?s new from @?([a-zA-Z0-9_]{{1,15}})\\??", RegexOptions.IgnoreCase);
+            var rgx = new Regex($"^{config.Nick}, what(?:'|’)?s new from @?([a-zA-Z0-9_]{{1,15}})\\??", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Message))
             {
                 var username = rgx.Replace(incomingMessage.Message, @"$1");
