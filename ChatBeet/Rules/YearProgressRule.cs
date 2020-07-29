@@ -13,10 +13,10 @@ namespace ChatBeet.Rules
 {
     public class YearProgressRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private static readonly int barLength = 25;
 
-        public YearProgressRule(IOptions<ChatBeetConfiguration> opts)
+        public YearProgressRule(IOptions<IrcBotConfiguration> opts)
         {
             config = opts.Value;
         }

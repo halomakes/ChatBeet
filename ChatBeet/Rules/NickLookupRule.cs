@@ -10,10 +10,10 @@ namespace ChatBeet.Rules
 {
     public abstract class NickLookupRule : MessageRuleBase<PrivateMessage>
     {
-        protected readonly ChatBeetConfiguration config;
+        protected readonly IrcBotConfiguration config;
         protected readonly MessageQueueService messageQueueService;
 
-        public NickLookupRule(MessageQueueService messageQueueService, IOptions<ChatBeetConfiguration> options)
+        public NickLookupRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options)
         {
             this.messageQueueService = messageQueueService;
             config = options.Value;
@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
 
         protected string CommandName;
         private MessageQueueService messageQueueService1;
-        private IOptions<ChatBeetConfiguration> options;
+        private IOptions<IrcBotConfiguration> options;
 
         protected abstract IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
 

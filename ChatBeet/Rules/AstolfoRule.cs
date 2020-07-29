@@ -10,10 +10,10 @@ namespace ChatBeet.Rules
 {
     public class AstolfoRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private readonly RecentTweetsService twitterImageService;
 
-        public AstolfoRule(RecentTweetsService twitterImageService, IOptions<ChatBeetConfiguration> options)
+        public AstolfoRule(RecentTweetsService twitterImageService, IOptions<IrcBotConfiguration> options)
         {
             this.twitterImageService = twitterImageService;
             config = options.Value;

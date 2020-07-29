@@ -10,10 +10,10 @@ namespace ChatBeet.Rules
 {
     public class AnimeRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private readonly AnilistService client;
 
-        public AnimeRule(IOptions<ChatBeetConfiguration> options, AnilistService client)
+        public AnimeRule(IOptions<IrcBotConfiguration> options, AnilistService client)
         {
             config = options.Value;
             this.client = client;

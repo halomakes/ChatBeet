@@ -10,10 +10,10 @@ namespace ChatBeet.Rules
 {
     public class TrackRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private readonly LastFmService lastFm;
 
-        public TrackRule(LastFmService lastFm, IOptions<ChatBeetConfiguration> options)
+        public TrackRule(LastFmService lastFm, IOptions<IrcBotConfiguration> options)
         {
             this.lastFm = lastFm;
             config = options.Value;

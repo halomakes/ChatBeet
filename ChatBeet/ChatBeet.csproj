@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GravyBot" Version="1.0.0" />
-    <PackageReference Include="GravyBot.SampleRules" Version="1.0.0" />
+    <PackageReference Include="GravyBot" Version="1.0.4" />
+    <PackageReference Include="GravyBot.SampleRules" Version="1.0.1" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
     <PackageReference Include="linqtotwitter" Version="5.1.2" />

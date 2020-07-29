@@ -12,9 +12,9 @@ namespace ChatBeet.Rules
     public class MemoryCellRule : MessageRuleBase<PrivateMessage>
     {
         private readonly DtellaContext ctx;
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
 
-        public MemoryCellRule(DtellaContext ctx, IOptions<ChatBeetConfiguration> options)
+        public MemoryCellRule(DtellaContext ctx, IOptions<IrcBotConfiguration> options)
         {
             config = options.Value;
             this.ctx = ctx;
@@ -22,7 +22,7 @@ namespace ChatBeet.Rules
 
         public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var setRgx = new Regex($"^({config.BotName}, |{config.CommandPrefix})remember (.*)=(.*)", RegexOptions.IgnoreCase);
+            var setRgx = new Regex($"^({config.Nick}, |{config.CommandPrefix})remember (.*)=(.*)", RegexOptions.IgnoreCase);
             var setMatch = setRgx.Match(incomingMessage.Message);
             if (setMatch.Success)
             {
@@ -55,7 +55,7 @@ namespace ChatBeet.Rules
                 }
             }
 
-            var getRgx = new Regex($"^({config.BotName}, |{config.CommandPrefix})recall (.*)", RegexOptions.IgnoreCase);
+            var getRgx = new Regex($"^({config.Nick}, |{config.CommandPrefix})recall (.*)", RegexOptions.IgnoreCase);
             var getMatch = getRgx.Match(incomingMessage.Message);
             if (getMatch.Success)
             {

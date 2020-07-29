@@ -9,9 +9,9 @@ namespace ChatBeet.Rules
 {
     public class DownloadCompleteRule : MessageRuleBase<DownloadCompleteMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
 
-        public DownloadCompleteRule(IOptions<ChatBeetConfiguration> options)
+        public DownloadCompleteRule(IOptions<IrcBotConfiguration> options)
         {
             config = options.Value;
         }

@@ -11,10 +11,10 @@ namespace ChatBeet.Rules
 {
     public class ArtistRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private readonly LastFmService lastFm;
 
-        public ArtistRule(LastFmService lastFm, IOptions<ChatBeetConfiguration> options)
+        public ArtistRule(LastFmService lastFm, IOptions<IrcBotConfiguration> options)
         {
             this.lastFm = lastFm;
             config = options.Value;

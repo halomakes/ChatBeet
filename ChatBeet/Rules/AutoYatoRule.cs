@@ -11,10 +11,10 @@ namespace ChatBeet.Rules
 {
     public class AutoYatoRule : MessageRuleBase<PrivateMessage>
     {
-        private readonly ChatBeetConfiguration config;
+        private readonly IrcBotConfiguration config;
         private readonly string autoYatoUrl;
 
-        public AutoYatoRule(IOptions<DtellaRuleConfiguration> dtellaOptions, IOptions<ChatBeetConfiguration> options)
+        public AutoYatoRule(IOptions<DtellaRuleConfiguration> dtellaOptions, IOptions<IrcBotConfiguration> options)
         {
             autoYatoUrl = dtellaOptions.Value.Urls["AutoYato"];
             config = options.Value;
@@ -22,7 +22,7 @@ namespace ChatBeet.Rules
 
         public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($@"^{config.BotName}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
+            var rgx = new Regex($@"^{config.Nick}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Message))
             {
                 var topic = rgx.Replace(incomingMessage.Message, @"$1");
