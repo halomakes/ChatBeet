@@ -50,7 +50,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<DeviantartRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<PixivRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
-                pipeline.RegisterRule<YearProgressRule, PrivateMessage>();
+                pipeline.RegisterRule<ProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
             });
 

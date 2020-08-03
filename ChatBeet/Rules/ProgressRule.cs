@@ -11,12 +11,12 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class YearProgressRule : MessageRuleBase<PrivateMessage>
+    public class ProgressRule : MessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private static readonly int barLength = 25;
 
-        public YearProgressRule(IOptions<IrcBotConfiguration> opts)
+        public ProgressRule(IOptions<IrcBotConfiguration> opts)
         {
             config = opts.Value;
         }
