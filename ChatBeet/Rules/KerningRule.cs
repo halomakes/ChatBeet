@@ -13,7 +13,7 @@ namespace ChatBeet.Rules
             CommandName = "kern";
         }
 
-        protected override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
+        protected override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
             var spaced = string.Join(" ", lookupMessage.Message.ToCharArray()).ToUpper();
 

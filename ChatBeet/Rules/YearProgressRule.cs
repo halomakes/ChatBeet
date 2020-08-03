@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
             config = opts.Value;
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{config.CommandPrefix}progress (year|day|hour|minute|month|decade|century|millennium|week|second)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);

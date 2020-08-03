@@ -9,23 +9,26 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class ArtistRule : MessageRuleBase<PrivateMessage>
+    public class ArtistRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly LastFmService lastFm;
+        private readonly Regex pattern;
 
         public ArtistRule(LastFmService lastFm, IOptions<IrcBotConfiguration> options)
         {
             this.lastFm = lastFm;
             config = options.Value;
+            pattern = new Regex($"^{config.CommandPrefix}artist (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override bool Matches(PrivateMessage incomingMessage) => pattern.IsMatch(incomingMessage.Message);
+
+        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}artist (.*)", RegexOptions.IgnoreCase);
-            if (rgx.IsMatch(incomingMessage.Message))
+            if (pattern.IsMatch(incomingMessage.Message))
             {
-                var artistName = rgx.Replace(incomingMessage.Message, @"$1");
+                var artistName = pattern.Replace(incomingMessage.Message, @"$1");
 
                 var artist = await lastFm.GetArtistInfo(artistName);
 

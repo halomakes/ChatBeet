@@ -20,5 +20,10 @@ namespace ChatBeet.Utilities
         {
             return source.OrderBy(x => Guid.NewGuid());
         }
+
+        public static IEnumerable<T> ToSingleElementSequence<T>(this T item)
+        {
+            yield return item;
+        }
     }
 }

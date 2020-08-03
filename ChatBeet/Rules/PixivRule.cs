@@ -13,12 +13,13 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class PixivRule : MessageRuleBase<PrivateMessage>
+    public class PixivRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly DtellaRuleConfiguration.PixivConfiguration pixivConfig;
         private readonly PixivAppAPI pixiv;
         private readonly IMemoryCache cache;
+        private readonly Regex rgx;
 
         public PixivRule(IOptions<IrcBotConfiguration> options, IOptions<DtellaRuleConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
         {
@@ -26,11 +27,13 @@ namespace ChatBeet.Rules
             pixivConfig = dtlaOptions.Value.Pixiv;
             this.pixiv = pixiv;
             this.cache = cache;
+            rgx = new Regex($"^{config.CommandPrefix}(pixiv) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+
+        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(pixiv) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {

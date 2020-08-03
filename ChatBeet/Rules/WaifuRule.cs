@@ -8,20 +8,23 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class WaifuRule : MessageRuleBase<PrivateMessage>
+    public class WaifuRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly AnilistService client;
+        private readonly Regex rgx;
 
         public WaifuRule(IOptions<IrcBotConfiguration> options, AnilistService client)
         {
             config = options.Value;
             this.client = client;
+            rgx = new Regex($"^{config.CommandPrefix}(waifu|husbando) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+
+        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(waifu|husbando) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {

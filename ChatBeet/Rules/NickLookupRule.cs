@@ -2,6 +2,7 @@
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +13,7 @@ namespace ChatBeet.Rules
     {
         protected readonly IrcBotConfiguration config;
         protected readonly MessageQueueService messageQueueService;
+        protected string CommandName;
 
         public NickLookupRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options)
         {
@@ -19,13 +21,9 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        protected string CommandName;
-        private MessageQueueService messageQueueService1;
-        private IOptions<IrcBotConfiguration> options;
+        protected abstract IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
 
-        protected abstract IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
-
-        public override IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             if (!string.IsNullOrEmpty(CommandName))
             {
@@ -34,16 +32,24 @@ namespace ChatBeet.Rules
                 if (match.Success)
                 {
                     var nick = match.Groups[1].Value;
-                    var message = messageQueueService.GetLatestMessage(nick, incomingMessage.To, incomingMessage);
-
-                    if (message != null)
+                    if (nick.Equals(config.Nick, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        return Respond(incomingMessage, nick, message);
+                        return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From}: no u").ToSingleElementSequence();
+                    }
+                    else
+                    {
+                        var message = messageQueueService.GetLatestMessage(nick, incomingMessage.To, incomingMessage);
+
+                        if (message != null)
+                        {
+                            return Respond(incomingMessage, nick, message);
+                        }
+
                     }
                 }
             }
 
-            return AsyncEnumerable.Empty<IClientMessage>();
+            return Enumerable.Empty<IClientMessage>();
         }
     }
 }

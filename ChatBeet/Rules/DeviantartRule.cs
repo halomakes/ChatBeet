@@ -8,20 +8,23 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class DeviantartRule : MessageRuleBase<PrivateMessage>
+    public class DeviantartRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly DeviantartService daService;
         private readonly IrcBotConfiguration config;
+        private readonly Regex rgx;
 
         public DeviantartRule(DeviantartService daService, IOptions<IrcBotConfiguration> options)
         {
             this.daService = daService;
             config = options.Value;
+            rgx = new Regex($"^{config.CommandPrefix}(da|deviantart|degenerate) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+
+        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(da|deviantart|degenerate) (.*)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {

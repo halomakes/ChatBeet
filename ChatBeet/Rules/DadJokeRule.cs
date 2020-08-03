@@ -8,21 +8,24 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class DadJokeRule : MessageRuleBase<PrivateMessage>
+    public class DadJokeRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly DadJokeService jokeService;
         private readonly IrcBotConfiguration config;
+        private readonly Regex filter;
 
         public DadJokeRule(DadJokeService jokeService, IOptions<IrcBotConfiguration> options)
         {
             this.jokeService = jokeService;
             config = options.Value;
+            filter = new Regex($"^({config.Nick},? ?tell.*joke)|({config.CommandPrefix}(dad )?joke)", RegexOptions.IgnoreCase);
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
+
+        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^({config.Nick},? ?tell.*joke)|({config.CommandPrefix}(dad )?joke)", RegexOptions.IgnoreCase);
-            var match = rgx.Match(incomingMessage.Message);
+            var match = filter.Match(incomingMessage.Message);
             if (match.Success)
             {
                 var joke = await jokeService.GetDadJokeAsync();

@@ -16,7 +16,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(DownloadCompleteMessage incomingMessage)
+        public override IEnumerable<IClientMessage> Respond(DownloadCompleteMessage incomingMessage)
         {
             if (incomingMessage.Source == "deluge" && !string.IsNullOrEmpty(incomingMessage.Name))
             {

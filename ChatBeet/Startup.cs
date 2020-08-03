@@ -36,21 +36,20 @@ namespace ChatBeet
             {
                 pipeline.AddSampleRules();
 
-                pipeline.RegisterRule<AstolfoRule, PrivateMessage>();
-                pipeline.RegisterRule<StopRule, PrivateMessage>();
-                pipeline.RegisterRule<RecentTweetRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<AstolfoRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<RecentTweetRule, PrivateMessage>();
                 pipeline.RegisterRule<AutoYatoRule, PrivateMessage>();
-                pipeline.RegisterRule<ArtistRule, PrivateMessage>();
-                pipeline.RegisterRule<TrackRule, PrivateMessage>();
-                pipeline.RegisterRule<MemoryCellRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<ArtistRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<TrackRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<MemoryCellRule, PrivateMessage>();
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
                 pipeline.RegisterRule<EmojifyRule, PrivateMessage>();
-                pipeline.RegisterRule<WaifuRule, PrivateMessage>();
-                pipeline.RegisterRule<AnimeRule, PrivateMessage>();
-                pipeline.RegisterRule<DeviantartRule, PrivateMessage>();
-                pipeline.RegisterRule<PixivRule, PrivateMessage>();
-                pipeline.RegisterRule<DadJokeRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<WaifuRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<AnimeRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<DeviantartRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<PixivRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
                 pipeline.RegisterRule<YearProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
             });

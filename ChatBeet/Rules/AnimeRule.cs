@@ -8,21 +8,24 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class AnimeRule : MessageRuleBase<PrivateMessage>
+    public class AnimeRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly AnilistService client;
+        private readonly Regex filter;
 
         public AnimeRule(IOptions<IrcBotConfiguration> options, AnilistService client)
         {
             config = options.Value;
             this.client = client;
+            filter = new Regex($"^{config.CommandPrefix}(anime|manga|ln|light novel|ova) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
+
+        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}(anime|manga|ln|light novel|ova) (.*)", RegexOptions.IgnoreCase);
-            var match = rgx.Match(incomingMessage.Message);
+            var match = filter.Match(incomingMessage.Message);
             if (match.Success)
             {
                 var mediaName = match.Groups[2].Value;

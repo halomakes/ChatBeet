@@ -8,20 +8,23 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class TrackRule : MessageRuleBase<PrivateMessage>
+    public class TrackRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly LastFmService lastFm;
+        private readonly Regex rgx;
 
         public TrackRule(LastFmService lastFm, IOptions<IrcBotConfiguration> options)
         {
             this.lastFm = lastFm;
             config = options.Value;
+            rgx = new Regex($"^{config.CommandPrefix}track (.*) by (.*)");
         }
 
-        public override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+
+        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{config.CommandPrefix}track (.*) by (.*)");
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {

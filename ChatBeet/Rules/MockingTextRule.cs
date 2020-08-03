@@ -15,7 +15,7 @@ namespace ChatBeet.Rules
             CommandName = "mock";
         }
 
-        protected override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
+        protected override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
             var rng = new Random();
             var stupefied = string.Concat(lookupMessage.Message.ToCharArray().Select(RandomizeCase));

@@ -60,11 +60,13 @@ namespace ChatBeet.Rules
             CommandName = "emojify";
         }
 
-        protected override async IAsyncEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
+        protected override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
             var content = lookupMessage.Message;
             foreach (var pair in mappings.OrderByDescending(m => m.Key.Length))
+            {
                 content = content.Replace(pair.Key, pair.Value, true, DtellaRuleConfiguration.Culture);
+            }
 
             yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {content}");
         }
