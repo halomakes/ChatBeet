@@ -13,15 +13,20 @@ namespace ChatBeet.Services
 {
     public class TenorGifService
     {
-        private readonly HttpClient httpClient;
+        private readonly TenorClient client;
         private readonly IMemoryCache cache;
         private readonly ChatBeetConfiguration.TenorConfiguration config;
 
         public TenorGifService(IHttpClientFactory clientFactory, IMemoryCache cache, IOptions<ChatBeetConfiguration> options)
         {
-            httpClient = clientFactory.CreateClient();
             this.cache = cache;
             config = options.Value.Tenor;
+            var settings = new TenorConfiguration
+            {
+                ApiKey = config.ApiKey,
+                ContentFilter = ContentFilter.Off
+            };
+            client = new TenorClient(settings, clientFactory.CreateClient());
         }
 
         public async Task<string> GetGifAsync(string search)
@@ -30,7 +35,6 @@ namespace ChatBeet.Services
             {
                 e.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
-                var client = new TenorClient(config.ApiKey, httpClient);
                 return await client.SearchAsync(search, limit: config.QueryLimit);
             });
 
