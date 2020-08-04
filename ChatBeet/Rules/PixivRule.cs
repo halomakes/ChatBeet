@@ -16,12 +16,12 @@ namespace ChatBeet.Rules
     public class PixivRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
-        private readonly DtellaRuleConfiguration.PixivConfiguration pixivConfig;
+        private readonly ChatBeetConfiguration.PixivConfiguration pixivConfig;
         private readonly PixivAppAPI pixiv;
         private readonly IMemoryCache cache;
         private readonly Regex rgx;
 
-        public PixivRule(IOptions<IrcBotConfiguration> options, IOptions<DtellaRuleConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
+        public PixivRule(IOptions<IrcBotConfiguration> options, IOptions<ChatBeetConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
         {
             config = options.Value;
             pixivConfig = dtlaOptions.Value.Pixiv;
@@ -54,7 +54,7 @@ namespace ChatBeet.Rules
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {match.Groups[2].Value}, ya perv.");
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {search}, ya perv.");
                 }
 
                 static string PickImage(SearchIllustResult searchResults)

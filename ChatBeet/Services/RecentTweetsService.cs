@@ -11,10 +11,10 @@ namespace ChatBeet.Services
 {
     public class RecentTweetsService
     {
-        private readonly DtellaRuleConfiguration.TwitterConfiguration twitterConfig;
+        private readonly ChatBeetConfiguration.TwitterConfiguration twitterConfig;
         private readonly IMemoryCache cache;
 
-        public RecentTweetsService(IOptions<DtellaRuleConfiguration> twitterOptions, IMemoryCache cache)
+        public RecentTweetsService(IOptions<ChatBeetConfiguration> twitterOptions, IMemoryCache cache)
         {
             twitterConfig = twitterOptions.Value.Twitter;
             this.cache = cache;

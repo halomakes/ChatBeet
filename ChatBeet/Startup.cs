@@ -52,6 +52,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
                 pipeline.RegisterRule<ProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
+                pipeline.RegisterAsyncRule<GifSearchRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -61,11 +62,12 @@ namespace ChatBeet
             services.AddTransient<DeviantartService>();
             services.AddTransient<AnilistClient>();
             services.AddTransient<AnilistService>();
-            services.Configure<DtellaRuleConfiguration>(Configuration.GetSection("Rules:Dtella"));
+            services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules:Dtella"));
             services.AddTransient<RecentTweetsService>();
+            services.AddTransient<TenorGifService>();
             services.AddTransient(provider =>
             {
-                var config = provider.GetService<IOptions<DtellaRuleConfiguration>>().Value.LastFm;
+                var config = provider.GetService<IOptions<ChatBeetConfiguration>>().Value.LastFm;
                 return new LastfmClient(config.ClientId, config.ClientSecret);
             });
             services.AddTransient<LastFmService>();
