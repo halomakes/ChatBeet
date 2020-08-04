@@ -38,7 +38,7 @@ namespace ChatBeet.Rules
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {search}.");
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {search.Trim()}.");
                 }
             }
         }
