@@ -14,7 +14,7 @@ namespace ChatBeet.Rules
         private readonly IrcBotConfiguration config;
         private readonly string autoYatoUrl;
 
-        public AutoYatoRule(IOptions<DtellaRuleConfiguration> dtellaOptions, IOptions<IrcBotConfiguration> options)
+        public AutoYatoRule(IOptions<ChatBeetConfiguration> dtellaOptions, IOptions<IrcBotConfiguration> options)
         {
             autoYatoUrl = dtellaOptions.Value.Urls["AutoYato"];
             config = options.Value;

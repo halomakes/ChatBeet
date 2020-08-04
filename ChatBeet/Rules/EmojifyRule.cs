@@ -65,7 +65,7 @@ namespace ChatBeet.Rules
             var content = lookupMessage.Message;
             foreach (var pair in mappings.OrderByDescending(m => m.Key.Length))
             {
-                content = content.Replace(pair.Key, pair.Value, true, DtellaRuleConfiguration.Culture);
+                content = content.Replace(pair.Key, pair.Value, true, ChatBeetConfiguration.Culture);
             }
 
             yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {content}");

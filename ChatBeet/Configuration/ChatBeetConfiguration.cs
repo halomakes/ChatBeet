@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace ChatBeet.Configuration
 {
-    public class DtellaRuleConfiguration
+    public class ChatBeetConfiguration
     {
         public TwitterConfiguration Twitter { get; set; }
         public LastFmConfiguration LastFm { get; set; }
         public PixivConfiguration Pixiv { get; set; }
+        public TenorConfiguration Tenor { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
 
@@ -29,6 +31,12 @@ namespace ChatBeet.Configuration
         {
             public string UserId { get; set; }
             public string Password { get; set; }
+        }
+
+        public class TenorConfiguration
+        {
+            public string ApiKey { get; set; }
+            public int QueryLimit { get; set; } = 10;
         }
     }
 }
