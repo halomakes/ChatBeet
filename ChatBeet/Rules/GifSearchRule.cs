@@ -34,7 +34,7 @@ namespace ChatBeet.Rules
 
                 if (!string.IsNullOrEmpty(url))
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), url);
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{url} - Via Tenor");
                 }
                 else
                 {
