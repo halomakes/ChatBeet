@@ -44,7 +44,10 @@ namespace ChatBeet.Rules
                         {
                             return Respond(incomingMessage, nick, message);
                         }
-
+                        else
+                        {
+                            return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Couldn't find a recent message from {IrcValues.BOLD}{nick}{IrcValues.RESET}.").ToSingleElementSequence();
+                        }
                     }
                 }
             }
