@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GravyBot" Version="1.1.0" />
+    <PackageReference Include="GravyBot" Version="1.1.1" />
     <PackageReference Include="GravyBot.SampleRules" Version="1.1.0" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
@@ -24,7 +24,7 @@
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="PixivCS" Version="0.5.11" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
-    <PackageReference Include="TenorClient" Version="1.0.1" />
+    <PackageReference Include="TenorClient" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -219,3 +219,7 @@ Logs/
 ChatBeet/dtella.db
 
 ChatBeet/appsettings.json
+
+ChatBeet.Server/appsettings.json
+
+ChatBeet.Server/dtella.db
