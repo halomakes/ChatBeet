@@ -53,6 +53,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<ProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
                 pipeline.RegisterAsyncRule<GifSearchRule, PrivateMessage>();
+                pipeline.RegisterRule<SentimentAnalysisRule, PrivateMessage>();
             });
 
             services.AddHttpClient();

@@ -25,5 +25,10 @@ namespace ChatBeet.Utilities
         {
             yield return item;
         }
+
+        public static async IAsyncEnumerable<T> ToAsyncSingleElementSequence<T>(this T item)
+        {
+            yield return item;
+        }
     }
 }

@@ -27,5 +27,9 @@
     <PackageReference Include="TenorClient" Version="1.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SentimentAnalysis\SentimentAnalysis.csproj" />
+  </ItemGroup>
+
 
 </Project>
