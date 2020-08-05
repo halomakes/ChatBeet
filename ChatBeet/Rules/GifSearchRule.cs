@@ -34,11 +34,11 @@ namespace ChatBeet.Rules
 
                 if (!string.IsNullOrEmpty(url))
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{url} - Via Tenor");
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{url} - {IrcValues.AQUA}Via Tenor");
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {search.Trim()}.");
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {IrcValues.ITALIC}{search.Trim()}{IrcValues.RESET}.");
                 }
             }
         }

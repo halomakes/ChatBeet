@@ -24,7 +24,7 @@
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="PixivCS" Version="0.5.11" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
-    <PackageReference Include="TenorClient" Version="1.0.0-alpha" />
+    <PackageReference Include="TenorClient" Version="1.0.1" />
   </ItemGroup>
 
 
