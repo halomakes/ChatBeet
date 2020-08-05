@@ -8,6 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["ChatBeet/ChatBeet.csproj", "ChatBeet/"]
+COPY ["SentimentAnalysis/SentimentAnalysis.csproj", "SentimentAnalysis/"]
 RUN dotnet restore "ChatBeet/ChatBeet.csproj"
 COPY . .
 WORKDIR "/src/ChatBeet"

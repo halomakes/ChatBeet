@@ -132,3 +132,19 @@ Example Output:
 ```
 Example Output:
 > █████████████░░░░░░░░░░░░ **2020** is **53.55%** complete.
+
+### Gif Search
+*Search for gifs on Tenor*
+```
+.cb gif astolfo
+```
+Example Output:
+> https://media.tenor.com/images/e3dd773e44bfea58e8b10b7a12d055af/tenor.gif - Via Tenor
+
+### Sentiment Analysis
+*Guess how positive someone is being, for all you sociopaths out there*
+```
+.cb sentiment carrots
+```
+Example Output:
+> carrots was slightly negative 🙁 (Positive F₁ of 0.45)
