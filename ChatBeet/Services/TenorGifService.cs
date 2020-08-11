@@ -24,7 +24,9 @@ namespace ChatBeet.Services
             var settings = new TenorConfiguration
             {
                 ApiKey = config.ApiKey,
-                ContentFilter = ContentFilter.Off
+                ContentFilter = ContentFilter.Off,
+                MediaFilter = MediaFilter.Minimal,
+                Locale = ChatBeetConfiguration.Culture
             };
             client = new TenorClient(settings, clientFactory.CreateClient());
         }
