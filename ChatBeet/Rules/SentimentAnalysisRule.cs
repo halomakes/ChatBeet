@@ -32,9 +32,16 @@ namespace ChatBeet.Rules
 
         protected override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage)
         {
+            var messages = messageQueueService.GetChatLog()
+                .Where(m => m.From == lookupMessage.From)
+                .Where(m => m.To == lookupMessage.To)
+                .Where(m => m.DateReceived > lookupMessage.DateReceived.AddSeconds(-30))
+                .Select(m => m.Message);
+            var allMessages = string.Join(" ", messages);
+
             var data = new SentimentInput()
             {
-                Message = lookupMessage.Message
+                Message = allMessages
             };
             var predictionResult = SentimentModel.Predict(data);
             var positiveScore = predictionResult.Score.LastOrDefault();
@@ -46,7 +53,7 @@ namespace ChatBeet.Rules
                 .Select(pair => pair.fscore.ToString("F").Colorize(pair.rank));
             var rank = scores.LastOrDefault();
 
-            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{lookupMessage.From} was {IrcValues.BOLD}{rating.description}{IrcValues.RESET} {rating.emoji} (Positive F₁ of {rank})");
+            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{lookupMessage.From} was {IrcValues.BOLD}{rating.description}{IrcValues.RESET} {rating.emoji} ({messages.Count()} {(messages.Count() == 1 ? "message" : "messages")} with positive F₁ of {rank})");
         }
     }
 }
