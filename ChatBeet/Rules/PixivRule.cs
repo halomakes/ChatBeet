@@ -37,34 +37,43 @@ namespace ChatBeet.Rules
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
-                var search = match.Groups[2].Value;
+                var search = match.Groups[2].Value.Trim();
 
-                var results = await cache.GetOrCreateAsync($"pixiv:{search}", async entry =>
+                if (!string.IsNullOrEmpty(search))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-                    await pixiv.AuthAsync(pixivConfig.UserId, pixivConfig.Password);
-                    return await pixiv.GetSearchIllustAsync(search);
-                });
+                    var results = await cache.GetOrCreateAsync($"pixiv:{search}", async entry =>
+                    {
+                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-                var text = PickImage(results);
-                if (text != null)
-                {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), text);
+                        await pixiv.AuthAsync(pixivConfig.UserId, pixivConfig.Password);
+                        return await pixiv.GetSearchIllustAsync(search);
+                    });
+
+                    var text = PickImage(results);
+                    if (text != null)
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), text);
+                    }
+                    else
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {search}, ya perv.");
+                    }
+
+
+                    static string PickImage(SearchIllustResult searchResults)
+                    {
+                        if (searchResults?.Illusts?.Any() ?? false)
+                        {
+                            var img = searchResults.Illusts.PickRandom();
+                            return $"{IrcValues.BOLD}{img.Title}{IrcValues.RESET} by {IrcValues.BOLD}{img.User?.Name}{IrcValues.RESET} - https://www.pixiv.net/en/artworks/{img.Id}";
+                        }
+                        return null;
+                    }
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {search}, ya perv.");
-                }
-
-                static string PickImage(SearchIllustResult searchResults)
-                {
-                    if (searchResults?.Illusts?.Any() ?? false)
-                    {
-                        var img = searchResults.Illusts.PickRandom();
-                        return $"{IrcValues.BOLD}{img.Title}{IrcValues.RESET} by {IrcValues.BOLD}{img.User?.Name}{IrcValues.RESET} - https://www.pixiv.net/en/artworks/{img.Id}";
-                    }
-                    return null;
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Please provide a search term.");
                 }
             }
         }

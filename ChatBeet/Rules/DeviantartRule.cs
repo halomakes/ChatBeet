@@ -28,17 +28,24 @@ namespace ChatBeet.Rules
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
-                var search = match.Groups[2].Value;
-                // use ID instead of name if provided
-                var media = await daService.GetRecentImageAsync(search);
+                var search = match.Groups[2].Value.Trim();
 
-                if (media != null)
+                if (!string.IsNullOrEmpty(search))
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{IrcValues.BOLD}{media.Title?.Text}{IrcValues.RESET} - {media.Id}");
+                    var media = await daService.GetRecentImageAsync(search);
+
+                    if (media != null)
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{IrcValues.BOLD}{media.Title?.Text}{IrcValues.RESET} - {media.Id}");
+                    }
+                    else
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything matching {match.Groups[2].Value}.");
+                    }
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything matching {match.Groups[2].Value}.");
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Please provide a search term.");
                 }
             }
         }

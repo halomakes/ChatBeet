@@ -28,18 +28,25 @@ namespace ChatBeet.Rules
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
-                var search = match.Groups[2].Value;
+                var search = match.Groups[2].Value.Trim();
 
-                var url = await gifService.GetGifAsync(search);
+                if (!string.IsNullOrEmpty(search))
+                {
+                    var url = await gifService.GetGifAsync(search);
 
-                if (!string.IsNullOrEmpty(url))
-                {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{url} - {IrcValues.AQUA}Via Tenor");
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{url} - {IrcValues.AQUA}Via Tenor");
+                    }
+                    else
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {IrcValues.ITALIC}{search.Trim()}{IrcValues.RESET}.");
+                    }
                 }
-                else
-                {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find that anything for {IrcValues.ITALIC}{search.Trim()}{IrcValues.RESET}.");
-                }
+            }
+            else
+            {
+                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Please provide a search term.");
             }
         }
     }
