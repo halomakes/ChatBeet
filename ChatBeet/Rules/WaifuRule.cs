@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
         {
             config = options.Value;
             this.client = client;
-            rgx = new Regex($"^{config.CommandPrefix}(waifu|husbando) (.*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(waifu|husbando) (.*)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

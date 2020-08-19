@@ -21,11 +21,11 @@ namespace ChatBeet.Rules
         }
 
         public override bool Matches(PrivateMessage incomingMessage) =>
-            new Regex($"^({config.Nick}, |{config.CommandPrefix})(remember (.*)=(.*))|(recall .*)", RegexOptions.IgnoreCase).IsMatch(incomingMessage.Message);
+            new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})(remember (.*?)=(.*))|(recall .*)", RegexOptions.IgnoreCase).IsMatch(incomingMessage.Message);
 
         public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var setRgx = new Regex($"^({config.Nick}, |{config.CommandPrefix})remember (.*)=(.*)", RegexOptions.IgnoreCase);
+            var setRgx = new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})remember (.*)=(.*)", RegexOptions.IgnoreCase);
             var setMatch = setRgx.Match(incomingMessage.Message);
             if (setMatch.Success)
             {
@@ -58,7 +58,7 @@ namespace ChatBeet.Rules
                 }
             }
 
-            var getRgx = new Regex($"^({config.Nick}, |{config.CommandPrefix})recall (.*)", RegexOptions.IgnoreCase);
+            var getRgx = new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})recall (.*)", RegexOptions.IgnoreCase);
             var getMatch = getRgx.Match(incomingMessage.Message);
             if (getMatch.Success)
             {

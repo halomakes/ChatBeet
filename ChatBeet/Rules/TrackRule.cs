@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
         {
             this.lastFm = lastFm;
             config = options.Value;
-            rgx = new Regex($"^{config.CommandPrefix}track (.*) by (.*)");
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}track (.*) by (.*)");
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

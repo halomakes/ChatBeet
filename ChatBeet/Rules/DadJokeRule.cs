@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
         {
             this.jokeService = jokeService;
             config = options.Value;
-            filter = new Regex($"^({config.Nick},? ?tell.*joke)|({config.CommandPrefix}(dad )?joke)", RegexOptions.IgnoreCase);
+            filter = new Regex($"^({Regex.Escape(config.Nick)},? ?tell.*joke)|({Regex.Escape(config.CommandPrefix)}(dad )?joke)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);

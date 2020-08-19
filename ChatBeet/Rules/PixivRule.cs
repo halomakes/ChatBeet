@@ -27,7 +27,7 @@ namespace ChatBeet.Rules
             pixivConfig = dtlaOptions.Value.Pixiv;
             this.pixiv = pixiv;
             this.cache = cache;
-            rgx = new Regex($"^{config.CommandPrefix}(pixiv) (.*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(pixiv) (.*)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

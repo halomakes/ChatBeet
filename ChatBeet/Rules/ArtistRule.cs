@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
         {
             this.lastFm = lastFm;
             config = options.Value;
-            pattern = new Regex($"^{config.CommandPrefix}artist (.*)", RegexOptions.IgnoreCase);
+            pattern = new Regex($"^{Regex.Escape(config.CommandPrefix)}artist (.*)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => pattern.IsMatch(incomingMessage.Message);

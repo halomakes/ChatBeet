@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
         {
             this.daService = daService;
             config = options.Value;
-            rgx = new Regex($"^{config.CommandPrefix}(da|deviantart|degenerate) (.*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(da|deviantart|degenerate) (.*)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

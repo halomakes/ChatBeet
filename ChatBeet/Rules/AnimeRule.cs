@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
         {
             config = options.Value;
             this.client = client;
-            filter = new Regex($"^{config.CommandPrefix}(anime|manga|ln|light novel|ova) (.*)", RegexOptions.IgnoreCase);
+            filter = new Regex($"^{Regex.Escape(config.CommandPrefix)}(anime|manga|ln|light novel|ova) (.*)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);

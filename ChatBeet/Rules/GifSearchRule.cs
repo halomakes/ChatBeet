@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
         {
             config = options.Value;
             this.gifService = gifService;
-            rgx = new Regex($"^{config.CommandPrefix}(gif) (.*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(gif) (.*)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

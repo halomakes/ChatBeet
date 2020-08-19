@@ -5,6 +5,7 @@ using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace ChatBeet.Rules
 {
@@ -18,16 +19,17 @@ namespace ChatBeet.Rules
         {
             this.tweetService = tweetService;
             config = options.Value;
-            rgx = new Regex($"^{config.Nick}, what(?:'|’)?s new from @?([a-zA-Z0-9_]{{1,15}})\\??", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^(?:({Regex.Escape(config.Nick)}, what(?:'|’)?s new from)|({Regex.Escape(config.CommandPrefix)}tweet)) @?([a-zA-Z0-9_]{{1,15}})\\??", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
         public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            if (rgx.IsMatch(incomingMessage.Message))
+            var match = rgx.Match(incomingMessage.Message);
+            if (match.Success)
             {
-                var username = rgx.Replace(incomingMessage.Message, @"$1");
+                var username = match.Groups[3].Value;
 
                 var tweet = await tweetService.GetRecentTweet(username, false, false);
 

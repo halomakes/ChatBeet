@@ -22,7 +22,7 @@ namespace ChatBeet.Rules
 
         public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($@"^{config.Nick}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
+            var rgx = new Regex($@"^{Regex.Escape(config.Nick)}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Message))
             {
                 var topic = rgx.Replace(incomingMessage.Message, @"$1");

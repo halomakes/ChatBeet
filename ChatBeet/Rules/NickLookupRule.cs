@@ -27,7 +27,7 @@ namespace ChatBeet.Rules
         {
             if (!string.IsNullOrEmpty(CommandName))
             {
-                var rgx = new Regex($@"^{config.CommandPrefix}{CommandName} ([A-z0-9-\[\]\\\^\{{\}}]*)", RegexOptions.IgnoreCase);
+                var rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}{Regex.Escape(CommandName)} ([A-z0-9-\[\]\\\^\{{\}}]*)", RegexOptions.IgnoreCase);
                 var match = rgx.Match(incomingMessage.Message);
                 if (match.Success)
                 {
