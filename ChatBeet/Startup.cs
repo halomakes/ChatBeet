@@ -1,3 +1,4 @@
+using BooruSharp.Booru;
 using ChatBeet.Configuration;
 using ChatBeet.Data;
 using ChatBeet.Models;
@@ -54,6 +55,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
                 pipeline.RegisterAsyncRule<GifSearchRule, PrivateMessage>();
                 pipeline.RegisterRule<SentimentAnalysisRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<BooruRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -66,6 +68,7 @@ namespace ChatBeet
             services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules:Dtella"));
             services.AddTransient<RecentTweetsService>();
             services.AddTransient<TenorGifService>();
+            services.AddTransient<Gelbooru>();
             services.AddTransient(provider =>
             {
                 var config = provider.GetService<IOptions<ChatBeetConfiguration>>().Value.LastFm;
