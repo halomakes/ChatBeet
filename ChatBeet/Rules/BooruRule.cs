@@ -63,7 +63,7 @@ namespace ChatBeet.Rules
                     }
                     else
                     {
-                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tagList}, ya perv.");
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tagList}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
                     }
 
 
