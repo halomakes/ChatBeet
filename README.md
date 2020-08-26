@@ -148,3 +148,12 @@ Example Output:
 ```
 Example Output:
 > carrots was slightly negative 🙁 (Positive F₁ of 0.45)
+
+### Gelbooru
+*There are just never enough ways to search for waifus, are there?*
+```
+.cb booru [tags]
+.cb booru astolfo_(fate) happy solo white_cloak
+```
+Example Output:
+> https://img2.gelbooru.com/images/57/40/5740126f663e673036498f6469ac06eb.jpg - **solo**, gauntlets, cloak, **astolfo_(fate)**, **happy**, **white_cloak**, fate/grand_order, fur_trim, fate_(series), hair_intakes
