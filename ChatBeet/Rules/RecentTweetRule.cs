@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
+using LinqToTwitter;
+using System.Threading.Tasks;
 
 namespace ChatBeet.Rules
 {
@@ -31,14 +33,26 @@ namespace ChatBeet.Rules
             {
                 var username = match.Groups[3].Value;
 
+                yield return await GetResponseAsync(username, incomingMessage.GetResponseTarget());
+            }
+        }
+
+        private async Task<IClientMessage> GetResponseAsync(string username, string target)
+        {
+            try
+            {
                 var tweet = await tweetService.GetRecentTweet(username, false, false);
 
-                yield return new PrivateMessage(
-                    incomingMessage.GetResponseTarget(),
-                    tweet != null
+                return new PrivateMessage(
+                    target,
+                    tweet != default
                         ? $"{IrcValues.BOLD}{tweet.User?.Name}{IrcValues.RESET} at {tweet.CreatedAt} - {tweet.Text}"
                         : "Sorry, couldn't find anything recent."
                 );
+            }
+            catch (TwitterQueryException)
+            {
+                return new PrivateMessage(target, "Sorry, couldn't find that account.");
             }
         }
     }
