@@ -10,7 +10,7 @@ namespace ChatBeet.Rules
     public class HighGroundRule : MessageRuleBase<PrivateMessage>
     {
         private readonly Regex filter;
-        private static string highestNick = null;
+        private static readonly Dictionary<string, string> highestNicks = new Dictionary<string, string>();
 
         public HighGroundRule(IOptions<IrcBotConfiguration> options)
         {
@@ -22,20 +22,20 @@ namespace ChatBeet.Rules
             var match = filter.Match(incomingMessage.Message);
             if (match.Success)
             {
-                if (string.IsNullOrEmpty(highestNick))
+                if (!highestNicks.ContainsKey(incomingMessage.To))
                 {
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From} has the high ground.");
-                    highestNick = incomingMessage.From;
+                    highestNicks[incomingMessage.To] = incomingMessage.From;
                 }
-                else if (incomingMessage.From == highestNick)
+                else if (incomingMessage.From == highestNicks[incomingMessage.To])
                 {
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From} trips and falls off the high ground.");
-                    highestNick = null;
+                    highestNicks.Remove(incomingMessage.To);
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"It's over, {highestNick}! {incomingMessage.From} has the high ground!");
-                    highestNick = incomingMessage.From;
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"It's over, {highestNicks[incomingMessage.To]}! {incomingMessage.From} has the high ground!");
+                    highestNicks[incomingMessage.To] = incomingMessage.From;
                 }
             }
         }
