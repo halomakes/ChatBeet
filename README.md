@@ -157,3 +157,12 @@ Example Output:
 ```
 Example Output:
 > https://img2.gelbooru.com/images/57/40/5740126f663e673036498f6469ac06eb.jpg - **solo**, gauntlets, cloak, **astolfo_(fate)**, **happy**, **white_cloak**, fate/grand_order, fur_trim, fate_(series), hair_intakes
+
+### High Ground
+*YOU WERE MY BROTHER, ANAKIN!*
+```
+.cb jump
+.cb climb
+```
+Example Output:
+> It's over, carrots! markov has the high ground!
