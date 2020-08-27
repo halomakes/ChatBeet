@@ -166,3 +166,11 @@ Example Output:
 ```
 Example Output:
 > It's over, carrots! markov has the high ground!
+
+### Game Database
+*gg ez*
+```
+.cb game Trails of Cold Steel
+```
+Example Output:
+> **The Legend of Heroes: Trails of Cold Steel** (26 Sep 2013) [PC, PS3, Vita, PS4] *Rated T* - 81.56% • Role-playing (RPG), Adventure • More Info: https://www.igdb.com/games/the-legend-of-heroes-trails-of-cold-steel
