@@ -43,11 +43,13 @@ namespace ChatBeet.Rules
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15);
 
-                    var query = $@"fields name, platforms.abbreviation, aggregated_rating, cover.url, collection.name, first_release_date, summary, url;
-limit 1;
+                    var query = $@"fields name, platforms.abbreviation, aggregated_rating, first_release_date, url, genres.name, age_ratings.category, age_ratings.rating;
+limit 4;
 search ""{mediaName.Replace("\"", string.Empty)}"";";
 
-                    return (await client.QueryAsync<Game>(Client.Endpoints.Games, query)).FirstOrDefault();
+                    return (await client.QueryAsync<Game>(Client.Endpoints.Games, query))
+                        .OrderByDescending(g => g.Name.Equals(mediaName, StringComparison.InvariantCultureIgnoreCase))
+                        .FirstOrDefault();
                 });
 
                 if (game != null)
@@ -63,17 +65,32 @@ search ""{mediaName.Replace("\"", string.Empty)}"";";
                         var platforms = string.Join(", ", game.Platforms.Values?.Select(p => p.Abbreviation));
                         messageBuilder.Append($" [{platforms}]");
                     }
+                    var rating = game.AgeRatings?.Values?.FirstOrDefault(r => r.Category == AgeRatingCategory.ESRB);
+                    if (rating?.Rating != null)
+                    {
+                        var color = rating.Rating switch
+                        {
+                            AgeRatingTitle.EC => IrcValues.TEAL,
+                            AgeRatingTitle.E => IrcValues.GREEN,
+                            AgeRatingTitle.E10 => IrcValues.LIME,
+                            AgeRatingTitle.T => IrcValues.YELLOW,
+                            AgeRatingTitle.M => IrcValues.ORANGE,
+                            AgeRatingTitle.AO => IrcValues.RED,
+                            _ => string.Empty
+                        };
+                        messageBuilder.Append($" {IrcValues.ITALIC}{color}Rated {rating.Rating}{IrcValues.RESET}");
+                    }
                     if (game.AggregatedRating.HasValue)
                     {
                         var score = $"{game.AggregatedRating?.ToString("0.00")}%".Colorize(game.AggregatedRating);
-                        messageBuilder.Append($"- {score}");
+                        messageBuilder.Append($" - {score}");
                     }
-                    if (game.Cover?.Value?.Url != null)
+                    if (game.Genres?.Values?.Any() ?? false)
                     {
-                        var cover = game.Cover?.Value?.Url?.Replace("t_thumb", "t_1080p");
-                        messageBuilder.Append($" https:{cover}");
+                        var platforms = string.Join(", ", game.Genres.Values?.Select(g => g.Name));
+                        messageBuilder.Append($" • {platforms}");
                     }
-                    messageBuilder.Append($" More Info: {game.Url}");
+                    messageBuilder.Append($" • More Info: {game.Url}");
 
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), messageBuilder.ToString());
                 }
@@ -81,7 +98,7 @@ search ""{mediaName.Replace("\"", string.Empty)}"";";
                 {
                     yield return new PrivateMessage(
                         incomingMessage.GetResponseTarget(),
-                        $"Sorry, couldn't find {match.Groups[1].Value}."
+                        $"Sorry, couldn't find {IrcValues.ITALIC}{match.Groups[2].Value}{IrcValues.RESET}."
                     );
                 }
             }
