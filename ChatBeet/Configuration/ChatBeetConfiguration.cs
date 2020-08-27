@@ -10,6 +10,7 @@ namespace ChatBeet.Configuration
         public LastFmConfiguration LastFm { get; set; }
         public PixivConfiguration Pixiv { get; set; }
         public TenorConfiguration Tenor { get; set; }
+        public IgdbConfiguration Igdb { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
 
@@ -37,6 +38,11 @@ namespace ChatBeet.Configuration
         {
             public string ApiKey { get; set; }
             public int QueryLimit { get; set; } = 10;
+        }
+
+        public class IgdbConfiguration
+        {
+            public string ApiKey { get; set; }
         }
     }
 }

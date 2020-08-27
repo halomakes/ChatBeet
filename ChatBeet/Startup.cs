@@ -59,6 +59,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
                 pipeline.RegisterRule<SlotMachineRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -78,6 +79,11 @@ namespace ChatBeet
                 return new LastfmClient(config.ClientId, config.ClientSecret);
             });
             services.AddTransient<LastFmService>();
+            services.AddSingleton(provider =>
+            {
+                var config = provider.GetRequiredService<IOptions<ChatBeetConfiguration>>().Value.Igdb;
+                return IGDB.Client.Create(config.ApiKey);
+            });
             services.AddDbContext<DtellaContext>(ServiceLifetime.Transient);
 
             services.AddMemoryCache();
