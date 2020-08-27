@@ -1,9 +1,12 @@
 ﻿using GravyBot;
+using System;
 
 namespace ChatBeet.Utilities
 {
     public static class FormattingExtensions
     {
+        public static string Colorize(this string text, double? rating) => text.Colorize(rating.HasValue ? Convert.ToInt32(rating) : (int?)null);
+
         public static string Colorize(this string text, int? rating) => $"{GetColor(rating)}{text}{IrcValues.RESET}";
 
         private static string GetColor(int? rating)

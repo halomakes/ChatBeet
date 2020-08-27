@@ -12,6 +12,7 @@
     <PackageReference Include="GravyBot" Version="1.2.0" />
     <PackageReference Include="GravyBot.SampleRules" Version="1.2.0" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
+    <PackageReference Include="IGDB" Version="1.0.1" />
     <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
     <PackageReference Include="linqtotwitter" Version="5.1.2" />
     <PackageReference Include="Markdig" Version="0.20.0" />
