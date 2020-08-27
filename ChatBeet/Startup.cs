@@ -58,6 +58,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<BooruRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
+                pipeline.RegisterRule<SlotMachineRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
