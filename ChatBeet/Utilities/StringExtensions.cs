@@ -1,5 +1,6 @@
 ﻿using GravyBot;
 using Markdig;
+using System;
 using System.Linq;
 using System.Text;
 
@@ -28,6 +29,6 @@ namespace ChatBeet.Utilities
             return null;
         }
 
-        public static string RemoveLineBreaks(this string @string, string delimiter = " ") => @string.Replace("\r\n", delimiter).Replace("\n", delimiter);
+        public static string RemoveLineBreaks(this string @string, string delimiter = " ") => string.Join(delimiter, @string.Replace("\r\n", "\n").Split("\n", StringSplitOptions.RemoveEmptyEntries));
     }
 }

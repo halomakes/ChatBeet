@@ -39,6 +39,7 @@ namespace ChatBeet.Services
                     .Where(s => s.ScreenName == handle)
                     .Where(s => s.RetweetedStatus.StatusID == 0)
                     .Where(s => s.InReplyToStatusID == 0)
+                    .Where(s => s.TweetMode == TweetMode.Extended)
                     .Take(10)
                     .ToListAsync();
             });
@@ -62,6 +63,7 @@ namespace ChatBeet.Services
             return await twitterContext.Status
                 .Where(s => s.Type == StatusType.Show)
                 .Where(s => s.StatusID == id || s.ID == id)
+                .Where(s => s.TweetMode == TweetMode.Extended)
                 .FirstOrDefaultAsync();
         });
 
