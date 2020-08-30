@@ -29,6 +29,11 @@ namespace ChatBeet.Utilities
             return null;
         }
 
-        public static string RemoveLineBreaks(this string @string, string delimiter = " ") => string.Join(delimiter, @string.Replace("\r\n", "\n").Split("\n", StringSplitOptions.RemoveEmptyEntries));
+        public static string RemoveLineBreaks(this string @string, string delimiter = " ") =>
+            string.Join(delimiter, @string.Replace("\r\n", "\n")
+                .Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrEmpty(s))
+            );
     }
 }
