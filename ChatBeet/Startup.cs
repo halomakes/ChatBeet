@@ -60,6 +60,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
                 pipeline.RegisterRule<SlotMachineRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -70,7 +71,7 @@ namespace ChatBeet
             services.AddTransient<AnilistClient>();
             services.AddTransient<AnilistService>();
             services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules:Dtella"));
-            services.AddTransient<RecentTweetsService>();
+            services.AddTransient<TwitterService>();
             services.AddTransient<TenorGifService>();
             services.AddTransient<Gelbooru>();
             services.AddTransient(provider =>

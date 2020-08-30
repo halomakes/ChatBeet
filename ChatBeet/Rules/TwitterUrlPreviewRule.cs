@@ -2,27 +2,22 @@
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
-using Microsoft.Extensions.Options;
+using LinqToTwitter;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Linq;
-using LinqToTwitter;
 using System.Threading.Tasks;
-using System;
 
 namespace ChatBeet.Rules
 {
-    public class RecentTweetRule : AsyncMessageRuleBase<PrivateMessage>
+    public class TwitterUrlPreviewRule : AsyncMessageRuleBase<PrivateMessage>
     {
-        private readonly IrcBotConfiguration config;
         private readonly TwitterService tweetService;
         private readonly Regex rgx;
 
-        public RecentTweetRule(TwitterService tweetService, IOptions<IrcBotConfiguration> options)
+        public TwitterUrlPreviewRule(TwitterService tweetService)
         {
             this.tweetService = tweetService;
-            config = options.Value;
-            rgx = new Regex($"^(?:({Regex.Escape(config.Nick)}, what(?:'|’)?s new from)|({Regex.Escape(config.CommandPrefix)}tweet)) @?([a-zA-Z0-9_]{{1,15}})\\??", RegexOptions.IgnoreCase);
+            rgx = new Regex(@"^(?!.*<.*>.*$).*twitter\.com\/.*\/status(?:es)?\/(\d+)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
@@ -32,17 +27,23 @@ namespace ChatBeet.Rules
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
-                var username = match.Groups[3].Value;
-
-                yield return await GetResponseAsync(username, incomingMessage.GetResponseTarget());
+                var postId = match.Groups[1].Value;
+                if (ulong.TryParse(postId, out var id))
+                {
+                    var msg = await GetResponseAsync(id, incomingMessage.GetResponseTarget());
+                    if (msg != default)
+                    {
+                        yield return msg;
+                    }
+                }
             }
         }
 
-        private async Task<IClientMessage> GetResponseAsync(string username, string target)
+        private async Task<IClientMessage> GetResponseAsync(ulong id, string target)
         {
             try
             {
-                var tweet = await tweetService.GetRecentTweet(username, false, false);
+                var tweet = await tweetService.GetTweet(id);
 
                 if (tweet == default)
                 {
@@ -55,7 +56,7 @@ namespace ChatBeet.Rules
             }
             catch (TwitterQueryException)
             {
-                return new PrivateMessage(target, "Sorry, couldn't find that account.");
+                return default;
             }
         }
     }
