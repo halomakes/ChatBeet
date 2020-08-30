@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Services
 {
-    public class RecentTweetsService
+    public class TwitterService
     {
         private readonly ChatBeetConfiguration.TwitterConfiguration twitterConfig;
         private readonly IMemoryCache cache;
 
-        public RecentTweetsService(IOptions<ChatBeetConfiguration> twitterOptions, IMemoryCache cache)
+        public TwitterService(IOptions<ChatBeetConfiguration> twitterOptions, IMemoryCache cache)
         {
             twitterConfig = twitterOptions.Value.Twitter;
             this.cache = cache;
@@ -32,18 +32,7 @@ namespace ChatBeet.Services
             var tweets = await cache.GetOrCreateAsync($"twitter:{handle}", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-
-                var auth = new ApplicationOnlyAuthorizer
-                {
-                    CredentialStore = new InMemoryCredentialStore()
-                    {
-                        ConsumerKey = twitterConfig.ConsumerKey,
-                        ConsumerSecret = twitterConfig.ConsumerSecret
-                    }
-                };
-
-                await auth.AuthorizeAsync();
-                var twitterContext = new TwitterContext(auth);
+                var twitterContext = await GetContext();
 
                 return await twitterContext.Status
                     .Where(s => s.Type == StatusType.User)
@@ -59,6 +48,36 @@ namespace ChatBeet.Services
             return randomize
                 ? filtered.PickRandom()
                 : filtered.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Get a tweet by its ID
+        /// </summary>
+        /// <param name="id">ID of the tweet</param>
+        public async Task<Status> GetTweet(ulong id) => await cache.GetOrCreateAsync($"twitter:status:{id}", async entry =>
+        {
+            entry.SlidingExpiration = TimeSpan.FromMinutes(5);
+            var twitterContext = await GetContext();
+
+            return await twitterContext.Status
+                .Where(s => s.Type == StatusType.Show)
+                .Where(s => s.StatusID == id || s.ID == id)
+                .FirstOrDefaultAsync();
+        });
+
+        private async Task<TwitterContext> GetContext()
+        {
+            var auth = new ApplicationOnlyAuthorizer
+            {
+                CredentialStore = new InMemoryCredentialStore()
+                {
+                    ConsumerKey = twitterConfig.ConsumerKey,
+                    ConsumerSecret = twitterConfig.ConsumerSecret
+                }
+            };
+
+            await auth.AuthorizeAsync();
+            return new TwitterContext(auth);
         }
     }
 }
