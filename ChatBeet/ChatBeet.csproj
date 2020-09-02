@@ -40,5 +40,9 @@
     <ProjectReference Include="..\SentimentAnalysis\SentimentAnalysis.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\" />
+  </ItemGroup>
+
 
 </Project>
