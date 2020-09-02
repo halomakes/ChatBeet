@@ -23,12 +23,12 @@ namespace ChatBeet.Services
             this.gelbooru = gelbooru;
         }
 
-        public Task<string> GetRandomPostAsync(bool safeContentOnly = true, params string[] tags) => GetRandomPostAsync(safeContentOnly, tags.AsEnumerable());
+        public Task<string> GetRandomPostAsync(bool? safeContentOnly = true, params string[] tags) => GetRandomPostAsync(safeContentOnly, tags.AsEnumerable());
 
-        public async Task<string> GetRandomPostAsync(bool safeContentOnly = true, IEnumerable<string> tags = null)
+        public async Task<string> GetRandomPostAsync(bool? safeContentOnly = true, IEnumerable<string> tags = null)
         {
-            var command = safeContentOnly ? "booru:sfw" : "booru:nsfw";
-            var filter = safeContentOnly ? "rating:safe" : "-rating:safe";
+            var command = safeContentOnly.HasValue ? (safeContentOnly.Value ? "booru:sfw" : "booru:nsfw") : "booru:all";
+            var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:safe" : "-rating:safe") : string.Empty;
             var results = await cache.GetOrCreateAsync($"{command}:{string.Join("|", tags.OrderBy(t => t))}", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
@@ -52,7 +52,7 @@ namespace ChatBeet.Services
                         .Take(10)
                         .OrderBy(t => rng.Next());
                     var tagList = string.Join(", ", resultTags);
-                    return $"{img.fileUrl} - {tagList}";
+                    return $"{img.fileUrl} ({img.rating}) - {tagList}";
                 }
                 return default;
             }

@@ -37,7 +37,7 @@ namespace ChatBeet.Rules
 
                     if (commandMessage.Message.StartsWith(".shipp @b "))
                     {
-                        var text = await booru.GetRandomPostAsync(false, tags);
+                        var text = await booru.GetRandomPostAsync(null, tags);
 
                         if (text != default)
                         {
