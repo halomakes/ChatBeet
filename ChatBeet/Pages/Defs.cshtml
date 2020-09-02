@@ -1,0 +1,30 @@
+﻿@page
+@model ChatBeet.Pages.DefsModel
+@inject ChatBeet.Data.MemoryCellContext db;
+@{
+    var defs = await db.MemoryCells.ToListAsync();
+    defs.Reverse();
+    ViewBag.Title = "Definitions";
+}
+
+<h1>Definitions</h1>
+<code>.cb remember <b>spud</b> = <b>potato</b></code>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Key</th>
+            <th scope="col">Value</th>
+            <th scope="col">Author</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var def in defs)
+        {
+            <tr>
+                <th scope="row">@def.Key</th>
+                <td>@def.Value</td>
+                <td>@def.Author</td>
+            </tr>
+        }
+    </tbody>
+</table>
