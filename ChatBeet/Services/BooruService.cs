@@ -16,24 +16,29 @@ namespace ChatBeet.Services
     {
         private readonly IMemoryCache cache;
         private readonly Gelbooru gelbooru;
+        private readonly ChatBeetConfiguration.BooruConfiguration booruConfig;
 
-        public BooruService(IOptions<ChatBeetConfiguration> dtlaOptions, IMemoryCache cache, Gelbooru gelbooru)
+        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru)
         {
             this.cache = cache;
             this.gelbooru = gelbooru;
+            booruConfig = options.Value.Booru;
         }
 
         public Task<string> GetRandomPostAsync(bool? safeContentOnly = true, params string[] tags) => GetRandomPostAsync(safeContentOnly, tags.AsEnumerable());
 
         public async Task<string> GetRandomPostAsync(bool? safeContentOnly = true, IEnumerable<string> tags = null)
         {
-            var command = safeContentOnly.HasValue ? (safeContentOnly.Value ? "booru:sfw" : "booru:nsfw") : "booru:all";
             var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:safe" : "-rating:safe") : string.Empty;
-            var results = await cache.GetOrCreateAsync($"{command}:{string.Join("|", tags.OrderBy(t => t))}", async entry =>
+            var globalBlacklist = booruConfig.BlacklistedTags.Select(t => $"-{t}");
+
+            var allTags = tags.Concat(globalBlacklist).Append(filter);
+
+            var results = await cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-                return await gelbooru.GetRandomPostsAsync(20, tags.Append(filter).ToArray());
+                return await gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
             });
 
             return PickImage(results, tags);
