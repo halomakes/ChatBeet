@@ -175,9 +175,11 @@ Example Output:
 ```
 .cb booru blacklist
 ```
-> **Global blacklist**: \[eggplant, cryging\]
+> **Global blacklist**: \[eggplant, crying\]
+
 > **User Blacklist**: \[thick_thighs, silver_hair\]
-> Use *.cbt booru blacklist/whitelist \[tags\]* to manage your personal blacklist.
+
+> Use *.cb booru blacklist/whitelist \[tags\]* to manage your personal blacklist.
 
 ```
 .cb booru whitelist thick_thighs silver_hair
