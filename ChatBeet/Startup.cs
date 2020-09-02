@@ -32,6 +32,7 @@ namespace ChatBeet
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddRazorPages();
 
             services.AddIrcBot(Configuration.GetSection("Irc"), pipeline =>
             {
@@ -109,6 +110,7 @@ namespace ChatBeet
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
 
             mcDb.Database.EnsureCreated();
