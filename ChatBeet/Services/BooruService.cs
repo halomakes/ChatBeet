@@ -21,13 +21,15 @@ namespace ChatBeet.Services
         private readonly Gelbooru gelbooru;
         private readonly ChatBeetConfiguration.BooruConfiguration booruConfig;
         private readonly BooruContext context;
+        private readonly MessageQueueService messageQueue;
 
-        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context)
+        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context, MessageQueueService messageQueue)
         {
             this.cache = cache;
             this.gelbooru = gelbooru;
             booruConfig = options.Value.Booru;
             this.context = context;
+            this.messageQueue = messageQueue;
         }
 
         public Task<string> GetRandomPostAsync(bool? safeContentOnly, string requestor, params string[] tags) => GetRandomPostAsync(safeContentOnly, requestor, tags.AsEnumerable());
@@ -49,16 +51,18 @@ namespace ChatBeet.Services
                 return await gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
             });
 
-            return PickImage(results, tags);
+            return PickImage(results);
 
-            static string PickImage(IEnumerable<SearchResult> searchResults, IEnumerable<string> searchTags)
+            string PickImage(IEnumerable<SearchResult> searchResults)
             {
                 if (searchResults?.Any() ?? false)
                 {
+                    Task.Run(() => RecordTags(requestor, tags));
+
                     var img = searchResults.PickRandom();
                     var rng = new Random();
                     var resultTags = img.tags
-                        .Select(t => (MatchesInput: searchTags.Contains(t), Tag: t))
+                        .Select(t => (MatchesInput: tags.Contains(t), Tag: t))
                         .OrderByDescending(p => p.MatchesInput)
                         .ThenBy(p => rng.Next())
                         .Select(p => p.MatchesInput ? $"{IrcValues.BOLD}{IrcValues.GREEN}{p.Tag}{IrcValues.RESET}" : p.Tag)
@@ -116,5 +120,20 @@ namespace ChatBeet.Services
         private static string GetCacheEntry(string nick) => $"boorublacklist:{nick}";
 
         private static IEnumerable<string> Negate(IEnumerable<string> tags) => tags.Select(t => $"-{t}");
+
+        private async Task RecordTags(string nick, IEnumerable<string> tags)
+        {
+            try
+            {
+                var usableTags = tags.Where(t => !t.StartsWith("-")).Where(t => !t.Contains(":"));
+                var tagEntries = usableTags.Select(t => new TagHistory { Nick = nick, Tag = t });
+                context.TagHistories.AddRange(tagEntries);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                messageQueue.Push(e);
+            }
+        }
     }
 }

@@ -1,0 +1,35 @@
+﻿@page
+@model ChatBeet.Pages.TagsModel
+@using Humanizer
+@{
+    ViewBag.Title = "Tags";
+    var max = Model.GeneralStats.Max(s => s.Total);
+    float getPercentage(int count) => max > 0 ? (float)count * 100 / max : 0;
+    var count = 0;
+    var offset = 200;
+}
+
+<h1>Tags</h1>
+<p>Stats collected since @Model.Earliest.Humanize()</p>
+<h3>Most popular tags</h3>
+<div class="list-group">
+    @foreach (var tag in Model.GeneralStats)
+    {
+        <div class="list-group-item list-group-item-action position-relative overflow-none">
+            <span class="ml-2">
+                @tag.Tag.Replace("_", " ")
+                <span class="badge badge-pill badge-primary ml-1">@tag.Total</span>
+            </span>
+            <span class="bg-primary background-bar" style="width: @getPercentage(tag.Total)%; animation-delay: @(count * offset)ms "></span>
+        </div>
+        count++;
+    }
+</div>
+<hr />
+<h3>Users' fetishes</h3>
+<div>
+    @foreach (var usr in Model.UserStats)
+    {
+        <div><b>@usr.Nick</b> searched for <b>@usr.Tag.Replace("_", " ")</b> @usr.Total @(usr.Total == 1 ? "time" : "times").</div>
+    }
+</div>
