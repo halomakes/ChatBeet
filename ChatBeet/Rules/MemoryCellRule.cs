@@ -11,10 +11,10 @@ namespace ChatBeet.Rules
 {
     public class MemoryCellRule : AsyncMessageRuleBase<PrivateMessage>
     {
-        private readonly DtellaContext ctx;
+        private readonly MemoryCellContext ctx;
         private readonly IrcBotConfiguration config;
 
-        public MemoryCellRule(DtellaContext ctx, IOptions<IrcBotConfiguration> options)
+        public MemoryCellRule(MemoryCellContext ctx, IOptions<IrcBotConfiguration> options)
         {
             config = options.Value;
             this.ctx = ctx;

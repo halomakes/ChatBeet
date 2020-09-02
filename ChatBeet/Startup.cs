@@ -87,13 +87,14 @@ namespace ChatBeet
                 return IGDB.Client.Create(config.ApiKey);
             });
             services.AddTransient<BooruService>();
-            services.AddDbContext<DtellaContext>(ServiceLifetime.Transient);
+            services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
+            services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
 
             services.AddMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DtellaContext db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MemoryCellContext mcDb, BooruContext bDb)
         {
             if (env.IsDevelopment())
             {
@@ -109,7 +110,8 @@ namespace ChatBeet
                 endpoints.MapControllers();
             });
 
-            db.Database.EnsureCreated();
+            mcDb.Database.EnsureCreated();
+            bDb.Database.EnsureCreated();
         }
     }
 }
