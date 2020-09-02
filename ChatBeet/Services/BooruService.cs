@@ -71,6 +71,8 @@ namespace ChatBeet.Services
             }
         }
 
+        public IEnumerable<string> GetGlobalBlacklistedTags() => booruConfig.BlacklistedTags;
+
         public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await cache.GetOrCreateAsync(GetCacheEntry(nick), async entry =>
         {
             entry.SlidingExpiration = TimeSpan.FromMinutes(15);

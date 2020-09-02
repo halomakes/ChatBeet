@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
         public BooruRule(IOptions<IrcBotConfiguration> options, BooruService booru)
         {
             config = options.Value;
-            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}((booru)|(nsfwbooru)) (.*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}((booru)|(nsfwbooru))(?!(?: blacklist)|(?: whitelist)) (.*)", RegexOptions.IgnoreCase);
             this.booru = booru;
         }
 
@@ -37,7 +37,7 @@ namespace ChatBeet.Rules
 
                 if (tags.Any())
                 {
-                    var text = await booru.GetRandomPostAsync(applyFilter, tags);
+                    var text = await booru.GetRandomPostAsync(applyFilter, incomingMessage.From, tags);
 
                     if (text != default)
                     {

@@ -62,6 +62,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ShipReactRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<BooruBlacklistRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
