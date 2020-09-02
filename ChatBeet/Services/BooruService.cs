@@ -78,7 +78,7 @@ namespace ChatBeet.Services
             entry.SlidingExpiration = TimeSpan.FromMinutes(15);
 
             return await context.Blacklists.AsQueryable()
-                .Where(b => b.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                .Where(b => b.Nick == nick)
                 .Select(b => b.Tag)
                 .ToListAsync();
         });
@@ -86,7 +86,7 @@ namespace ChatBeet.Services
         public async Task BlacklistTags(string nick, IEnumerable<string> tags)
         {
             var existingTags = await context.Blacklists.AsQueryable()
-                .Where(t => t.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                .Where(t => t.Nick == nick)
                 .Where(t => tags.Contains(t.Tag))
                 .ToListAsync();
 
@@ -105,7 +105,7 @@ namespace ChatBeet.Services
 
         public async Task WhitelistTags(string nick, IEnumerable<string> tags)
         {
-            context.Blacklists.RemoveRange(context.Blacklists.AsQueryable().Where(b => b.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) && tags.Contains(b.Tag)));
+            context.Blacklists.RemoveRange(context.Blacklists.AsQueryable().Where(b => b.Nick == nick && tags.Contains(b.Tag)));
 
             await context.SaveChangesAsync();
             ClearCache(nick);

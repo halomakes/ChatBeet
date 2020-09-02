@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
         public BooruBlacklistRule(IOptions<IrcBotConfiguration> options, BooruService booru)
         {
             config = options.Value;
-            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}((?:whitelist)|(?:blacklist)) ?(.*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}booru ((?:whitelist)|(?:blacklist)) ?(.*)", RegexOptions.IgnoreCase);
             this.booru = booru;
         }
 
