@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="db\**" />
+    <Content Remove="db\**" />
+    <EmbeddedResource Remove="db\**" />
+    <None Remove="db\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BooruSharp" Version="2.10.0" />
     <PackageReference Include="GravyBot" Version="1.2.0" />
     <PackageReference Include="GravyBot.SampleRules" Version="1.2.0" />

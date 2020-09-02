@@ -11,17 +11,17 @@ namespace ChatBeet.Rules
 {
     public class MemoryCellRule : AsyncMessageRuleBase<PrivateMessage>
     {
-        private readonly DtellaContext ctx;
+        private readonly MemoryCellContext ctx;
         private readonly IrcBotConfiguration config;
 
-        public MemoryCellRule(DtellaContext ctx, IOptions<IrcBotConfiguration> options)
+        public MemoryCellRule(MemoryCellContext ctx, IOptions<IrcBotConfiguration> options)
         {
             config = options.Value;
             this.ctx = ctx;
         }
 
         public override bool Matches(PrivateMessage incomingMessage) =>
-            new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})(remember (.*?)=(.*))|(recall .*)", RegexOptions.IgnoreCase).IsMatch(incomingMessage.Message);
+            new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})(remember (.*?)=(.*))|(recall .*)|(whodef .*)", RegexOptions.IgnoreCase).IsMatch(incomingMessage.Message);
 
         public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
@@ -88,6 +88,30 @@ namespace ChatBeet.Rules
                     yield return new PrivateMessage(
                         incomingMessage.GetResponseTarget(),
                         $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}: {cell.Value}"
+                    );
+                }
+                else
+                {
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        $"I don't have anything for {IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}."
+                    );
+                }
+            }
+
+            var whoRgx = new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})whodef (.*)", RegexOptions.IgnoreCase);
+            var whoMatch = whoRgx.Match(incomingMessage.Message);
+            if (whoMatch.Success)
+            {
+                var caseSensitiveKey = whoMatch.Groups[2].Value.Trim();
+
+                var cell = await ctx.MemoryCells.FindAsync(caseSensitiveKey.ToLower());
+
+                if (cell != null)
+                {
+                    yield return new PrivateMessage(
+                        incomingMessage.GetResponseTarget(),
+                        $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET} was set by {IrcValues.BOLD}{cell.Author}{IrcValues.RESET}"
                     );
                 }
                 else

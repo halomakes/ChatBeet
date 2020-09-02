@@ -74,6 +74,13 @@ ChatBeet, recall {id}
 Example Output:
 > **astolfo**: kyoot
 
+```
+.cb whodef {id}
+```
+Example Output:
+> **astolfo** was set by **carrots**
+
+
 ### Mocking
 *DiSsMIsS sOmeOnES oPiNIoN*
 ```
@@ -157,6 +164,27 @@ Example Output:
 ```
 Example Output:
 > https://img2.gelbooru.com/images/57/40/5740126f663e673036498f6469ac06eb.jpg - **solo**, gauntlets, cloak, **astolfo_(fate)**, **happy**, **white_cloak**, fate/grand_order, fur_trim, fate_(series), hair_intakes
+
+### Gelbooru Blacklist
+*Some of that stuff is a little too freaky*
+```
+.cb booru blacklist thick_thighs silver_hair
+```
+> \[thick_thighs, silver_hair\] added to your blacklist.
+
+```
+.cb booru blacklist
+```
+> **Global blacklist**: \[eggplant, crying\]
+
+> **User Blacklist**: \[thick_thighs, silver_hair\]
+
+> Use *.cb booru blacklist/whitelist \[tags\]* to manage your personal blacklist.
+
+```
+.cb booru whitelist thick_thighs silver_hair
+```
+> \[thick_thighs, silver_hair\] removed from your blacklist.
 
 ### High Ground
 *YOU WERE MY BROTHER, ANAKIN!*

@@ -3,18 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Data
 {
-    public class DtellaContext : DbContext
+    public class MemoryCellContext : DbContext
     {
-        public DtellaContext() : base()
-        {
-
-        }
+        public MemoryCellContext() : base(){}
 
         public virtual DbSet<MemoryCell> MemoryCells { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=dtella.db");
+            optionsBuilder.UseSqlite("Data Source=db/memorycell.db");
         }
     }
 }

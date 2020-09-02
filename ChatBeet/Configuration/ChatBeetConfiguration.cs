@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 
 namespace ChatBeet.Configuration
@@ -11,6 +10,7 @@ namespace ChatBeet.Configuration
         public PixivConfiguration Pixiv { get; set; }
         public TenorConfiguration Tenor { get; set; }
         public IgdbConfiguration Igdb { get; set; }
+        public BooruConfiguration Booru { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
 
@@ -43,6 +43,11 @@ namespace ChatBeet.Configuration
         public class IgdbConfiguration
         {
             public string ApiKey { get; set; }
+        }
+
+        public class BooruConfiguration
+        {
+            public IEnumerable<string> BlacklistedTags { get; set; }
         }
     }
 }
