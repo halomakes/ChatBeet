@@ -61,6 +61,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<SlotMachineRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<ShipReactRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -85,6 +86,7 @@ namespace ChatBeet
                 var config = provider.GetRequiredService<IOptions<ChatBeetConfiguration>>().Value.Igdb;
                 return IGDB.Client.Create(config.ApiKey);
             });
+            services.AddTransient<BooruService>();
             services.AddDbContext<DtellaContext>(ServiceLifetime.Transient);
 
             services.AddMemoryCache();

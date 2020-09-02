@@ -23,7 +23,9 @@ namespace ChatBeet.Services
             this.gelbooru = gelbooru;
         }
 
-        public async Task<string> GetRandomPostAsync(bool safeContentOnly = true, params string[] tags)
+        public Task<string> GetRandomPostAsync(bool safeContentOnly = true, params string[] tags) => GetRandomPostAsync(safeContentOnly, tags.AsEnumerable());
+
+        public async Task<string> GetRandomPostAsync(bool safeContentOnly = true, IEnumerable<string> tags = null)
         {
             var command = safeContentOnly ? "booru:sfw" : "booru:nsfw";
             var filter = safeContentOnly ? "rating:safe" : "-rating:safe";
