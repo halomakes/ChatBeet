@@ -21,13 +21,15 @@ namespace ChatBeet.Services
         private readonly Gelbooru gelbooru;
         private readonly ChatBeetConfiguration.BooruConfiguration booruConfig;
         private readonly BooruContext context;
+        private readonly MessageQueueService messageQueue;
 
-        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context)
+        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context, MessageQueueService messageQueue)
         {
             this.cache = cache;
             this.gelbooru = gelbooru;
             booruConfig = options.Value.Booru;
             this.context = context;
+            this.messageQueue = messageQueue;
         }
 
         public Task<string> GetRandomPostAsync(bool? safeContentOnly, string requestor, params string[] tags) => GetRandomPostAsync(safeContentOnly, requestor, tags.AsEnumerable());
@@ -121,10 +123,17 @@ namespace ChatBeet.Services
 
         private async Task RecordTags(string nick, IEnumerable<string> tags)
         {
-            var usableTags = tags.Where(t => !t.StartsWith("-")).Where(t => !t.Contains(":"));
-            var tagEntries = usableTags.Select(t => new TagHistory { Nick = nick, Tag = t });
-            context.TagHistories.AddRange(tagEntries);
-            await context.SaveChangesAsync();
+            try
+            {
+                var usableTags = tags.Where(t => !t.StartsWith("-")).Where(t => !t.Contains(":"));
+                var tagEntries = usableTags.Select(t => new TagHistory { Nick = nick, Tag = t });
+                context.TagHistories.AddRange(tagEntries);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                messageQueue.Push(e);
+            }
         }
     }
 }
