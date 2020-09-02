@@ -1,5 +1,6 @@
 ﻿@page
 @model ChatBeet.Pages.TagsModel
+@using Humanizer
 @{
     ViewBag.Title = "Tags";
     var max = Model.GeneralStats.Max(s => s.Total);
@@ -9,6 +10,7 @@
 }
 
 <h1>Tags</h1>
+<p>Stats collected since @Model.Earliest.Humanize()</p>
 <h3>Most popular tags</h3>
 <div class="list-group">
     @foreach (var tag in Model.GeneralStats)

@@ -18,6 +18,7 @@ namespace ChatBeet.Pages
 
         public IEnumerable<Stat> GeneralStats { get; private set; }
         public IEnumerable<TopTag> UserStats { get; private set; }
+        public DateTime Earliest { get; private set; }
 
         public TagsModel(BooruContext db, IMemoryCache cache)
         {
@@ -41,6 +42,11 @@ namespace ChatBeet.Pages
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
                 return await db.GetTopTags();
+            });
+            Earliest = await cache.GetOrCreate("tagdate", async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+                return await EntityFrameworkQueryableExtensions.MinAsync(db.TagHistories, th => th.Timestamp);
             });
         }
 
