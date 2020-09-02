@@ -113,6 +113,8 @@ namespace ChatBeet
                 endpoints.MapRazorPages();
             });
 
+            app.UseStaticFiles();
+
             mcDb.Database.EnsureCreated();
             bDb.Database.EnsureCreated();
         }
