@@ -1,35 +1,49 @@
 ﻿@page
 @model ChatBeet.Pages.TagsModel
 @using Humanizer
-@{
+@if (Model.GeneralStats.Any())
+{
     ViewBag.Title = "Tags";
     var max = Model.GeneralStats.Max(s => s.Total);
     float getPercentage(int count) => max > 0 ? (float)count * 100 / max : 0;
     var count = 0;
     var offset = 200;
-}
+    string getLink(string tag) => $"https://gelbooru.com/index.php?page=post&s=list&tags=rating:safe%20{tag}";
 
-<h1>Tags</h1>
-<p>Stats collected since @Model.Earliest.Humanize()</p>
-<h3>Most popular tags</h3>
-<div class="list-group">
-    @foreach (var tag in Model.GeneralStats)
-    {
-        <div class="list-group-item list-group-item-action position-relative overflow-none">
-            <span class="ml-2">
-                @tag.Tag.Replace("_", " ")
-                <span class="badge badge-pill badge-primary ml-1">@tag.Total</span>
-            </span>
-            <span class="bg-primary background-bar" style="width: @getPercentage(tag.Total)%; animation-delay: @(count * offset)ms "></span>
-        </div>
-        count++;
-    }
-</div>
-<hr />
-<h3>Users' fetishes</h3>
-<div>
-    @foreach (var usr in Model.UserStats)
-    {
-        <div><b>@usr.Nick</b> searched for <b>@usr.Tag.Replace("_", " ")</b> @usr.Total @(usr.Total == 1 ? "time" : "times").</div>
-    }
-</div>
+    <h1>Tags</h1>
+    <p>Stats collected since @Model.Earliest.Humanize()</p>
+    <h3>Most popular tags</h3>
+    <div class="list-group">
+        @foreach (var tag in Model.GeneralStats)
+        {
+            <a class="list-group-item list-group-item-action position-relative overflow-none" href="@getLink(tag.Tag)" target="_blank">
+                <span class="ml-2">
+                    @tag.Tag.Replace("_", " ")
+                    <span class="badge badge-pill badge-success ml-1">@tag.Total</span>
+                </span>
+                <span class="bg-primary background-bar" style="width: @getPercentage(tag.Total)%; animation-delay: @(count * offset)ms "></span>
+            </a>
+            count++;
+        }
+    </div>
+    <hr />
+    <h3>Users' fetishes</h3>
+    <div>
+        @foreach (var usr in Model.UserStats)
+        {
+            <div>
+                <b class="text-success">@usr.Nick</b>
+                searched for
+                <b class="text-success">
+                    <a href="@getLink(usr.Tag)" target="_blank">@usr.Tag.Replace("_", " ")</a>
+                </b>
+                @usr.Total @(usr.Total == 1 ? "time" : "times").
+            </div>
+        }
+    </div>
+}
+else
+{
+    <h1>Tags</h1>
+    <p>No stats for tags yet 😢</p>
+}
