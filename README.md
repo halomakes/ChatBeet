@@ -210,7 +210,9 @@ Example Output:
 ```
 Example Output:
 > ---------- carrots
+
 > ------ potato
+
 > -------------- dio
 
 ### User Preferences
