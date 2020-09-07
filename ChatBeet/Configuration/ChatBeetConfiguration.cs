@@ -11,6 +11,7 @@ namespace ChatBeet.Configuration
         public TenorConfiguration Tenor { get; set; }
         public IgdbConfiguration Igdb { get; set; }
         public BooruConfiguration Booru { get; set; }
+        public PronounConfiguration Pronouns { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
 
@@ -48,6 +49,19 @@ namespace ChatBeet.Configuration
         public class BooruConfiguration
         {
             public IEnumerable<string> BlacklistedTags { get; set; }
+        }
+
+        public class PronounConfiguration
+        {
+            public AllowedPronounsConfiguration Allowed { get; set; }
+
+            public class AllowedPronounsConfiguration
+            {
+                public IEnumerable<string> Subjects { get; set; }
+                public IEnumerable<string> Objects { get; set; }
+                public IEnumerable<string> Possessives { get; set; }
+                public IEnumerable<string> Reflexives { get; set; }
+            }
         }
     }
 }

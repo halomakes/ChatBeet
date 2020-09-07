@@ -212,3 +212,31 @@ Example Output:
 > ---------- carrots
 > ------ potato
 > -------------- dio
+
+### User Preferences
+*Personalize your ChatBeet experience*
+```
+.cb set {preference} = {value}
+```
+Example Output:
+> Set *Pronoun (Subject)* to **He**.
+
+#### Available Preferences
+
+| Preference         | Description              |
+|--------------------|--------------------------|
+| birthday           | Date of Birth            |
+| pronoun:subject    | Pronoun (Subject)        |
+| pronoun:object     | Pronoun (Object)         |
+| pronoun:possessive | Pronoun (Possessive)     |
+| pronoun:reflexive  | Pronoun (Reflexive)      |
+| work:start         | Starting Time of Workday |
+| work:end           | Ending Time of Workday   |
+
+### Pronouns
+*Look up pronouns for a user*
+```
+.cb pronouns carrots
+```
+Example Output:
+> Preferred pronouns for carrots: **He/Him**
