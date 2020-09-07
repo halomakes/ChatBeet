@@ -202,3 +202,13 @@ Example Output:
 ```
 Example Output:
 > **The Legend of Heroes: Trails of Cold Steel** (26 Sep 2013) [PC, PS3, Vita, PS4] *Rated T* - 81.56% • Role-playing (RPG), Adventure • More Info: https://www.igdb.com/games/the-legend-of-heroes-trails-of-cold-steel
+
+### Lots
+*draw lots and compare sizes*
+```
+.cb lots
+```
+Example Output:
+> ---------- carrots
+> ------ potato
+> -------------- dio
