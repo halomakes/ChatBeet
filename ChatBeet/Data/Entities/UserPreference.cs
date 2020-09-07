@@ -7,9 +7,9 @@ namespace ChatBeet.Data.Entities
         [Parameter("birthday", "Date of Birth"),]
         DateOfBirth,
         [Parameter("pronoun:subject", "Pronoun (Subject)")]
-        SingularPronoun,
+        SubjectPronoun,
         [Parameter("pronoun:object", "Pronoun (Object)")]
-        PluralPronoun,
+        ObjectPronoun,
         [Parameter("work:start", "Start of Working Hours")]
         WorkHoursStart,
         [Parameter("work:end", "End of Working Hours")]
