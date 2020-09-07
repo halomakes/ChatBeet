@@ -1,16 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChatBeet.Annotations;
 
 namespace ChatBeet.Data.Entities
 {
     public enum UserPreference
     {
-        [Display(Name = "Date of Birth")]
+        [Parameter("birthday", "Date of Birth"),]
         DateOfBirth,
-        [Display(Name = "Pronouns")]
+        [Parameter("pronouns", "Pronouns")]
         Pronouns,
-        [Display(Name = "Start of Working Hours")]
+        [Parameter("workstart", "Start of Working Hours")]
         WorkHoursStart,
-        [Display(Name = "End of Working Hours")]
+        [Parameter("workend", "End of Working Hours")]
         WorkHoursEnd
     }
 }

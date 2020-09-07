@@ -65,6 +65,8 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<ShipReactRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<BooruBlacklistRule, PrivateMessage>();
                 pipeline.RegisterRule<DrawLotsRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<PronounRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -90,8 +92,10 @@ namespace ChatBeet
                 return IGDB.Client.Create(config.ApiKey);
             });
             services.AddTransient<BooruService>();
+            services.AddTransient<UserPreferencesService>();
             services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
             services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
+            services.AddDbContext<PreferencesContext>(ServiceLifetime.Transient);
 
             services.AddMemoryCache();
         }
