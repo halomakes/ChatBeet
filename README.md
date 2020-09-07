@@ -223,13 +223,15 @@ Example Output:
 
 #### Available Preferences
 
-| Preference      | Description              |
-|-----------------|--------------------------|
-| birthday        | Date of Birth            |
-| pronoun:subject | Pronoun (Subject)        |
-| pronoun:object  | Pronoun (Object)         |
-| work:start      | Starting Time of Workday |
-| work:end        | Ending Time of Workday   |
+| Preference         | Description              |
+|--------------------|--------------------------|
+| birthday           | Date of Birth            |
+| pronoun:subject    | Pronoun (Subject)        |
+| pronoun:object     | Pronoun (Object)         |
+| pronoun:possessive | Pronoun (Possessive)     |
+| pronoun:reflexive  | Pronoun (Reflexive)      |
+| work:start         | Starting Time of Workday |
+| work:end           | Ending Time of Workday   |
 
 ### Pronouns
 *Look up pronouns for a user*

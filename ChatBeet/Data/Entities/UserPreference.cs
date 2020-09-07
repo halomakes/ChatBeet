@@ -13,6 +13,10 @@ namespace ChatBeet.Data.Entities
         [Parameter("work:start", "Start of Working Hours")]
         WorkHoursStart,
         [Parameter("work:end", "End of Working Hours")]
-        WorkHoursEnd
+        WorkHoursEnd,
+        [Parameter("pronoun:possessive", "Pronoun (Possessive)")]
+        PossessivePronoun,
+        [Parameter("pronoun:reflexive", "Pronoun (Reflexive)")]
+        ReflexivePronoun
     }
 }
