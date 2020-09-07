@@ -6,11 +6,13 @@ namespace ChatBeet.Data.Entities
     {
         [Parameter("birthday", "Date of Birth"),]
         DateOfBirth,
-        [Parameter("pronouns", "Pronouns")]
-        Pronouns,
-        [Parameter("workstart", "Start of Working Hours")]
+        [Parameter("pronoun:subject", "Pronoun (Subject)")]
+        SingularPronoun,
+        [Parameter("pronoun:object", "Pronoun (Object)")]
+        PluralPronoun,
+        [Parameter("work:start", "Start of Working Hours")]
         WorkHoursStart,
-        [Parameter("workend", "End of Working Hours")]
+        [Parameter("work:end", "End of Working Hours")]
         WorkHoursEnd
     }
 }

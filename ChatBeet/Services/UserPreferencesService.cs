@@ -21,21 +21,31 @@ namespace ChatBeet.Services
             }
         }
 
-        public async Task Set<T>(string nick, UserPreference preference, T value)
+        public async Task Set(string nick, UserPreference preference, string value)
         {
             var existingPref = await db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
             if (existingPref == null)
             {
-                db.PreferenceSettings.Add(new UserPreferenceSetting
+                if (!string.IsNullOrEmpty(value))
                 {
-                    Nick = nick,
-                    Preference = preference,
-                    Value = value.ToString()
-                });
+                    db.PreferenceSettings.Add(new UserPreferenceSetting
+                    {
+                        Nick = nick,
+                        Preference = preference,
+                        Value = value
+                    });
+                }
             }
             else
             {
-                existingPref.Value = value.ToString();
+                if (string.IsNullOrEmpty(value))
+                {
+                    db.PreferenceSettings.Remove(existingPref);
+                }
+                else
+                {
+                    existingPref.Value = value.ToString();
+                }
             }
 
             await db.SaveChangesAsync();

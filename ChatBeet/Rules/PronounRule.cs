@@ -3,6 +3,7 @@ using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
+using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -38,14 +39,23 @@ namespace ChatBeet.Rules
                 }
                 else
                 {
-                    var pref = await userPreferences.Get(incomingMessage.From, UserPreference.Pronouns);
-                    if (string.IsNullOrEmpty(pref))
+                    var subject = await userPreferences.Get(incomingMessage.From, UserPreference.SingularPronoun);
+                    var @object = await userPreferences.Get(incomingMessage.From, UserPreference.PluralPronoun);
+                    if (string.IsNullOrEmpty(subject) && string.IsNullOrEmpty(@object))
                     {
                         yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, I don't know the preferred pronouns for {nick}.");
                     }
+                    else if (string.IsNullOrEmpty(subject))
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Object pronoun for {nick}: {IrcValues.BOLD}{@object}{IrcValues.RESET}");
+                    }
+                    else if (string.IsNullOrEmpty(@object))
+                    {
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Subject pronoun for {nick}: {IrcValues.BOLD}{subject}{IrcValues.RESET}");
+                    }
                     else
                     {
-                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Preferred pronouns for {nick}: {IrcValues.BOLD}{pref}{IrcValues.RESET}.");
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Preferred pronouns for {nick}: {IrcValues.BOLD}{subject}/{@object}{IrcValues.RESET}");
                     }
                 }
             }

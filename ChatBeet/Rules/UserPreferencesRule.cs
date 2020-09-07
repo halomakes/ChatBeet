@@ -49,7 +49,14 @@ namespace ChatBeet.Rules
                     await service.Set(incomingMessage.From, preference, value);
                     var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
 
-                    yield return new PrivateMessage(incomingMessage.From, $"Set {IrcValues.ITALIC}{displayName}{IrcValues.RESET} to {IrcValues.BOLD}{value}{IrcValues.RESET}.");
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        yield return new PrivateMessage(incomingMessage.From, $"Cleared value for {IrcValues.ITALIC}{displayName}{IrcValues.RESET}.");
+                    }
+                    else
+                    {
+                        yield return new PrivateMessage(incomingMessage.From, $"Set {IrcValues.ITALIC}{displayName}{IrcValues.RESET} to {IrcValues.BOLD}{value}{IrcValues.RESET}.");
+                    }
                 }
                 else
                 {
