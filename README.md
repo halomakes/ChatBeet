@@ -217,15 +217,23 @@ Example Output:
 
 #### Available Preferences
 
-| Preference         | Description              |
-|--------------------|--------------------------|
-| birthday           | Date of Birth            |
-| pronoun:subject    | Pronoun (Subject)        |
-| pronoun:object     | Pronoun (Object)         |
-| pronoun:possessive | Pronoun (Possessive)     |
-| pronoun:reflexive  | Pronoun (Reflexive)      |
-| work:start         | Starting Time of Workday |
-| work:end           | Ending Time of Workday   |
+| Preference         | Description              | Type     |
+|--------------------|--------------------------|----------|
+| birthday           | Date of Birth            | DateTime |
+| pronoun:subject    | Pronoun (Subject)        | string   |
+| pronoun:object     | Pronoun (Object)         | string   |
+| pronoun:possessive | Pronoun (Possessive)     | string   |
+| pronoun:reflexive  | Pronoun (Reflexive)      | string   |
+| work:start         | Starting Time of Workday | DateTime |
+| work:end           | Ending Time of Workday   | DateTime |
+
+#### Specific Examples
+
+##### Setting Times
+If you live in a time zone other than the objectively best one (Eastern), you can indicate time zone for dates/times by adding an offset at the end.
+```
+cb set work:start = 7am-05:00
+```
 
 ### Pronouns
 *Look up pronouns for a user*
