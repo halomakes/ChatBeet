@@ -21,4 +21,81 @@ else
     <p>No personalizations set.</p>
 }
 <hr />
-<h2>Blacklist</h2>
+<h2>Booru Tag Blacklist</h2>
+<h3>Global Blacklist</h3>
+@if (Model.GlobalTags.Any())
+{
+    <ul>
+        @foreach (var t in Model.GlobalTags)
+        {
+            <li>@t.Replace("_", " ")</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No tags blacklisted globally.</p>
+}
+<h3>Personal Blacklist</h3>
+@if (Model.BlacklistedTags.Any())
+{
+    <ul id="tagList">
+        @foreach (var t in Model.BlacklistedTags)
+        {
+            <li>
+                <div class="d-inline-flex align-content-center">
+                    <span>@t.Replace("_", " ")</span>
+                    <a onclick="removeFromWhitelist('@t.Replace("'","\"")', this)" role="button">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No tags blacklisted.</p>
+}
+<div>
+    <form class="form-inline" onsubmit="addToWhitelist(this, event)">
+        <label class="sr-only" for="blacklistTag">Tag</label>
+        <input type="text" class="form-control mb-2 mr-sm-2" id="blacklistTag" name="blacklistTag" placeholder="silver_hair">
+        <button type="submit" class="btn btn-primary mb-2">Add</button>
+    </form>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        removeFromWhitelist = function (tag, link) {
+            link.parentElement.parentElement.remove();
+            window.fetch(`/api/Blacklist/${tag}`, { method: 'DELETE' });
+        };
+
+        addToWhitelist = function (form, event) {
+            event.preventDefault();
+            var tags = new FormData(form).get('blacklistTag');
+            window.fetch(`/api/Blacklist/${tags}`, { method: 'PATCH' });
+            var list = document.getElementById('tagList');
+            for (var t of tags.split(' ')) {
+                var li = document.createElement('li');
+                var div = document.createElement('div');
+                div.className = 'd-inline-flex align-content-center';
+                var span = document.createElement('span');
+                span.innerHTML = t.replace('_', ' ');
+                var a = document.createElement('a');
+                a.onclick = function () { removeFromWhitelist(t, a); };
+                a.setAttribute('role', 'button');
+                var i = document.createElement('i');
+                i.classList = 'material-icons';
+                i.innerHTML = 'delete';
+                a.appendChild(i);
+                div.appendChild(span);
+                div.appendChild(a);
+                li.appendChild(div);
+                list.appendChild(li);
+            }
+            form.reset();
+        };
+    </script>
+}

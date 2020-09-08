@@ -88,6 +88,7 @@ namespace ChatBeet.Pages.Account
                         new Claim(ClaimTypes.NameIdentifier, LoginInfo.Nick)
                     }, IdentityConstants.ApplicationScheme);
                     await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(claims));
+                    messageQueue.Push(new LoginCompleteNotification { Nick = LoginInfo.Nick });
                     return RedirectToPage(string.IsNullOrEmpty(ReturnUrl) ? "/Account/Success" : ReturnUrl);
                 }
                 else

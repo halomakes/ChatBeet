@@ -71,6 +71,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<PronounRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WorkdayProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
+                pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
             });
 
             services.AddHttpClient();
