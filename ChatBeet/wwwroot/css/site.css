@@ -76,6 +76,10 @@ body {
     overflow: hidden;
 }
 
+.list-group-item.list-group-item-action {
+    z-index: 0;
+}
+
 .background-bar {
     transform-origin: left;
     animation-name: grow-x;
