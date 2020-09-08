@@ -61,6 +61,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<BooruRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
+                pipeline.RegisterRule<HighGroundRule, HighGroundClaim>();
                 pipeline.RegisterRule<SlotMachineRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();

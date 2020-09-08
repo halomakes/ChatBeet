@@ -1,20 +1,24 @@
 ﻿@page "HighGround"
-@using ChatBeet.Utilities;
-@using ChatBeet.Rules;
 @model ChatBeet.Pages.HighGroundModel
 
 @{
     ViewBag.Title = "The High Ground";
 }
 
-@if (HighGroundRule.HighestNicks.AsEnumerable().Any())
+@if (!string.IsNullOrEmpty(Model.Channel))
 {
-    var top = HighGroundRule.HighestNicks.AsEnumerable().PickRandom();
     <div class="high-ground">
         <img src="~/img/high_ground.webp" />
-        <span class="ground-label person">@top.Value</span>
-        <span class="ground-label channel">@top.Key</span>
+        <span class="ground-label person">@Model.Nick</span>
+        <span class="ground-label channel">@Model.Channel</span>
     </div>
+    @if (User?.Identity?.IsAuthenticated ?? false)
+    {
+        <form asp-page="/HighGround" method="post" class="mt-4">
+            <input asp-for="Channel" type="hidden" />
+            <button class="btn btn-primary" type="submit">Claim the High Ground</button>
+        </form>
+    }
 }
 else
 {
