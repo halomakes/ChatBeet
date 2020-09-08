@@ -38,10 +38,14 @@ namespace ChatBeet.Pages.Account
 
         public void OnGet(string ReturnUrl = default)
         {
+            if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                RedirectToPage(ReturnUrl ?? "/Account/Success");
+            }
+
             this.ReturnUrl = ReturnUrl;
         }
 
-        [HttpPost]
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -84,7 +88,7 @@ namespace ChatBeet.Pages.Account
                         new Claim(ClaimTypes.NameIdentifier, LoginInfo.Nick)
                     }, IdentityConstants.ApplicationScheme);
                     await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(claims));
-                    return RedirectToPage(string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/Account/Success");
+                    return RedirectToPage(string.IsNullOrEmpty(ReturnUrl) ? "/Account/Success" : ReturnUrl);
                 }
                 else
                 {

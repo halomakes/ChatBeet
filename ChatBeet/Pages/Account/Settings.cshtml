@@ -1,0 +1,24 @@
+﻿@page "/Account/Settings"
+@model ChatBeet.Pages.Account.SettingsModel
+@{
+    ViewBag.Title = "Settings";
+}
+
+<h1>Preferences for <span class="text-secondary">@Model.Nick</span></h1>
+<h2>Personalizations</h2>
+@if (Model.Settings.Any())
+{
+    @foreach (var s in Model.Settings)
+    {
+        <div class="d-flex flex-row">
+            <b class="mr-3">@s.Key:</b>
+            <span>@s.Value</span>
+        </div>
+    }
+}
+else
+{
+    <p>No personalizations set.</p>
+}
+<hr />
+<h2>Blacklist</h2>

@@ -36,6 +36,10 @@
                     {
                         <a class="nav-link" asp-page="/Account/Settings">@User.Claims.FirstOrDefault(c => c.Type == "nick")?.Value</a>
                     }
+                    else
+                    {
+                        <a class="nav-link" asp-page="/Account/Login">Log In</a>
+                    }
                 </div>
             </div>
         </nav>
