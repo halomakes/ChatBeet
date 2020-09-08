@@ -6,7 +6,6 @@ using Humanizer;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
@@ -14,7 +13,6 @@ namespace ChatBeet.Rules
     public class ProgressRule : MessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
-
 
         public ProgressRule(IOptions<IrcBotConfiguration> opts)
         {
