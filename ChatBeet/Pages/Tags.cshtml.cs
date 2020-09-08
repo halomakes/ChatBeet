@@ -1,6 +1,5 @@
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
-using ChatBeet.Utilities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
