@@ -3,6 +3,10 @@
 @using ChatBeet.Rules;
 @model ChatBeet.Pages.HighGroundModel
 
+@{
+    ViewBag.Title = "The High Ground";
+}
+
 @if (HighGroundRule.HighestNicks.AsEnumerable().Any())
 {
     var top = HighGroundRule.HighestNicks.AsEnumerable().PickRandom();
