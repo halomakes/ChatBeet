@@ -101,3 +101,12 @@ body {
         transform: scaleX(1)
     }
 }
+
+.bootstrap-dark pre code, .bootstrap pre code {
+    color: #e83e8c;
+}
+
+.bootstrap-dark blockquote, .bootstrap blockquote {
+    border-left: solid 4px #bbb;
+    padding-left: 12px;
+}

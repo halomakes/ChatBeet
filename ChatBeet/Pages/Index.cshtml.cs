@@ -36,7 +36,8 @@ namespace ChatBeet.Pages
                 return await System.IO.File.ReadAllTextAsync(filepath);
             });
 
-            ReadmeHtml = Markdown.ToHtml(readmeMarkdown);
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            ReadmeHtml = Markdown.ToHtml(readmeMarkdown, pipeline);
         }
     }
 }
