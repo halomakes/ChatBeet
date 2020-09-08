@@ -15,8 +15,10 @@ namespace ChatBeet.Pages
     {
         private readonly BooruContext db;
         private readonly IMemoryCache cache;
+        private static readonly Random rng = new Random();
 
         public IEnumerable<Stat> GeneralStats { get; private set; }
+        public IEnumerable<Stat> RandomStats { get; private set; }
         public IEnumerable<TopTag> UserStats { get; private set; }
         public DateTime Earliest { get; private set; }
 
@@ -28,27 +30,32 @@ namespace ChatBeet.Pages
 
         public async Task OnGet()
         {
-            GeneralStats = await cache.GetOrCreateAsync("toptags", async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-                return await db.TagHistories.AsQueryable()
-                    .GroupBy(th => th.Tag)
-                    .Select(g => new Stat { Tag = g.Key, Total = g.Count() })
-                    .OrderByDescending(s => s.Total)
-                    .Take(20)
-                    .ToListAsync();
-            });
-            UserStats = await cache.GetOrCreate("usertags", async entry =>
+            GeneralStats = (await GetStats())
+                .OrderByDescending(s => s.Total)
+                .Take(20);
+            RandomStats = (await GetStats())
+                .OrderBy(s => rng.Next())
+                .Take(20);
+            UserStats = await cache.GetOrCreate("tags:user", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
                 return await db.GetTopTags();
             });
-            Earliest = await cache.GetOrCreate("tagdate", async entry =>
+            Earliest = await cache.GetOrCreate("tags:date", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
                 return await EntityFrameworkQueryableExtensions.MinAsync(db.TagHistories, th => th.Timestamp);
             });
         }
+
+        private async Task<IEnumerable<Stat>> GetStats() => await cache.GetOrCreateAsync("tags:stats", async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+            return await db.TagHistories.AsQueryable()
+                .GroupBy(th => th.Tag)
+                .Select(g => new Stat { Tag = g.Key, Total = g.Count() })
+                .ToListAsync();
+        });
 
         public struct Stat
         {

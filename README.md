@@ -32,14 +32,6 @@ Example Output:
 > Fall Out Boy is a band formed in 2001 in Glenview, Illinois after good friends Joe Trohman and Pete Wentz met high schooler Patrick Stump. Stump originally auditioned as a drummer, but soon became the lead singer. The following year, the band debuted with a self-released demo and followed it up with the May 28, 2002 release of Split EP, which featured Project Rocket, on Uprising Records. The group released a mini-LP, Evening Out With Your Gir
 > Related tags: pop punk, rock, emo, alternative, punk
 
-### Astolfo
-*Fill the void in your soul with a top-tier Fate waifu*
-```
-.cb astolfo
-```
-Example Output:
-> https://pbs.twimg.com/media/EczfPtwWsAYvs07.png
-
 ### DeviantArt
 *Explore the depths of degeneracy on DeviantArt*
 ```

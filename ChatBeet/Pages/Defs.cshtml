@@ -6,33 +6,43 @@
     defs.Reverse();
     ViewBag.Title = "Definitions";
 }
-
-<h1>Definitions</h1>
-<code>.cb remember <b>spud</b> = <b>potato</b></code>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Key</th>
-            <th scope="col">Value</th>
-            <th scope="col">Author</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var def in defs)
-        {
-        <tr>
-            <th scope="row">@def.Key</th>
-            <td class="value">@def.Value</td>
-            <td>@def.Author</td>
-        </tr>
-        }
-    </tbody>
-</table>
+<div id="tagList">
+    <h1>Definitions</h1>
+    <code>.cb remember <b>spud</b> = <b>potato</b></code>
+    <div class="input-group my-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Filter</span>
+        </div>
+        <input type="text" class="form-control" data-in="this.filter" data-immediate="true">
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Key</th>
+                <th scope="col">Value</th>
+                <th scope="col">Author</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var def in defs)
+            {
+                <tr data-show="!this.filter || '@def.Key.Replace("'","\"")'.toLowerCase().includes(this.filter.toLowerCase())">
+                    <th scope="row">@def.Key</th>
+                    <td class="value">@def.Value</td>
+                    <td>@def.Author</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @section Scripts {
     <script src="https://unpkg.com/linkifyjs@2.1.9/dist/linkify.min.js" type="text/javascript"></script>
     <script src="https://unpkg.com/linkifyjs@2.1.9/dist/linkify-jquery.min.js" type="text/javascript"></script>
-    <script>
+    <script type="text/javascript">
         $('.value').linkify();
+    </script>
+    <script type="text/javascript">
+        var binder = new GravyBinder({ filter: '' }, document.getElementById('tagList'));
     </script>
 }

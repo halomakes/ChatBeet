@@ -38,7 +38,6 @@ namespace ChatBeet
             {
                 pipeline.AddSampleRules();
 
-                pipeline.RegisterAsyncRule<AstolfoRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<RecentTweetRule, PrivateMessage>();
                 pipeline.RegisterRule<AutoYatoRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ArtistRule, PrivateMessage>();

@@ -10,7 +10,7 @@ namespace ChatBeet.Rules
     public class HighGroundRule : MessageRuleBase<PrivateMessage>
     {
         private readonly Regex filter;
-        private static readonly Dictionary<string, string> highestNicks = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> HighestNicks = new Dictionary<string, string>();
 
         public HighGroundRule(IOptions<IrcBotConfiguration> options)
         {
@@ -22,20 +22,20 @@ namespace ChatBeet.Rules
             var match = filter.Match(incomingMessage.Message);
             if (match.Success)
             {
-                if (!highestNicks.ContainsKey(incomingMessage.To))
+                if (!HighestNicks.ContainsKey(incomingMessage.To))
                 {
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From} has the high ground.");
-                    highestNicks[incomingMessage.To] = incomingMessage.From;
+                    HighestNicks[incomingMessage.To] = incomingMessage.From;
                 }
-                else if (incomingMessage.From == highestNicks[incomingMessage.To])
+                else if (incomingMessage.From == HighestNicks[incomingMessage.To])
                 {
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From} trips and falls off the high ground.");
-                    highestNicks.Remove(incomingMessage.To);
+                    HighestNicks.Remove(incomingMessage.To);
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"It's over, {highestNicks[incomingMessage.To]}! {incomingMessage.From} has the high ground!");
-                    highestNicks[incomingMessage.To] = incomingMessage.From;
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"It's over, {HighestNicks[incomingMessage.To]}! {incomingMessage.From} has the high ground!");
+                    HighestNicks[incomingMessage.To] = incomingMessage.From;
                 }
             }
         }
