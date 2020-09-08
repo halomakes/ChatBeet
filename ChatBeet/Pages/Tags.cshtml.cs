@@ -32,10 +32,12 @@ namespace ChatBeet.Pages
         {
             GeneralStats = (await GetStats())
                 .OrderByDescending(s => s.Total)
-                .Take(20);
+                .Take(20)
+                .ToList();
             RandomStats = (await GetStats())
                 .OrderBy(s => rng.Next())
-                .Take(20);
+                .Take(20)
+                .ToList();
             UserStats = await cache.GetOrCreate("tags:user", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
