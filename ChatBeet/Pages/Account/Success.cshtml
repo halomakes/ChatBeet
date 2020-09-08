@@ -1,0 +1,8 @@
+﻿@page "/Account/Success"
+@model ChatBeet.Pages.Account.SuccessModel
+@{
+    ViewBag.Title = "Logged In";
+}
+
+<h1>Login successful</h1>
+<p>You have logged in successfully, @User.Claims.FirstOrDefault(c => c.Type == "nick")?.Value.</p>

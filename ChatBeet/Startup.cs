@@ -10,6 +10,9 @@ using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -58,6 +61,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<BooruRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
+                pipeline.RegisterRule<HighGroundRule, HighGroundClaim>();
                 pipeline.RegisterRule<SlotMachineRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
@@ -67,6 +71,8 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<PronounRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WorkdayProgressRule, PrivateMessage>();
+                pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
+                pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
             });
 
             services.AddHttpClient();
@@ -96,8 +102,13 @@ namespace ChatBeet
             services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
             services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
             services.AddDbContext<PreferencesContext>(ServiceLifetime.Transient);
+            services.AddDbContext<IdentityDbContext>(opts => opts.UseInMemoryDatabase(databaseName: "auth"));
 
             services.AddMemoryCache();
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<IdentityDbContext>()
+                .AddDefaultTokenProviders();
+            services.AddAuthentication();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,6 +125,7 @@ namespace ChatBeet
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

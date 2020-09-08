@@ -1,6 +1,7 @@
 ﻿using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -56,5 +57,7 @@ namespace ChatBeet.Services
             var pref = await db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
             return pref?.Value;
         }
+
+        public Task<List<UserPreferenceSetting>> Get(string nick) => db.PreferenceSettings.AsQueryable().Where(p => p.Nick == nick).ToListAsync();
     }
 }
