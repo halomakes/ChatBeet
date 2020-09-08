@@ -1,0 +1,34 @@
+﻿@page "/Account/Login"
+@model ChatBeet.Pages.Account.LoginModel
+@{
+}
+
+<h1>Log In</h1>
+@if (string.IsNullOrEmpty(Model?.LoginInfo?.Nick))
+{
+    <form asp-page="/Account/Login" method="post">
+        <div class="form-group">
+            <label asp-for="LoginInfo.Nick"></label>
+            <input asp-for="LoginInfo.Nick" />
+            <span class="text-warning" asp-validation-for="LoginInfo.Nick"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+}
+else
+{
+    <form asp-page="/Account/Login" method="post">
+        <div class="form-group">
+            <label asp-for="LoginInfo.Nick"></label>
+            <input asp-for="LoginInfo.Nick" disabled />
+            <span class="text-warning" asp-validation-for="LoginInfo.Nick"></span>
+        </div>
+        <input asp-for="LoginInfo.Nick" type="hidden" />
+        <div class="form-group">
+            <label asp-for="LoginInfo.AuthToken"></label>
+            <input asp-for="LoginInfo.AuthToken" />
+            <span class="text-warning" asp-validation-for="LoginInfo.AuthToken"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+}
