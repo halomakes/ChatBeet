@@ -43,15 +43,38 @@ namespace ChatBeet.Rules
             }
             else
             {
-                var start = DateTime.Parse(startPref);
-                var end = DateTime.Parse(endPref);
                 var now = DateTime.Now;
+                var start = NormalizeTime(DateTime.Parse(startPref), now);
+                var end = NormalizeTime(DateTime.Parse(endPref), now);
 
-                var bar = Progress.GetBar(now, start, end, $"{IrcValues.BOLD}Your workday{IrcValues.RESET} is");
-                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), bar);
+                if (end < start)
+                {
+                    // handle overnight shifts
+                    if (start < now)
+                    {
+                        end = end.AddDays(1);
+                    }
+                    else
+                    {
+                        start = start.AddDays(-1);
+                    }
+                }
+
+                if (start <= now && end >= now)
+                {
+                    var bar = Progress.GetBar(now, start, end, $"{IrcValues.BOLD}Your workday{IrcValues.RESET} is");
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), bar);
+                }
+                else
+                {
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"You are outside of working hours.");
+                }
             }
 
             static bool IsValidDate(string val) => !string.IsNullOrEmpty(val) && DateTime.TryParse(val, out var _);
+
+            static DateTime NormalizeTime(DateTime date, DateTime baseline) =>
+                new DateTime(baseline.Year, baseline.Month, baseline.Day, date.Hour, date.Minute, date.Second);
         }
     }
 }
