@@ -225,3 +225,5 @@ ChatBeet.Server/appsettings.json
 ChatBeet.Server/dtella.db
 
 ChatBeet/db/
+
+ChatBeet/wwwroot/README.md
