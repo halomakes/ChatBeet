@@ -19,7 +19,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Miki.Anilist;
 using PixivCS;
-using System.Linq;
 
 namespace ChatBeet
 {
@@ -107,6 +106,7 @@ namespace ChatBeet
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
+            services.AddAuthentication();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
