@@ -114,3 +114,32 @@ body {
     border-left: solid 4px #bbb;
     padding-left: 12px;
 }
+
+.high-ground {
+    position: relative;
+}
+
+    .high-ground > img {
+        width: 100%;
+    }
+
+    .high-ground > .ground-label {
+        font-family: Impact, sans-serif;
+        text-transform: uppercase;
+        color: white;
+        text-shadow: 0 0 8px black;
+        font-size: 3rem;
+        position: absolute;
+    }
+
+        .high-ground > .ground-label.person {
+            right: 27%;
+            top: 30%;
+            transform: translate(50%,-50%);
+        }
+
+        .high-ground > .ground-label.channel {
+            left: 22%;
+            top: 45%;
+            transform: translate(-50%,-50%);
+        }

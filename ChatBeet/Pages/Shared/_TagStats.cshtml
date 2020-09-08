@@ -12,7 +12,7 @@
         <a class="list-group-item list-group-item-action position-relative overflow-none" href="@getLink(stat.Tag)" target="_blank">
             <span class="ml-2">
                 @stat.Tag.Replace("_", " ")
-                <span class="badge badge-pill badge-success ml-1">@stat.Total</span>
+                <span class="badge badge-pill badge-primary ml-1">@stat.Total</span>
             </span>
             <span class="bg-primary background-bar" style="width: @getPercentage(stat.Total)%; animation-delay: @(count * offset)ms "></span>
         </a>

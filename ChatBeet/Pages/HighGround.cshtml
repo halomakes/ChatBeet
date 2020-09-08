@@ -1,0 +1,18 @@
+﻿@page "HighGround"
+@using ChatBeet.Utilities;
+@using ChatBeet.Rules;
+@model ChatBeet.Pages.HighGroundModel
+
+@if (HighGroundRule.HighestNicks.AsEnumerable().Any())
+{
+    var top = HighGroundRule.HighestNicks.AsEnumerable().PickRandom();
+    <div class="high-ground">
+        <img src="~/img/high_ground.webp" />
+        <span class="ground-label person">@top.Value</span>
+        <span class="ground-label channel">@top.Key</span>
+    </div>
+}
+else
+{
+    <p>The high ground is unclaimed.</p>
+}
