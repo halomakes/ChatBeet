@@ -56,6 +56,8 @@ namespace ChatBeet.Rules
                         UserPreference.PossessivePronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Possessives, displayName),
                         UserPreference.ReflexivePronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Reflexives, displayName),
                         UserPreference.DateOfBirth => GetDateValidation(value),
+                        UserPreference.WorkHoursEnd => GetDateValidation(value),
+                        UserPreference.WorkHoursStart => GetDateValidation(value),
                         _ => default
                     };
 
