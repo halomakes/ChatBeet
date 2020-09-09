@@ -76,6 +76,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
                 pipeline.RegisterRule<BadBotReactRule, PrivateMessage>();
                 pipeline.RegisterRule<DefUpdatedRule, DefinitionChange>();
+                pipeline.RegisterRule<UserPreferencesRule, PreferenceChange>();
             });
 
             services.AddHttpClient();

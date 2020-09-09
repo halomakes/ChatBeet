@@ -1,4 +1,4 @@
-﻿using ChatBeet.Annotations;
+﻿using ChatBeet.Attributes;
 
 namespace ChatBeet.Data.Entities
 {

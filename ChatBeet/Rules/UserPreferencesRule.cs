@@ -1,6 +1,6 @@
-﻿using ChatBeet.Annotations;
-using ChatBeet.Configuration;
+﻿using ChatBeet.Attributes;
 using ChatBeet.Data.Entities;
+using ChatBeet.Models;
 using ChatBeet.Services;
 using GravyBot;
 using GravyIrc.Messages;
@@ -13,10 +13,9 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class UserPreferencesRule : AsyncMessageRuleBase<PrivateMessage>
+    public class UserPreferencesRule : AsyncMessageRuleBase<PrivateMessage>, IMessageRule<PreferenceChange>
     {
         private readonly UserPreferencesService service;
-        private readonly ChatBeetConfiguration config;
         private readonly Regex rgx;
         private static readonly Dictionary<string, UserPreference> preferenceMappings;
 
@@ -27,11 +26,10 @@ namespace ChatBeet.Rules
                 .ToDictionary(p => p.GetAttribute<ParameterAttribute>().InlineName, p => p);
         }
 
-        public UserPreferencesRule(IOptions<IrcBotConfiguration> options, UserPreferencesService service, IOptions<ChatBeetConfiguration> cbOptions)
+        public UserPreferencesRule(IOptions<IrcBotConfiguration> options, UserPreferencesService service)
         {
             this.service = service;
             var botConfig = options.Value;
-            config = cbOptions.Value;
             rgx = new Regex($"^({Regex.Escape(botConfig.Nick)}, |{Regex.Escape(botConfig.CommandPrefix)})set (.*?)=(.*)", RegexOptions.IgnoreCase);
         }
 
@@ -48,18 +46,7 @@ namespace ChatBeet.Rules
                 if (preferenceMappings.ContainsKey(prefName))
                 {
                     var preference = preferenceMappings[prefName];
-                    var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
-                    var validationMessage = string.IsNullOrEmpty(value) ? default : preference switch
-                    {
-                        UserPreference.SubjectPronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Subjects, displayName),
-                        UserPreference.ObjectPronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Objects, displayName),
-                        UserPreference.PossessivePronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Possessives, displayName),
-                        UserPreference.ReflexivePronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Reflexives, displayName),
-                        UserPreference.DateOfBirth => GetDateValidation(value),
-                        UserPreference.WorkHoursEnd => GetDateValidation(value),
-                        UserPreference.WorkHoursStart => GetDateValidation(value),
-                        _ => default
-                    };
+                    var validationMessage = service.GetValidation(preference, value);
 
                     if (!string.IsNullOrEmpty(validationMessage))
                     {
@@ -68,15 +55,7 @@ namespace ChatBeet.Rules
                     else
                     {
                         await service.Set(incomingMessage.From, preference, value);
-
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            yield return new PrivateMessage(incomingMessage.From, $"Cleared value for {IrcValues.ITALIC}{displayName}{IrcValues.RESET}.");
-                        }
-                        else
-                        {
-                            yield return new PrivateMessage(incomingMessage.From, $"Set {IrcValues.ITALIC}{displayName}{IrcValues.RESET} to {IrcValues.BOLD}{value}{IrcValues.RESET}.");
-                        }
+                        yield return new PrivateMessage(incomingMessage.From, GetConfirmationMessage(preference, value));
                     }
                 }
                 else
@@ -86,22 +65,19 @@ namespace ChatBeet.Rules
             }
         }
 
-        private static string GetCollectionValidation(string value, IEnumerable<string> collection, string displayName)
+        public IEnumerable<IClientMessage> Respond(PreferenceChange incomingMessage)
         {
-            if (!collection.Contains(value.ToLower()))
-            {
-                return $"Sorry, {IrcValues.BOLD}{value}{IrcValues.RESET} is not an available value for {IrcValues.ITALIC}{displayName}{IrcValues.RESET}.  Available values are [{string.Join(", ", collection)}].";
-            }
-            return default;
+            yield return new PrivateMessage(incomingMessage.Nick, $"{GetConfirmationMessage(incomingMessage.Preference, incomingMessage.Value)} via WebUI");
         }
 
-        private static string GetDateValidation(string value)
+        public IEnumerable<IClientMessage> Respond(object incomingMessage) => incomingMessage is PreferenceChange pc ? Respond(pc) : Enumerable.Empty<IClientMessage>();
+
+        private string GetConfirmationMessage(UserPreference preference, string value)
         {
-            if (!DateTime.TryParse(value, out var _))
-            {
-                return $"{IrcValues.BOLD}{value}{IrcValues.RESET} is not a valid date.";
-            }
-            return default;
+            var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
+            return string.IsNullOrEmpty(value)
+                ? $"Cleared value for {IrcValues.ITALIC}{displayName}{IrcValues.RESET}"
+                : $"Set {IrcValues.ITALIC}{displayName}{IrcValues.RESET} to {IrcValues.BOLD}{value}{IrcValues.RESET}";
         }
     }
 }
