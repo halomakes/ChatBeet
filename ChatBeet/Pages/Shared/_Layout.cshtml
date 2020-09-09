@@ -10,6 +10,14 @@
     <link rel="stylesheet" href="~/css/site.css" async />
 </head>
 <body class="bootstrap-dark">
+    <script type="text/javascript">
+        var body = document.getElementsByTagName('body')[0];
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.classList = 'bootstrap-dark';
+        } else {
+            body.classList = 'bootstrap';
+        }
+    </script>
     <header>
         <nav class="navbar navbar-themed navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
             <div class="container">
@@ -71,16 +79,6 @@
     <script type="text/javascript" src="https://unpkg.com/gravy-bind/dist.browser/index.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js" async></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js" async></script>
-
-    <script type="text/javascript">
-        var body = document.getElementsByTagName('body')[0];
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            body.classList = 'bootstrap-dark';
-        } else {
-            body.classList = 'bootstrap';
-        }
-    </script>
-
     @RenderSection("Scripts", required: false)
 </body>
 </html>
