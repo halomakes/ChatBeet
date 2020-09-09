@@ -1,5 +1,8 @@
 ﻿@page "/Account/Settings"
 @model ChatBeet.Pages.Account.SettingsModel
+@using ChatBeet.Data.Entities;
+@using ChatBeet.Utilities;
+@using ChatBeet.Attributes;
 @{
     ViewBag.Title = "Settings";
 }
@@ -20,6 +23,30 @@ else
 {
     <p>No personalizations set.</p>
 }
+<div>
+    <form class="form-inline my-2" asp-page="/Account/Settings" method="post">
+        <label class="sr-only" asp-for="Preference.Preference"></label>
+        <select class="custom-select mr-2" asp-for="Preference.Preference">
+            @if (Model.Preference?.Preference.HasValue ?? false)
+            {
+                <option disabled></option>
+            }
+            else
+            {
+                <option disabled selected></option>
+            }
+            @foreach (var e in Enum.GetValues(typeof(UserPreference)).Cast<UserPreference>())
+            {
+                var label = EnumerationExtensions.GetAttribute<ParameterAttribute, UserPreference>(e).DisplayName;
+                <option value="@e">@label</option>
+            }
+        </select>
+        <label class="sr-only" asp-for="Preference.Value"></label>
+        <input class="form-control flex-grow-1 mr-2" asp-for="Preference.Value">
+        <button type="submit" class="btn btn-primary">Set</button>
+    </form>
+    <div asp-validation-summary="All"></div>
+</div>
 <hr class="my-4" />
 <h2>Booru Tag Blacklist</h2>
 <h3>Global Blacklist</h3>
