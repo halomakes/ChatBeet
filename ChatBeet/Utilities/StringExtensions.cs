@@ -35,5 +35,12 @@ namespace ChatBeet.Utilities
                 .Select(s => s.Trim())
                 .Where(s => !string.IsNullOrEmpty(s))
             );
+
+        public static string CapitalizeFirst(this string input) => input switch
+        {
+            null => null,
+            "" => input,
+            _ => input.First().ToString().ToUpper() + input.Substring(1).ToLower()
+        };
     }
 }

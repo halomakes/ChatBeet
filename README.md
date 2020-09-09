@@ -242,3 +242,17 @@ cb set work:start = 7am-05:00
 ```
 Example Output:
 > Preferred pronouns for carrots: **He/Him**
+
+### Birthdays
+*Find out whose very special day it is*
+```
+.cb birthday
+```
+Example Output:
+> Upcoming birthdays: Mike on **October 1**, Feedbag on **October 4**, Jane on **January 23**
+
+```
+.cb birthday carrots
+```
+Example Output:
+> His birthday is on August 14.
