@@ -37,6 +37,11 @@ namespace ChatBeet.Services
                 using var contentStream = await response.Content.ReadAsStreamAsync();
                 return contentStream.DeserializeJson<FunTranslation>()?.Contents?.Translated;
             }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Couldn't transltate | {error.Replace("\n", " ")}");
+            }
 
             return null;
         }
