@@ -11,7 +11,7 @@
 </head>
 <body class="bootstrap-dark">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-themed navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">ChatBeet</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -35,14 +35,20 @@
                             <a class="nav-link" asp-area="" asp-page="/HighGround">High Ground</a>
                         </li>
                     </ul>
-                    @if (User?.Identity?.IsAuthenticated ?? false)
-                    {
-                        <a class="nav-link" asp-page="/Account/Settings">@User.Claims.FirstOrDefault(c => c.Type == "nick")?.Value</a>
-                    }
-                    else
-                    {
-                        <a class="nav-link" asp-page="/Account/Login">Log In</a>
-                    }
+                    <ul class="navbar-nav">
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Account/Settings">@User.Claims.FirstOrDefault(c => c.Type == "nick")?.Value</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Account/Login">Log In</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>
