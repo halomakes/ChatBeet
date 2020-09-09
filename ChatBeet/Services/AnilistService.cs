@@ -15,9 +15,9 @@ namespace ChatBeet.Services
             this.client = client;
         }
 
-        public Task<IMedia> GetMediaAsync(string search) => int.TryParse(search, out var id)
+        public Task<IMedia> GetMediaAsync(string search, MediaType format = MediaType.ANIME) => int.TryParse(search, out var id)
             ? GetMediaAsync(id)
-            : GetTopSearchItemAsync(search, t => client.SearchMediaAsync(t), r => client.GetMediaAsync(r.Id));
+            : GetTopSearchItemAsync(search, t => client.SearchMediaAsync(t, type: format), r => client.GetMediaAsync(r.Id));
 
         public Task<IMedia> GetMediaAsync(int id) => client.GetMediaAsync(id);
 
