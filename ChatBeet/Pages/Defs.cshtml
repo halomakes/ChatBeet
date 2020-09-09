@@ -1,9 +1,6 @@
 ﻿@page
 @model ChatBeet.Pages.DefsModel
-@inject ChatBeet.Data.MemoryCellContext db;
 @{
-    var defs = await db.MemoryCells.ToListAsync();
-    defs.Reverse();
     ViewBag.Title = "Definitions";
 }
 <div id="tagList">
@@ -15,25 +12,41 @@
         </div>
         <input type="text" class="form-control" data-in="this.filter" data-immediate="true">
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Key</th>
-                <th scope="col">Value</th>
-                <th scope="col">Author</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var def in defs)
-            {
-                <tr data-show="!this.filter || '@def.Key.Replace("'","\"")'.toLowerCase().includes(this.filter.toLowerCase())">
-                    <th scope="row">@def.Key</th>
-                    <td class="value">@def.Value</td>
-                    <td>@def.Author</td>
+    <form asp-page="/Defs" method="post">
+        <table class="table">
+            <tbody>
+                @if (User?.Identity?.IsAuthenticated ?? false)
+                {
+                    <tr>
+                        <td scope="col">
+                            <label class="sr-only" asp-for="Info.Key"></label>
+                            <input type="text" class="form-control" asp-for="Info.Key">
+                        </td>
+                        <td scope="col">
+                            <label class="sr-only" asp-for="Info.NewValue"></label>
+                            <input type="text" class="form-control" asp-for="Info.NewValue">
+                        </td>
+                        <td scope="col">
+                            <button type="submit" class="btn btn-primary w-100">Set</button>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <th scope="col">Key</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Author</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+                @foreach (var def in Model.Cells)
+                {
+                    <tr data-show="!this.filter || '@def.Key.Replace("'","\"")'.toLowerCase().includes(this.filter.toLowerCase())">
+                        <th scope="row">@def.Key</th>
+                        <td class="value">@def.Value</td>
+                        <td>@def.Author</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
 </div>
 
 @section Scripts {
