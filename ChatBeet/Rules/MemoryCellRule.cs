@@ -5,6 +5,7 @@ using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
@@ -29,7 +30,7 @@ namespace ChatBeet.Rules
             var setMatch = setRgx.Match(incomingMessage.Message);
             if (setMatch.Success)
             {
-                var key = setMatch.Groups[2].Value.Trim().ToLower();
+                var key = setMatch.Groups[2].Value.Trim();
                 var value = setMatch.Groups[3].Value.Trim();
 
                 if (string.IsNullOrEmpty(key))
@@ -48,7 +49,7 @@ namespace ChatBeet.Rules
                 }
                 else
                 {
-                    var existingCell = await ctx.MemoryCells.FindAsync(key);
+                    var existingCell = await ctx.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
                     if (existingCell != null)
                     {
                         ctx.MemoryCells.Remove(existingCell);
@@ -79,22 +80,22 @@ namespace ChatBeet.Rules
             var getMatch = getRgx.Match(incomingMessage.Message);
             if (getMatch.Success)
             {
-                var caseSensitiveKey = getMatch.Groups[2].Value.Trim();
+                var key = getMatch.Groups[2].Value.Trim();
 
-                var cell = await ctx.MemoryCells.FindAsync(caseSensitiveKey.ToLower());
+                var cell = await ctx.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
                 if (cell != null)
                 {
                     yield return new PrivateMessage(
                         incomingMessage.GetResponseTarget(),
-                        $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}: {cell.Value}"
+                        $"{IrcValues.BOLD}{cell.Key}{IrcValues.RESET}: {cell.Value}"
                     );
                 }
                 else
                 {
                     yield return new PrivateMessage(
                         incomingMessage.GetResponseTarget(),
-                        $"I don't have anything for {IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}."
+                        $"I don't have anything for {IrcValues.BOLD}{key}{IrcValues.RESET}."
                     );
                 }
             }
@@ -103,22 +104,22 @@ namespace ChatBeet.Rules
             var whoMatch = whoRgx.Match(incomingMessage.Message);
             if (whoMatch.Success)
             {
-                var caseSensitiveKey = whoMatch.Groups[2].Value.Trim();
+                var key = whoMatch.Groups[2].Value.Trim();
 
-                var cell = await ctx.MemoryCells.FindAsync(caseSensitiveKey.ToLower());
+                var cell = await ctx.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
                 if (cell != null)
                 {
                     yield return new PrivateMessage(
                         incomingMessage.GetResponseTarget(),
-                        $"{IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET} was set by {IrcValues.BOLD}{cell.Author}{IrcValues.RESET}"
+                        $"{IrcValues.BOLD}{cell.Key}{IrcValues.RESET} was set by {IrcValues.BOLD}{cell.Author}{IrcValues.RESET}"
                     );
                 }
                 else
                 {
                     yield return new PrivateMessage(
                         incomingMessage.GetResponseTarget(),
-                        $"I don't have anything for {IrcValues.BOLD}{caseSensitiveKey}{IrcValues.RESET}."
+                        $"I don't have anything for {IrcValues.BOLD}{key}{IrcValues.RESET}."
                     );
                 }
             }

@@ -20,7 +20,7 @@ else
 {
     <p>No personalizations set.</p>
 }
-<hr />
+<hr class="my-4" />
 <h2>Booru Tag Blacklist</h2>
 <h3>Global Blacklist</h3>
 @if (Model.GlobalTags.Any())
@@ -64,6 +64,8 @@ else
         <button type="submit" class="btn btn-primary mb-2">Add</button>
     </form>
 </div>
+<hr class="my-4" />
+<a asp-page="/Account/Logout" class="btn btn-danger">Log Out</a>
 
 @section Scripts{
     <script type="text/javascript">
