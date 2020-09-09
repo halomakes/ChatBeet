@@ -8,6 +8,7 @@ using GravyBot;
 using GravyBot.DefaultRules;
 using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -113,7 +114,7 @@ namespace ChatBeet
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
-            services.AddAuthentication();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders =
