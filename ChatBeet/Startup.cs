@@ -74,11 +74,13 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<WorkdayProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
                 pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
+                pipeline.RegisterAsyncRule<YodaRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
 
             services.AddTransient<DadJokeService>();
+            services.AddTransient<FunTranslationService>();
             services.AddTransient<PixivAppAPI>();
             services.AddTransient<DeviantartService>();
             services.AddTransient<AnilistClient>();

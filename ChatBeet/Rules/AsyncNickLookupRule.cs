@@ -21,14 +21,15 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
+        public override bool Matches(PrivateMessage incomingMessage) => BuildRegex().IsMatch(incomingMessage.Message);
+
         protected abstract IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
 
         public override IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             if (!string.IsNullOrEmpty(CommandName))
             {
-                var rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}{Regex.Escape(CommandName)} ([A-z0-9-\[\]\\\^\{{\}}]*)", RegexOptions.IgnoreCase);
-                var match = rgx.Match(incomingMessage.Message);
+                var match = BuildRegex().Match(incomingMessage.Message);
                 if (match.Success)
                 {
                     var nick = match.Groups[1].Value;
@@ -51,5 +52,7 @@ namespace ChatBeet.Rules
 
             return AsyncEnumerable.Empty<IClientMessage>();
         }
+
+        private Regex BuildRegex() => new Regex($@"^{Regex.Escape(config.CommandPrefix)}{Regex.Escape(CommandName)} ([A-z0-9-\[\]\\\^\{{\}}]*)", RegexOptions.IgnoreCase);
     }
 }

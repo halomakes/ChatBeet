@@ -1,28 +1,33 @@
 ﻿using ChatBeet.Models;
 using ChatBeet.Utilities;
-using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Services
 {
-    public class DadJokeService
+    public class FunTranslationService
     {
         private readonly HttpClient client;
 
-        public DadJokeService(IHttpClientFactory clientFactory)
+        public FunTranslationService(IHttpClientFactory clientFactory)
         {
             client = clientFactory.CreateClient();
         }
 
-        public async Task<string> GetDadJokeAsync()
+        public async Task<string> TranslateAsync(string text, string language)
         {
+            var content = new Dictionary<string, string>
+            {
+                ["text"] = text
+            };
             var request = new HttpRequestMessage
             {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("https://icanhazdadjoke.com/")
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"https://api.funtranslations.com/translate/{language}.json"),
+                Content = new FormUrlEncodedContent(content)
             };
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -30,7 +35,7 @@ namespace ChatBeet.Services
             if (response.IsSuccessStatusCode)
             {
                 using var contentStream = await response.Content.ReadAsStreamAsync();
-                return contentStream.DeserializeJson<DadJoke>()?.Joke;
+                return contentStream.DeserializeJson<FunTranslation>()?.Contents?.Translated;
             }
 
             return null;

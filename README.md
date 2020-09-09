@@ -242,3 +242,11 @@ cb set work:start = 7am-05:00
 ```
 Example Output:
 > Preferred pronouns for carrots: **He/Him**
+
+### Yoda Tranlsation
+*a translation, I have*
+```
+.cb yoda carrots
+```
+Example Output:
+> &lt;carrots&gt; Always ready for sex, I am.
