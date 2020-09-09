@@ -3,6 +3,7 @@ using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
+using Miki.Anilist;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -28,9 +29,18 @@ namespace ChatBeet.Rules
             var match = filter.Match(incomingMessage.Message);
             if (match.Success)
             {
+                var type = match.Groups[1].Value switch
+                {
+                    "anime" => MediaType.ANIME,
+                    "manga" => MediaType.MANGA,
+                    "ln" => MediaType.MANGA,
+                    "light novel" => MediaType.MANGA,
+                    "ova" => MediaType.ANIME,
+                    _ => MediaType.ANIME
+                };
                 var mediaName = match.Groups[2].Value;
                 // use ID instead of name if provided
-                var media = await client.GetMediaAsync(mediaName);
+                var media = await client.GetMediaAsync(mediaName, type);
 
                 if (media != null)
                 {
