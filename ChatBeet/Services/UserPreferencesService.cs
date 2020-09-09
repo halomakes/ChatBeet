@@ -60,7 +60,7 @@ namespace ChatBeet.Services
             await db.SaveChangesAsync();
         }
 
-        public Task Set(PreferenceChange change) => Set(change.Nick, change.Preference, change.Value);
+        public Task Set(PreferenceChange change) => Set(change.Nick, change.Preference.Value, change.Value);
 
         public async Task<string> Get(string nick, UserPreference preference)
         {

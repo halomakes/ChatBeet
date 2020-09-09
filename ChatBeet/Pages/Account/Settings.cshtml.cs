@@ -44,7 +44,7 @@ namespace ChatBeet.Pages.Account
         {
             if (ModelState.IsValid)
             {
-                var valMsg = userPreferences.GetValidation(Preference.Preference, Preference.Value);
+                var valMsg = userPreferences.GetValidation(Preference.Preference.Value, Preference.Value);
                 if (string.IsNullOrEmpty(valMsg))
                 {
                     Preference.Value = Preference.Value.Trim();

@@ -67,7 +67,7 @@ namespace ChatBeet.Rules
 
         public IEnumerable<IClientMessage> Respond(PreferenceChange incomingMessage)
         {
-            yield return new PrivateMessage(incomingMessage.Nick, $"{GetConfirmationMessage(incomingMessage.Preference, incomingMessage.Value)} via WebUI");
+            yield return new PrivateMessage(incomingMessage.Nick, $"{GetConfirmationMessage(incomingMessage.Preference.Value, incomingMessage.Value)} via WebUI");
         }
 
         public IEnumerable<IClientMessage> Respond(object incomingMessage) => incomingMessage is PreferenceChange pc ? Respond(pc) : Enumerable.Empty<IClientMessage>();

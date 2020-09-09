@@ -6,7 +6,7 @@ namespace ChatBeet.Models
     public class PreferenceChange
     {
         [Required]
-        public UserPreference Preference { get; set; }
+        public UserPreference? Preference { get; set; }
 
         public string Value { get; set; }
 
