@@ -81,9 +81,15 @@ namespace ChatBeet.Pages.Account
                     var claims = new ClaimsIdentity(new List<Claim> {
                         new Claim("sub", user.Id),
                         new Claim("nick", LoginInfo.Nick),
-                        new Claim(ClaimTypes.NameIdentifier, LoginInfo.Nick)
+                        new Claim(ClaimTypes.NameIdentifier, LoginInfo.Nick),
+                        new Claim(ClaimTypes.Name, LoginInfo.Nick)
                     }, IdentityConstants.ApplicationScheme);
-                    await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(claims));
+                    var authProperties = new AuthenticationProperties
+                    {
+                        AllowRefresh = true,
+                        IsPersistent = LoginInfo.Persist
+                    };
+                    await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(claims), authProperties);
                     messageQueue.Push(new LoginCompleteNotification { Nick = LoginInfo.Nick });
                     return RedirectToPage(string.IsNullOrEmpty(ReturnUrl) ? "/Account/Success" : ReturnUrl);
                 }

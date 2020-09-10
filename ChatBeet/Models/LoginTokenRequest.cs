@@ -9,5 +9,8 @@ namespace ChatBeet.Models
 
         [Display(Name = "Authentication Token")]
         public string AuthToken { get; set; }
+
+        [Display(Name = "Remember Me")]
+        public bool Persist { get; set; }
     }
 }

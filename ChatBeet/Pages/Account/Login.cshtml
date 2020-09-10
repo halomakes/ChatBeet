@@ -35,8 +35,12 @@ else
             <input asp-for="LoginInfo.AuthToken" class="form-control" autofocus />
             <span class="text-danger" asp-validation-for="LoginInfo.AuthToken"></span>
         </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" asp-for="LoginInfo.Persist">
+            <label class="form-check-label" asp-for="LoginInfo.Persist"></label>
+        </div>
         <input asp-for="LoginInfo.Nick" type="hidden" />
         <input asp-for="ReturnUrl" type="hidden" />
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary mt-2">Submit</button>
     </form>
 }
