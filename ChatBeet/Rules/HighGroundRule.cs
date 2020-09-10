@@ -21,10 +21,16 @@ namespace ChatBeet.Rules
 
         public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var match = filter.Match(incomingMessage.Message);
-            if (match.Success)
+            if (filter.IsMatch(incomingMessage.Message))
             {
-                yield return GetResponse(incomingMessage.From, incomingMessage.To, incomingMessage.GetResponseTarget());
+                if (incomingMessage.IsChannelMessage)
+                {
+                    yield return GetResponse(incomingMessage.From, incomingMessage.To, incomingMessage.GetResponseTarget());
+                }
+                else
+                {
+                    yield return new PrivateMessage(incomingMessage.From, $"You must be in a channel to claim the high ground.");
+                }
             }
         }
 
