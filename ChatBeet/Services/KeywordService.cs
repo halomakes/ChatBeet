@@ -32,7 +32,7 @@ namespace ChatBeet.Services
 
         public Task<List<Keyword>> GetKeywordsAsync() => cache.GetOrCreateAsync("keywords", async entry =>
         {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
             return await db.Keywords.AsQueryable().ToListAsync();
         });
 
@@ -59,7 +59,7 @@ namespace ChatBeet.Services
 
         public Task<KeywordStat> GetKeywordStatAsync(string label) => cache.GetOrCreateAsync($"keywords:stats:{label}", async entry =>
         {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(5);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
             var keyword = await GetKeywordAsync(label);
             var stats = await db.Records
@@ -84,8 +84,8 @@ namespace ChatBeet.Services
 
         public Task<IEnumerable<KeywordStat>> GetKeywordStatsAsync() => cache.GetOrCreateAsync("keyword:stats", async entry =>
         {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(5);
-            StatsLastUpdated = DateTime.Now;
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+            StatsLastUpdated = DateTime.UtcNow;
 
             var keywords = await GetKeywordsAsync();
             var allStats = await db.Records

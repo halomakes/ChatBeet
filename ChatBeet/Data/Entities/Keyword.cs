@@ -14,6 +14,8 @@ namespace ChatBeet.Data.Entities
 
         public string Regex { get; set; }
 
+        public int SortOrder { get; set; }
+
         [JsonIgnore]
         public virtual ICollection<KeywordRecord> Records { get; set; }
     }
