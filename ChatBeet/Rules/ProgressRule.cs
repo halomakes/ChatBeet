@@ -63,7 +63,7 @@ namespace ChatBeet.Rules
                 case "decade":
                     start = new DateTime(now.Year - (now.Year % 10), 1, 1);
                     end = start.AddYears(10);
-                    return Progress.GetBar(now, start, end, $"{IrcValues.BOLD}The {start.Year}'s{IrcValues.RESET} are");
+                    return Progress.GetBar(now, start, end, $"{IrcValues.BOLD}The {start.Year}s{IrcValues.RESET} are");
                 case "week":
                     start = now.StartOfWeek(DayOfWeek.Sunday);
                     end = start.AddDays(7);
