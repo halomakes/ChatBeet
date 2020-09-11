@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ChatBeet.Data.Entities
 {
@@ -13,6 +14,7 @@ namespace ChatBeet.Data.Entities
 
         public string Regex { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<KeywordRecord> Records { get; set; }
     }
 }

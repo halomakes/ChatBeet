@@ -15,11 +15,17 @@ namespace ChatBeet.Services
     {
         private readonly KeywordContext db;
         private readonly IMemoryCache cache;
+        private static bool initialized;
 
         public KeywordService(KeywordContext db, IMemoryCache cache)
         {
             this.db = db;
             this.cache = cache;
+            if (!initialized)
+            {
+                this.db.Database.EnsureCreated();
+                initialized = true;
+            }
         }
 
         public Task<List<Keyword>> GetKeywordsAsync() => cache.GetOrCreateAsync("keywords", async entry =>
@@ -28,11 +34,13 @@ namespace ChatBeet.Services
             return await db.Keywords.AsQueryable().ToListAsync();
         });
 
-        public async Task RecordKeywordEntryAsync(Keyword keyword, PrivateMessage message)
+        public Task RecordKeywordEntryAsync(Keyword keyword, PrivateMessage message) => RecordKeywordEntryAsync(keyword.Id, message);
+
+        public async Task RecordKeywordEntryAsync(int keywordId, PrivateMessage message)
         {
             var record = new KeywordRecord
             {
-                KeywordId = keyword.Id,
+                KeywordId = keywordId,
                 Message = message.Message,
                 Nick = message.From,
                 Time = message.DateReceived
@@ -47,7 +55,7 @@ namespace ChatBeet.Services
             return keywords.FirstOrDefault(k => k.Label == label);
         }
 
-        public Task<KeywordStat> GetKeywordStat(string label) => cache.GetOrCreateAsync($"keywords:stats:{label}", async entry =>
+        public Task<KeywordStat> GetKeywordStatAsync(string label) => cache.GetOrCreateAsync($"keywords:stats:{label}", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(5);
 
@@ -60,7 +68,7 @@ namespace ChatBeet.Services
                 {
                     Nick = g.Key,
                     Hits = g.Count(),
-                    Excerpt = g.FirstOrDefault().Message
+                    Excerpt = g.Min(gp => gp.Message)
                 })
                 .ToListAsync();
 
@@ -71,7 +79,7 @@ namespace ChatBeet.Services
             };
         });
 
-        public Task<IEnumerable<KeywordStat>> GetKeywordStats() => cache.GetOrCreateAsync("keyword:stats", async entry =>
+        public Task<IEnumerable<KeywordStat>> GetKeywordStatsAsync() => cache.GetOrCreateAsync("keyword:stats", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(5);
 
@@ -86,7 +94,7 @@ namespace ChatBeet.Services
                     {
                         Nick = g.Key.Nick,
                         Hits = g.Count(),
-                        Excerpt = g.FirstOrDefault().Message
+                        Excerpt = g.Min(gp => gp.Message)
                     }
                 })
                 .ToListAsync();
