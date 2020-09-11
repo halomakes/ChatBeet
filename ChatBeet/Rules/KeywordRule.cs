@@ -36,7 +36,7 @@ namespace ChatBeet.Rules
         private async Task<Dictionary<int, Regex>> GetKeywords()
         {
             var keywords = await service.GetKeywordsAsync();
-            return keywords.ToDictionary(k => k.Id, k => new Regex(k.Regex));
+            return keywords.ToDictionary(k => k.Id, k => new Regex(k.Regex, RegexOptions.IgnoreCase));
         }
     }
 }
