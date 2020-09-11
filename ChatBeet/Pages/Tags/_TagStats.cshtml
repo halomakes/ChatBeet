@@ -14,7 +14,7 @@
                 @stat.Tag.Replace("_", " ")
                 <span class="badge badge-pill badge-primary ml-1">@stat.Total</span>
             </span>
-            <span class="bg-primary background-bar" style="width: @getPercentage(stat.Total)%; animation-delay: @(count * offset)ms "></span>
+            <background-bar class="bg-primary" value="stat.Total" animation-delay="count * offset" collection-max="max"></background-bar>
         </a>
         count++;
     }

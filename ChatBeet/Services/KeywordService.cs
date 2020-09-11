@@ -17,6 +17,8 @@ namespace ChatBeet.Services
         private readonly IMemoryCache cache;
         private static bool initialized;
 
+        public static DateTime StatsLastUpdated { get; private set; }
+
         public KeywordService(KeywordContext db, IMemoryCache cache)
         {
             this.db = db;
@@ -64,6 +66,7 @@ namespace ChatBeet.Services
                 .AsQueryable()
                 .Where(r => r.KeywordId == keyword.Id)
                 .GroupBy(r => r.Nick)
+                .OrderByDescending(g => g.Count())
                 .Select(g => new KeywordStat.UserKeywordStat
                 {
                     Nick = g.Key,
@@ -82,11 +85,13 @@ namespace ChatBeet.Services
         public Task<IEnumerable<KeywordStat>> GetKeywordStatsAsync() => cache.GetOrCreateAsync("keyword:stats", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(5);
+            StatsLastUpdated = DateTime.Now;
 
             var keywords = await GetKeywordsAsync();
             var allStats = await db.Records
                 .AsQueryable()
                 .GroupBy(r => new { r.KeywordId, r.Nick })
+                .OrderByDescending(g => g.Count())
                 .Select(g => new
                 {
                     g.Key.KeywordId,
