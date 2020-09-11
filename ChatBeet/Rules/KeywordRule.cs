@@ -13,23 +13,18 @@ namespace ChatBeet.Rules
     {
         private readonly IrcBotConfiguration config;
         private readonly KeywordService service;
-        private static Dictionary<int, Regex> keywords;
-        private static bool starting;
 
         public KeywordRule(IOptions<IrcBotConfiguration> opts, KeywordService service)
         {
             config = opts.Value;
             this.service = service;
-            if (!starting)
-            {
-                Task.Run(() => Initialize(service));
-            }
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => !incomingMessage.Message.StartsWith(config.CommandPrefix) && IsReady();
+        public override bool Matches(PrivateMessage incomingMessage) => !incomingMessage.Message.StartsWith(config.CommandPrefix);
 
         public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
+            var keywords = await GetKeywords();
             var tasks = keywords
                 .Where(pair => pair.Value.IsMatch(incomingMessage.Message))
                 .Select(pair => service.RecordKeywordEntryAsync(pair.Key, incomingMessage));
@@ -38,13 +33,10 @@ namespace ChatBeet.Rules
             yield break;
         }
 
-        private bool IsReady() => keywords != default;
-
-        private async Task Initialize(KeywordService service)
+        private async Task<Dictionary<int, Regex>> GetKeywords()
         {
-            starting = true;
             var keywords = await service.GetKeywordsAsync();
-            KeywordRule.keywords = keywords.ToDictionary(k => k.Id, k => new Regex(k.Regex));
+            return keywords.ToDictionary(k => k.Id, k => new Regex(k.Regex));
         }
     }
 }
