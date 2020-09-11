@@ -1,4 +1,4 @@
-using ChatBeet.Data;
+﻿using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages
+namespace ChatBeet.Pages.Tags
 {
-    public class TagsModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly BooruContext db;
         private readonly IMemoryCache cache;
@@ -21,7 +21,7 @@ namespace ChatBeet.Pages
         public IEnumerable<TopTag> UserStats { get; private set; }
         public DateTime Earliest { get; private set; }
 
-        public TagsModel(BooruContext db, IMemoryCache cache)
+        public IndexModel(BooruContext db, IMemoryCache cache)
         {
             this.db = db;
             this.cache = cache;
