@@ -1,0 +1,8 @@
+﻿@page "{nick}"
+@model ChatBeet.Pages.Tags.UserModel
+@{
+    ViewData["Title"] = "Stats for ${Model.Nick}";
+}
+
+<h1>Stats for <span class="text-secondary">@Model.Nick</span></h1>
+<partial name="_TagStats" model="Model.Stats" />

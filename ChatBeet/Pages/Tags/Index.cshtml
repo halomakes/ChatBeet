@@ -1,10 +1,9 @@
-﻿@page "/Tags"
+﻿@page
 @model ChatBeet.Pages.Tags.IndexModel
 @using Humanizer
 @if (Model.GeneralStats.Any())
 {
     ViewBag.Title = "Tags";
-    string getLink(string tag) => $"https://gelbooru.com/index.php?page=post&s=list&tags=rating:safe%20{tag}";
 
     <h1>Tags</h1>
     <p>Stats collected since @Model.Earliest.Humanize()</p>
@@ -16,11 +15,9 @@
         @foreach (var usr in Model.UserStats)
         {
             <div>
-                <b class="text-success">@usr.Nick</b>
-                searched for
-                <b class="text-success">
-                    <a href="@getLink(usr.Tag)" target="_blank">@usr.Tag.Replace("_", " ")</a>
-                </b>
+                <b><a asp-page="User" asp-route-nick="@usr.Nick" class="text-success">@usr.Nick</a></b>
+                <span>searched for</span>
+                <b><a asp-page="Tag" asp-route-tagname="@usr.Tag" class="text-success">@usr.Tag.Replace("_", " ")</a></b>
                 @usr.Total @(usr.Total == 1 ? "time" : "times").
             </div>
         }
