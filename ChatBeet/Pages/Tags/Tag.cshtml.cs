@@ -1,5 +1,6 @@
 ﻿using ChatBeet.Data;
 using ChatBeet.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Pages.Tags
 {
+    [Authorize]
     public class TagModel : PageModel
     {
         private readonly BooruContext booru;
