@@ -42,6 +42,9 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-page="/HighGround">High Ground</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Keywords/Index">Keywords</a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         @if (User?.Identity?.IsAuthenticated ?? false)
@@ -69,7 +72,9 @@
 
     <footer class="border-top footer text-muted mt-5">
         <div class="container">
-            &copy; @DateTime.Now.Year - ChatBeet
+            <cache>
+                &copy; @DateTime.Now.Year - ChatBeet v@(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version)
+            </cache>
         </div>
     </footer>
 
