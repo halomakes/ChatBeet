@@ -1,5 +1,5 @@
 ﻿var updateLoginLinks = function () {
-    if (window.location.pathname.toLowerCase().indexOf('logout' === -1) && window.location.pathname.toLowerCase().indexOf('login' === -1)) {
+    if (window.location.pathname.toLowerCase().indexOf('logout') === -1 && window.location.pathname.toLowerCase().indexOf('login') === -1) {
         var links = document.getElementsByClassName('login-link');
         for (var i = 0; i < links.length; i++) {
             var link = links[i];
