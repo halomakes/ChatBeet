@@ -35,7 +35,7 @@ namespace ChatBeet.Pages.Account
         {
             if (User?.Identity?.IsAuthenticated ?? false)
             {
-                return RedirectToPage(ReturnUrl ?? "/Account/Success");
+                return Redirect(ReturnUrl ?? "/Account/Success");
             }
 
             this.ReturnUrl = ReturnUrl;
@@ -91,7 +91,7 @@ namespace ChatBeet.Pages.Account
                     };
                     await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(claims), authProperties);
                     messageQueue.Push(new LoginCompleteNotification { Nick = LoginInfo.Nick });
-                    return RedirectToPage(string.IsNullOrEmpty(ReturnUrl) ? "/Account/Success" : ReturnUrl);
+                    return Redirect(string.IsNullOrEmpty(ReturnUrl) ? "/Account/Success" : ReturnUrl);
                 }
                 else
                 {

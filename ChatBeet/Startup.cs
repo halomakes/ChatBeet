@@ -80,6 +80,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<DefUpdatedRule, DefinitionChange>();
                 pipeline.RegisterRule<UserPreferencesRule, PreferenceChange>();
                 pipeline.RegisterAsyncRule<BirthdaysRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<KeywordRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -106,9 +107,11 @@ namespace ChatBeet
             });
             services.AddTransient<BooruService>();
             services.AddTransient<UserPreferencesService>();
+            services.AddTransient<KeywordService>();
             services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
             services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
             services.AddDbContext<PreferencesContext>(ServiceLifetime.Transient);
+            services.AddDbContext<KeywordContext>(ServiceLifetime.Transient);
             services.AddDbContext<IdentityDbContext>(opts => opts.UseInMemoryDatabase(databaseName: "auth"));
 
             services.AddMemoryCache();
@@ -118,8 +121,7 @@ namespace ChatBeet
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
-                options.ForwardedHeaders =
-                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
         }
 

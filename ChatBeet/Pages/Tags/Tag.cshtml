@@ -1,0 +1,15 @@
+﻿@page "{tagName}"
+@model ChatBeet.Pages.Tags.TagModel
+@{
+    ViewData["Title"] = $"Stats for {Model.TagName}";
+}
+
+<h1>Stats for <span class="text-secondary">@Model.TagName.Replace("_", " ")</span></h1>
+@if (Model.Stats.Any())
+{
+    <partial name="_TagStats" model="Model.Stats" />
+}
+else
+{
+    <p class="text-warning">No stats found for tag <b>@Model.TagName</b></p>
+}

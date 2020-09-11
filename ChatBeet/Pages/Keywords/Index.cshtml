@@ -1,0 +1,42 @@
+﻿@page
+@model ChatBeet.Pages.Keywords.IndexModel
+@using Humanizer;
+@{
+    ViewData["Title"] = "Keywords";
+    var yeet = "yeet";
+}
+
+<h1>Keywords</h1>
+<p>Last updated @Model.LastUpdated.Humanize().</p>
+@if (Model.Stats?.Any() ?? false)
+{
+    var count = 0;
+    var offset = 200;
+    @foreach (var statSet in Model.Stats.OrderBy(s => s.Keyword.SortOrder))
+    {
+        bool isYeet = statSet.Keyword.Label == yeet;
+        var max = statSet.Stats.Max(s => s.Hits);
+        <div class="my-4">
+            <h2>@statSet.Keyword.Label</h2>
+            <ul class="list-group">
+                @foreach (var stat in statSet.Stats)
+                {
+                    <li class="list-group-item list-group-item-action position-relative overflow-none">
+                        <span class="ml-2 d-flex align-items-center flex-wrap">
+                            <span>@stat.Nick</span>
+                            <span class="badge badge-pill badge-primary ml-1">@stat.Hits</span>
+                            <span class="flex-grow-1"></span>
+                            <span>&quot;@stat.Excerpt&quot;</span>
+                        </span>
+                        <background-bar class="bg-primary" value="stat.Hits" animation-delay="count * offset" collection-max="max"></background-bar>
+                    </li>
+                    count++;
+                }
+            </ul>
+        </div>
+    }
+}
+else
+{
+    <p>No stats to show.</p>
+}

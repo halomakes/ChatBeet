@@ -1,5 +1,6 @@
-using ChatBeet.Data;
+﻿using ChatBeet.Data;
 using ChatBeet.Data.Entities;
+using ChatBeet.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -8,20 +9,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages
+namespace ChatBeet.Pages.Tags
 {
-    public class TagsModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly BooruContext db;
         private readonly IMemoryCache cache;
         private static readonly Random rng = new Random();
 
-        public IEnumerable<Stat> GeneralStats { get; private set; }
-        public IEnumerable<Stat> RandomStats { get; private set; }
+        public IEnumerable<TagStat> GeneralStats { get; private set; }
+        public IEnumerable<TagStat> RandomStats { get; private set; }
         public IEnumerable<TopTag> UserStats { get; private set; }
         public DateTime Earliest { get; private set; }
 
-        public TagsModel(BooruContext db, IMemoryCache cache)
+        public IndexModel(BooruContext db, IMemoryCache cache)
         {
             this.db = db;
             this.cache = cache;
@@ -49,19 +50,13 @@ namespace ChatBeet.Pages
             });
         }
 
-        private async Task<IEnumerable<Stat>> GetStats() => await cache.GetOrCreateAsync("tags:stats", async entry =>
+        private async Task<IEnumerable<TagStat>> GetStats() => await cache.GetOrCreateAsync("tags:stats", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
             return await db.TagHistories.AsQueryable()
                 .GroupBy(th => th.Tag)
-                .Select(g => new Stat { Tag = g.Key, Total = g.Count() })
+                .Select(g => new TagStat { Tag = g.Key, Total = g.Count() })
                 .ToListAsync();
         });
-
-        public struct Stat
-        {
-            public string Tag;
-            public int Total;
-        }
     }
 }
