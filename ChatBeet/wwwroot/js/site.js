@@ -1,4 +1,15 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿var updateLoginLinks = function () {
+    if (window.location.pathname.toLowerCase().indexOf('logout' === -1) && window.location.pathname.toLowerCase().indexOf('login' === -1)) {
+        var links = document.getElementsByClassName('login-link');
+        for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            link.href = link.href + "?ReturnUrl=" + window.location.pathname;
+        }
+    }
+};
 
-// Write your Javascript code.
+if (document.readyState === "complete" || (document.readyState !== "loading" && !document.documentElement.doScroll)) {
+    updateLoginLinks();
+} else {
+    document.addEventListener("DOMContentLoaded", updateLoginLinks);
+}
