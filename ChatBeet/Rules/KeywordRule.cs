@@ -1,4 +1,5 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Configuration;
+using ChatBeet.Services;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
@@ -12,15 +13,19 @@ namespace ChatBeet.Rules
     public class KeywordRule : AsyncMessageRuleBase<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
+        private readonly ChatBeetConfiguration cbConfig;
         private readonly KeywordService service;
 
-        public KeywordRule(IOptions<IrcBotConfiguration> opts, KeywordService service)
+        public KeywordRule(IOptions<IrcBotConfiguration> opts, KeywordService service, IOptions<ChatBeetConfiguration> cbOpts)
         {
             config = opts.Value;
+            cbConfig = cbOpts.Value;
             this.service = service;
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => !incomingMessage.Message.StartsWith(config.CommandPrefix);
+        public override bool Matches(PrivateMessage incomingMessage) => incomingMessage.IsChannelMessage
+            && !incomingMessage.Message.StartsWith(config.CommandPrefix)
+            && cbConfig.MessageCollection.AllowedChannels.Contains(incomingMessage.To);
 
         public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {

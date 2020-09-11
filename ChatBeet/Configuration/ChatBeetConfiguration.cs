@@ -12,6 +12,7 @@ namespace ChatBeet.Configuration
         public IgdbConfiguration Igdb { get; set; }
         public BooruConfiguration Booru { get; set; }
         public PronounConfiguration Pronouns { get; set; }
+        public MessageCollectionConfiguration MessageCollection { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
 
@@ -62,6 +63,11 @@ namespace ChatBeet.Configuration
                 public IEnumerable<string> Possessives { get; set; }
                 public IEnumerable<string> Reflexives { get; set; }
             }
+        }
+
+        public class MessageCollectionConfiguration
+        {
+            public IEnumerable<string> AllowedChannels { get; set; }
         }
     }
 }
