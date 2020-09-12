@@ -39,8 +39,8 @@ namespace ChatBeet.Rules
                 }
                 else
                 {
-                    var subject = await userPreferences.Get(incomingMessage.From, UserPreference.SubjectPronoun);
-                    var @object = await userPreferences.Get(incomingMessage.From, UserPreference.ObjectPronoun);
+                    var subject = await userPreferences.Get(nick, UserPreference.SubjectPronoun);
+                    var @object = await userPreferences.Get(nick, UserPreference.ObjectPronoun);
                     if (string.IsNullOrEmpty(subject) && string.IsNullOrEmpty(@object))
                     {
                         yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Sorry, I don't know the preferred pronouns for {nick}.");
