@@ -108,11 +108,15 @@ namespace ChatBeet
             services.AddTransient<BooruService>();
             services.AddTransient<UserPreferencesService>();
             services.AddTransient<KeywordService>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<LogonService>();
+
+            services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
             services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
             services.AddDbContext<PreferencesContext>(ServiceLifetime.Transient);
             services.AddDbContext<KeywordContext>(ServiceLifetime.Transient);
-            services.AddDbContext<IdentityDbContext>(opts => opts.UseInMemoryDatabase(databaseName: "auth"));
+            services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();
             services.AddIdentity<IdentityUser, IdentityRole>()
@@ -126,7 +130,7 @@ namespace ChatBeet
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MemoryCellContext mcDb, BooruContext bDb)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MemoryCellContext mcDb, BooruContext bDb, IdentityDbContext ctx)
         {
             app.UseForwardedHeaders();
 

@@ -15,7 +15,6 @@ namespace ChatBeet.Services
 {
     public class UserPreferencesService
     {
-        private static bool Initialized;
         private readonly PreferencesContext db;
         private readonly ChatBeetConfiguration config;
 
@@ -23,11 +22,6 @@ namespace ChatBeet.Services
         {
             this.db = db;
             config = opts.Value;
-            if (!Initialized)
-            {
-                db.Database.EnsureCreated();
-                Initialized = true;
-            }
         }
 
         public async Task Set(string nick, UserPreference preference, string value)
