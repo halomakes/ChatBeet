@@ -108,6 +108,9 @@ namespace ChatBeet
             services.AddTransient<BooruService>();
             services.AddTransient<UserPreferencesService>();
             services.AddTransient<KeywordService>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<LogonService>();
+
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
             services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
