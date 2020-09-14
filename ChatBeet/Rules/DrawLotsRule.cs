@@ -16,6 +16,8 @@ namespace ChatBeet.Rules
         private readonly IMemoryCache cache;
         private static readonly int maxLength = 16;
         private static readonly Random rng = new Random();
+        private static readonly int godChance = 10_000_000;
+        private static readonly int godLength = 32;
 
         public DrawLotsRule(IOptions<IrcBotConfiguration> opts, IMemoryCache cache)
         {
@@ -42,7 +44,9 @@ namespace ChatBeet.Rules
             var length = cache.GetOrCreate($"lot:{nick}:{mode}", entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromMinutes(5);
-                return rng.Next(1, maxLength);
+
+                var isGodLength = rng.Next(0, godChance) == 0;
+                return isGodLength ? godLength : rng.NormalNext(1, maxLength);
             });
 
             return mode switch
