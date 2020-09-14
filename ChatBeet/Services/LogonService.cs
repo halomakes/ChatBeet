@@ -1,6 +1,7 @@
 ﻿using ChatBeet.Models;
 using GravyBot;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -17,6 +18,7 @@ namespace ChatBeet.Services
         private readonly IHttpContextAccessor httpContextAccessor;
         private static readonly string TokenAction = "passwordless-auth";
         private static readonly string TokenProvider = "Default";
+        public static readonly string Scheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
         public LogonService(MessageQueueService messageQueue, UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
@@ -58,13 +60,13 @@ namespace ChatBeet.Services
                         new Claim("nick", user.UserName),
                         new Claim(ClaimTypes.NameIdentifier, user.UserName),
                         new Claim(ClaimTypes.Name, user.UserName)
-                    }, IdentityConstants.ApplicationScheme);
+                    }, Scheme);
                 var authProperties = new AuthenticationProperties
                 {
                     AllowRefresh = true,
                     IsPersistent = persist
                 };
-                await httpContextAccessor.HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(claims), authProperties);
+                await httpContextAccessor.HttpContext.SignInAsync(Scheme, new ClaimsPrincipal(claims), authProperties);
                 messageQueue.Push(new LoginCompleteNotification { Nick = user.UserName });
                 return;
             }
@@ -74,7 +76,7 @@ namespace ChatBeet.Services
             }
         }
 
-        public Task LogoutAsync() => httpContextAccessor.HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+        public Task LogoutAsync() => httpContextAccessor.HttpContext.SignOutAsync(Scheme);
 
         public class UserNotFoundException : Exception { }
 

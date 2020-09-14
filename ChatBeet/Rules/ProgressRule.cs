@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
 
         public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}progress (year|day|hour|minute|month|decade|century|millennium|week|second)", RegexOptions.IgnoreCase);
+            var rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}progress (year|day|hour|minute|month|decade|century|millennium|week|yatoweek|second)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
@@ -64,6 +64,10 @@ namespace ChatBeet.Rules
                     start = new DateTime(now.Year - (now.Year % 10), 1, 1);
                     end = start.AddYears(10);
                     return Progress.GetBar(now, start, end, $"{IrcValues.BOLD}The {start.Year}s{IrcValues.RESET} are");
+                case "yatoweek":
+                    start = now.StartOfWeek(DayOfWeek.Monday);
+                    end = start.AddDays(7);
+                    return Progress.GetBar(now, start, end, $"{IrcValues.BOLD}This week{IrcValues.RESET} is");
                 case "week":
                     start = now.StartOfWeek(DayOfWeek.Sunday);
                     end = start.AddDays(7);

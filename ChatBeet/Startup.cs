@@ -122,7 +122,12 @@ namespace ChatBeet
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = LogonService.Scheme;
+                options.DefaultChallengeScheme = LogonService.Scheme;
+                options.DefaultScheme = LogonService.Scheme;
+            }).AddCookie(LogonService.Scheme);
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
