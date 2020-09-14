@@ -15,7 +15,6 @@ namespace ChatBeet.Services
     {
         private readonly KeywordContext db;
         private readonly IMemoryCache cache;
-        private static bool initialized;
 
         public static DateTime StatsLastUpdated { get; private set; }
 
@@ -23,11 +22,6 @@ namespace ChatBeet.Services
         {
             this.db = db;
             this.cache = cache;
-            if (!initialized)
-            {
-                this.db.Database.EnsureCreated();
-                initialized = true;
-            }
         }
 
         public Task<List<Keyword>> GetKeywordsAsync() => cache.GetOrCreateAsync("keywords", async entry =>
