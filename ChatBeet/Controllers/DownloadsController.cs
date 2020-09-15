@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChatBeet.Controllers
 {
     [Route("api/[controller]")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ApiController]
     public class DownloadsController : ControllerBase
     {

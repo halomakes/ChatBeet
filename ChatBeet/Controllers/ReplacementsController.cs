@@ -20,9 +20,17 @@ namespace ChatBeet.Controllers
             this.db = db;
         }
 
+        /// <summary>
+        /// Get all replacement sets
+        /// </summary>
         [HttpGet]
         public IQueryable<ReplacementSet> GetSets() => db.Sets;
 
+        /// <summary>
+        /// Get a replacement set
+        /// </summary>
+        /// <param name="id">ID of set</param>
+        /// <remarks>Includes associated mappings</remarks>
         [HttpGet("{id}")]
         public async Task<ActionResult<ReplacementSet>> GetSet([FromRoute] int id)
         {
@@ -34,9 +42,18 @@ namespace ChatBeet.Controllers
             else return Ok(set);
         }
 
+        /// <summary>
+        /// Get mappings for a set
+        /// </summary>
+        /// <param name="id">ID of set</param>
         [HttpGet("{id}/Mappings")]
         public IQueryable<ReplacementMapping> GetSetMappings([FromRoute] int id) => db.Mappings.AsQueryable().Where(s => s.SetId == id);
 
+        /// <summary>
+        /// Get a single mapping
+        /// </summary>
+        /// <param name="id">ID of set</param>
+        /// <param name="input">Matching input string</param>
         [HttpGet("{id}/Mappings/{input}")]
         public async Task<ActionResult<ReplacementMapping>> GetMapping([FromRoute] int id, [FromRoute] string input)
         {
@@ -50,6 +67,11 @@ namespace ChatBeet.Controllers
                 return Ok(map);
         }
 
+        /// <summary>
+        /// Add a mapping to a set
+        /// </summary>
+        /// <param name="id">ID of set</param>
+        /// <param name="mapping">Mapping to add</param>
         [Authorize]
         [HttpPost("{id}/Mappings")]
         public async Task<ActionResult> AddMapping([FromRoute] int id, [FromBody] ReplacementMapping mapping)

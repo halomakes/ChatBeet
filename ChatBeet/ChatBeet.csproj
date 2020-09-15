@@ -5,6 +5,8 @@
     <UserSecretsId>c79cf495-2496-4295-ad2d-49b3d2c73886</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Version>2.4.4</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +44,7 @@
     <PackageReference Include="Miki.Anilist" Version="0.6.3" />
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="PixivCS" Version="0.5.11" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.0" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
     <PackageReference Include="TenorClient" Version="1.0.3" />
   </ItemGroup>
