@@ -21,7 +21,7 @@ namespace ChatBeet.Controllers
         [HttpGet]
         public Task<IEnumerable<KeywordStat>> GetStats() => service.GetKeywordStatsAsync();
 
-        [HttpGet("{label}")]
-        public Task<KeywordStat> GetStat([FromRoute] string label) => service.GetKeywordStatAsync(label);
+        [HttpGet("{id}")]
+        public Task<KeywordStat> GetStat([FromRoute] int id) => service.GetKeywordStatAsync(id);
     }
 }
