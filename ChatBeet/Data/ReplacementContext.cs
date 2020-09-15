@@ -12,7 +12,7 @@ namespace ChatBeet.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ReplacementMapping>().HasKey(m => new { m.SetId, m.Replacement });
+            modelBuilder.Entity<ReplacementMapping>().HasKey(m => new { m.SetId, m.Input });
             modelBuilder.Entity<ReplacementSet>().HasMany(s => s.Mappings).WithOne().HasForeignKey(m => m.SetId);
         }
     }
