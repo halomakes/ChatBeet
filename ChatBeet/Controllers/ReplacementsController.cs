@@ -91,5 +91,27 @@ namespace ChatBeet.Controllers
 
             return CreatedAtAction(nameof(GetMapping), new { id, input = mapping.Input });
         }
+
+        /// <summary>
+        /// Delete a mapping from a set
+        /// </summary>
+        /// <param name="id">ID of set</param>
+        /// <param name="input">Input on map</param>
+        [Authorize]
+        [HttpDelete("{id}/Mappings/{input}")]
+        public async Task<ActionResult> DeleteMapping([FromRoute] int id, [FromRoute] string input)
+        {
+            var map = await db.Mappings
+                .AsQueryable()
+                .Where(m => m.SetId == id && m.Input.ToLower() == input.ToLower())
+                .FirstOrDefaultAsync();
+            if (map == default)
+                return NotFound();
+
+            db.Mappings.Remove(map);
+            await db.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }
