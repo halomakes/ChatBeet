@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChatBeet.Data.Entities
 {
@@ -7,8 +8,10 @@ namespace ChatBeet.Data.Entities
         [JsonIgnore]
         public int SetId { get; set; }
 
+        [Required]
         public string Input { get; set; }
 
+        [Required]
         public string Replacement { get; set; }
     }
 }
