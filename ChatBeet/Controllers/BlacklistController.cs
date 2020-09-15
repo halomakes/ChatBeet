@@ -19,6 +19,10 @@ namespace ChatBeet.Controllers
             this.booru = booru;
         }
 
+        /// <summary>
+        /// Remove tags from your booru blacklist
+        /// </summary>
+        /// <param name="tagList">String-delimited tags</param>
         [HttpDelete("{tagList}")]
         public async Task Remove(string tagList)
         {
@@ -26,6 +30,10 @@ namespace ChatBeet.Controllers
             await booru.WhitelistTags(User.GetNick(), allTags);
         }
 
+        /// <summary>
+        /// Add tags to your booru blacklist
+        /// </summary>
+        /// <param name="tagList">String-delimited tags</param>
         [HttpPatch("{tagList}")]
         public async Task Add(string tagList)
         {

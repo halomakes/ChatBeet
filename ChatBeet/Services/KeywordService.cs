@@ -45,17 +45,17 @@ namespace ChatBeet.Services
             await db.SaveChangesAsync();
         }
 
-        public async Task<Keyword> GetKeywordAsync(string label)
+        public async Task<Keyword> GetKeywordAsync(int id)
         {
             var keywords = await GetKeywordsAsync();
-            return keywords.FirstOrDefault(k => k.Label == label);
+            return keywords.FirstOrDefault(k => k.Id == id);
         }
 
-        public Task<KeywordStat> GetKeywordStatAsync(string label) => cache.GetOrCreateAsync($"keywords:stats:{label}", async entry =>
+        public Task<KeywordStat> GetKeywordStatAsync(int id) => cache.GetOrCreateAsync($"keywords:stats:{id}", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-            var keyword = await GetKeywordAsync(label);
+            var keyword = await GetKeywordAsync(id);
             var stats = await db.Records
                 .AsQueryable()
                 .Where(r => r.KeywordId == keyword.Id)

@@ -3,7 +3,6 @@ using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
-using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,7 @@ namespace ChatBeet.Rules
         {
             this.userPreferences = userPreferences;
             config = options.Value;
-            rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}pronouns ([^\ ]*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}pronouns ([^\ ]+)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

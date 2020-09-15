@@ -20,8 +20,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Miki.Anilist;
 using PixivCS;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace ChatBeet
 {
@@ -51,7 +56,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<MemoryCellRule, PrivateMessage>();
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
-                pipeline.RegisterRule<EmojifyRule, PrivateMessage>();
+                pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WaifuRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<AnimeRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DeviantartRule, PrivateMessage>();
@@ -65,7 +70,6 @@ namespace ChatBeet
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, HighGroundClaim>();
-                pipeline.RegisterRule<SlotMachineRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ShipReactRule, PrivateMessage>();
@@ -85,37 +89,38 @@ namespace ChatBeet
 
             services.AddHttpClient();
 
-            services.AddTransient<DadJokeService>();
-            services.AddTransient<PixivAppAPI>();
-            services.AddTransient<DeviantartService>();
-            services.AddTransient<AnilistClient>();
-            services.AddTransient<AnilistService>();
+            services.AddScoped<DadJokeService>();
+            services.AddScoped<PixivAppAPI>();
+            services.AddScoped<DeviantartService>();
+            services.AddScoped<AnilistClient>();
+            services.AddScoped<AnilistService>();
             services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules:Dtella"));
-            services.AddTransient<TwitterService>();
-            services.AddTransient<TenorGifService>();
-            services.AddTransient<Gelbooru>();
-            services.AddTransient(provider =>
+            services.AddScoped<TwitterService>();
+            services.AddScoped<TenorGifService>();
+            services.AddScoped<Gelbooru>();
+            services.AddScoped(provider =>
             {
                 var config = provider.GetService<IOptions<ChatBeetConfiguration>>().Value.LastFm;
                 return new LastfmClient(config.ClientId, config.ClientSecret);
             });
-            services.AddTransient<LastFmService>();
+            services.AddScoped<LastFmService>();
             services.AddSingleton(provider =>
             {
                 var config = provider.GetRequiredService<IOptions<ChatBeetConfiguration>>().Value.Igdb;
                 return IGDB.Client.Create(config.ApiKey);
             });
-            services.AddTransient<BooruService>();
-            services.AddTransient<UserPreferencesService>();
-            services.AddTransient<KeywordService>();
+            services.AddScoped<BooruService>();
+            services.AddScoped<UserPreferencesService>();
+            services.AddScoped<KeywordService>();
             services.AddHttpContextAccessor();
             services.AddScoped<LogonService>();
 
             services.AddHostedService<ContextInitializer>();
-            services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
-            services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
-            services.AddDbContext<PreferencesContext>(ServiceLifetime.Transient);
-            services.AddDbContext<KeywordContext>(ServiceLifetime.Transient);
+            services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
+            services.AddDbContext<BooruContext>(opts => opts.UseSqlite("Data Source=db/booru.db"));
+            services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"));
+            services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"));
+            services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
             services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();
@@ -127,10 +132,41 @@ namespace ChatBeet
                 options.DefaultAuthenticateScheme = LogonService.Scheme;
                 options.DefaultChallengeScheme = LogonService.Scheme;
                 options.DefaultScheme = LogonService.Scheme;
-            }).AddCookie(LogonService.Scheme);
+            }).AddCookie(LogonService.Scheme, options =>
+            {
+                options.Events = new CookieAuthenticationEvents
+                {
+                    OnRedirectToLogin = context =>
+                    {
+                        if (context.Request.Path.StartsWithSegments("/api"))
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        }
+                        else
+                        {
+                            context.Response.Redirect(context.RedirectUri);
+                        }
+
+                        return Task.FromResult(0);
+                    }
+                };
+            });
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "ChatBeet",
+                    Description = "A chat bot, but also a root vegetable."
+                });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
@@ -147,6 +183,12 @@ namespace ChatBeet
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatBeet");
+            });
 
             var cookieOptions = new CookiePolicyOptions
             {
