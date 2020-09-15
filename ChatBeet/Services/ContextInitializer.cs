@@ -18,7 +18,8 @@ namespace ChatBeet.Services
             typeof(BooruContext),
             typeof(PreferencesContext),
             typeof(KeywordContext),
-            typeof(IdentityDbContext)
+            typeof(IdentityDbContext),
+            typeof(ReplacementContext)
         };
 
         public ContextInitializer(IServiceProvider serviceProvider)

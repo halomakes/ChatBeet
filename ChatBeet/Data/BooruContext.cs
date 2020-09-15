@@ -17,11 +17,6 @@ namespace ChatBeet.Data
             .FromSqlRaw(@"select Tag, Nick, Total from (select t.Id, t.Tag, t.Nick, count(*) as Total from TagHistories t group by t.Tag, t.Nick order by Total desc) i group by i.Nick order by i.Total desc limit 10")
             .ToListAsync();
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=db/booru.db");
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BooruBlacklist>().HasKey(b => new { b.Nick, b.Tag });

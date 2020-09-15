@@ -8,7 +8,6 @@ using GravyBot;
 using GravyBot.DefaultRules;
 using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -111,10 +110,11 @@ namespace ChatBeet
             services.AddScoped<LogonService>();
 
             services.AddHostedService<ContextInitializer>();
-            services.AddDbContext<MemoryCellContext>(ServiceLifetime.Transient);
-            services.AddDbContext<BooruContext>(ServiceLifetime.Transient);
-            services.AddDbContext<PreferencesContext>(ServiceLifetime.Transient);
-            services.AddDbContext<KeywordContext>(ServiceLifetime.Transient);
+            services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"), ServiceLifetime.Transient);
+            services.AddDbContext<BooruContext>(opts => opts.UseSqlite("Data Source=db/booru.db"), ServiceLifetime.Transient);
+            services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"), ServiceLifetime.Transient);
+            services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"), ServiceLifetime.Transient);
+            services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements"), ServiceLifetime.Transient);
             services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();
