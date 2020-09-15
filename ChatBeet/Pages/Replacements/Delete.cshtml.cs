@@ -1,4 +1,5 @@
 using ChatBeet.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Pages.Replacements
 {
+    [Authorize]
     public class DeleteModel : PageModel
     {
         private readonly ReplacementContext db;

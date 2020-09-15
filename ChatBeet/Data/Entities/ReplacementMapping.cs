@@ -15,12 +15,14 @@ namespace ChatBeet.Data.Entities
         /// Input string to match
         /// </summary>
         [Required]
+        [Display(Name = "Input", Prompt = "carrot")]
         public string Input { get; set; }
 
         /// <summary>
         /// Value to replace input with
         /// </summary>
         [Required]
+        [Display(Name = "Replacement", Prompt = "🥕")]
         public string Replacement { get; set; }
     }
 }

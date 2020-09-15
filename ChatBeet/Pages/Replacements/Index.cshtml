@@ -5,10 +5,11 @@
 }
 <h1>Replacement Sets</h1>
 <p class="font-italic text-warning">Allow up to 5 minutes for the cache to expire before changes take effect.</p>
+<div asp-validation-summary="All" class="text-danger"></div>
 
 @foreach (var s in Model.Stats)
 {
-    <div id="Set-@(s.Item.Id)" class="my-2">
+    <div id="Set-@(s.Item.Id)" class="my-3">
         <div class="d-flex align-items-center flex-wrap">
             <h2>@s.Item.Command</h2>
             <span class="badge badge-pill badge-primary ml-2">@s.Count @(s.Count == 1 ? "Mapping" : "Mappings")</span>
@@ -18,25 +19,41 @@
             </a>
         </div>
         <div class="collapse" id="Collapse-@(s.Item.Id)">
-            <table class="table my-3">
-                <thead>
-                    <tr>
-                        <th scope="col">Input</th>
-                        <th scope="col">Replacement</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var m in s.Item.Mappings.OrderByDescending(m => m.Input?.Length ?? 0))
-                    {
+            <form method="post" asp-page="Index">
+                <table class="table my-3">
+                    <thead>
                         <tr>
-                            <td>@m.Input</td>
-                            <td>@m.Replacement</td>
-                            <td class="text-right"><a asp-page="Delete" asp-route-id="@m.SetId" asp-route-input="@m.Input"><i class="material-icons">delete</i></a></td>
+                            <th scope="col">Input</th>
+                            <th scope="col">Replacement</th>
+                            <th scope="col"></th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td scope="col">
+                                <label class="sr-only" asp-for="Info.Input"></label>
+                                <input type="text" class="form-control" asp-for="Info.Input">
+                            </td>
+                            <td scope="col">
+                                <label class="sr-only" asp-for="Info.Replacement"></label>
+                                <input type="text" class="form-control" asp-for="Info.Replacement">
+                            </td>
+                            <td scope="col">
+                                <input type="hidden" asp-for="Info.SetId" value="@s.Item.Id" />
+                                <button type="submit" class="btn btn-primary w-100">Add</button>
+                            </td>
+                        </tr>
+                        @foreach (var m in s.Item.Mappings.OrderByDescending(m => m.Input?.Length ?? 0))
+                        {
+                            <tr>
+                                <td>@m.Input</td>
+                                <td>@m.Replacement</td>
+                                <td class="text-right"><a asp-page="Delete" asp-route-id="@m.SetId" asp-route-input="@m.Input"><i class="material-icons">delete</i></a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </form>
         </div>
         <div>
 
