@@ -17,7 +17,6 @@ namespace ChatBeet.Pages
         public string RequestId { get; set; }
         private readonly MessageQueueService service;
 
-
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
         private readonly ILogger<ErrorModel> _logger;
