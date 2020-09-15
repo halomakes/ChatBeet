@@ -3,7 +3,6 @@ using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
-using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
