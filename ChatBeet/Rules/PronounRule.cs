@@ -20,7 +20,7 @@ namespace ChatBeet.Rules
         {
             this.userPreferences = userPreferences;
             config = options.Value;
-            rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}pronouns ([^\ ]*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}pronouns ([^\ ]+)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

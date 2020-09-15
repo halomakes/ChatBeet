@@ -5,7 +5,7 @@ namespace ChatBeet.Data
 {
     public class PreferencesContext : DbContext
     {
-        public PreferencesContext() : base() { }
+        public PreferencesContext(DbContextOptions<PreferencesContext> optsBuilder) : base(optsBuilder) { }
 
         public virtual DbSet<UserPreferenceSetting> PreferenceSettings { get; set; }
 

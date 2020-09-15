@@ -50,7 +50,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<MemoryCellRule, PrivateMessage>();
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
-                pipeline.RegisterRule<EmojifyRule, PrivateMessage>();
+                pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WaifuRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<AnimeRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DeviantartRule, PrivateMessage>();
@@ -83,38 +83,38 @@ namespace ChatBeet
 
             services.AddHttpClient();
 
-            services.AddTransient<DadJokeService>();
-            services.AddTransient<PixivAppAPI>();
-            services.AddTransient<DeviantartService>();
-            services.AddTransient<AnilistClient>();
-            services.AddTransient<AnilistService>();
+            services.AddScoped<DadJokeService>();
+            services.AddScoped<PixivAppAPI>();
+            services.AddScoped<DeviantartService>();
+            services.AddScoped<AnilistClient>();
+            services.AddScoped<AnilistService>();
             services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules:Dtella"));
-            services.AddTransient<TwitterService>();
-            services.AddTransient<TenorGifService>();
-            services.AddTransient<Gelbooru>();
-            services.AddTransient(provider =>
+            services.AddScoped<TwitterService>();
+            services.AddScoped<TenorGifService>();
+            services.AddScoped<Gelbooru>();
+            services.AddScoped(provider =>
             {
                 var config = provider.GetService<IOptions<ChatBeetConfiguration>>().Value.LastFm;
                 return new LastfmClient(config.ClientId, config.ClientSecret);
             });
-            services.AddTransient<LastFmService>();
+            services.AddScoped<LastFmService>();
             services.AddSingleton(provider =>
             {
                 var config = provider.GetRequiredService<IOptions<ChatBeetConfiguration>>().Value.Igdb;
                 return IGDB.Client.Create(config.ApiKey);
             });
-            services.AddTransient<BooruService>();
-            services.AddTransient<UserPreferencesService>();
-            services.AddTransient<KeywordService>();
+            services.AddScoped<BooruService>();
+            services.AddScoped<UserPreferencesService>();
+            services.AddScoped<KeywordService>();
             services.AddHttpContextAccessor();
             services.AddScoped<LogonService>();
 
             services.AddHostedService<ContextInitializer>();
-            services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"), ServiceLifetime.Transient);
-            services.AddDbContext<BooruContext>(opts => opts.UseSqlite("Data Source=db/booru.db"), ServiceLifetime.Transient);
-            services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"), ServiceLifetime.Transient);
-            services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"), ServiceLifetime.Transient);
-            services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements"), ServiceLifetime.Transient);
+            services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
+            services.AddDbContext<BooruContext>(opts => opts.UseSqlite("Data Source=db/booru.db"));
+            services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"));
+            services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"));
+            services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
             services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();

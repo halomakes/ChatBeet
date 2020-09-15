@@ -7,7 +7,7 @@ namespace ChatBeet.Data
 {
     public class BooruContext : DbContext
     {
-        public BooruContext() : base() { }
+        public BooruContext(DbContextOptions<BooruContext> optsBuilder) : base(optsBuilder) { }
 
         public virtual DbSet<BooruBlacklist> Blacklists { get; set; }
         public virtual DbSet<TagHistory> TagHistories { get; set; }
