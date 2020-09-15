@@ -8,6 +8,7 @@ using GravyBot;
 using GravyBot.DefaultRules;
 using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +26,7 @@ using PixivCS;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace ChatBeet
 {
@@ -130,7 +132,25 @@ namespace ChatBeet
                 options.DefaultAuthenticateScheme = LogonService.Scheme;
                 options.DefaultChallengeScheme = LogonService.Scheme;
                 options.DefaultScheme = LogonService.Scheme;
-            }).AddCookie(LogonService.Scheme);
+            }).AddCookie(LogonService.Scheme, options =>
+            {
+                options.Events = new CookieAuthenticationEvents
+                {
+                    OnRedirectToLogin = context =>
+                    {
+                        if (context.Request.Path.StartsWithSegments("/api"))
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        }
+                        else
+                        {
+                            context.Response.Redirect(context.RedirectUri);
+                        }
+
+                        return Task.FromResult(0);
+                    }
+                };
+            });
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
