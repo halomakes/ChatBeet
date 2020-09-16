@@ -172,7 +172,7 @@ namespace ChatBeet
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MemoryCellContext mcDb, BooruContext bDb, IdentityDbContext ctx)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseForwardedHeaders();
 
@@ -188,7 +188,7 @@ namespace ChatBeet
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("v1/swagger.json", "ChatBeet");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatBeet");
             });
 
             var cookieOptions = new CookiePolicyOptions
@@ -209,9 +209,6 @@ namespace ChatBeet
             });
 
             app.UseStaticFiles();
-
-            mcDb.Database.EnsureCreated();
-            bDb.Database.EnsureCreated();
         }
     }
 }

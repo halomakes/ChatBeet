@@ -18,6 +18,6 @@ namespace ChatBeet.Rules
 
         public override IEnumerable<IClientMessage> Respond(Exception incomingMessage) => incomingMessage.StackTrace
             .Replace("\r\n", "\n").Split("\n")
-            .Select(line => new PrivateMessage(config.LogChannel, $"{IrcValues.YELLOW}line{IrcValues.RESET}"));
+            .Select(line => new PrivateMessage(config.LogChannel, $"{IrcValues.YELLOW}{line}{IrcValues.RESET}"));
     }
 }
