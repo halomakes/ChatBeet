@@ -37,7 +37,9 @@ namespace ChatBeet.Rules
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
-                var nick = match.Groups[1].Value?.Trim();
+                var naturalGroup = match.Groups[1].Value?.Trim();
+                var commandGroup = match.Groups[2].Value?.Trim();
+                var nick = string.IsNullOrEmpty(naturalGroup) ? commandGroup : naturalGroup;
                 if (!string.IsNullOrEmpty(nick))
                 {
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), await GetUserBirthday(nick));
