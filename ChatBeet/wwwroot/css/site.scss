@@ -117,29 +117,84 @@ body {
 
 .high-ground {
     position: relative;
-}
 
-    .high-ground > img {
+    & > img {
         width: 100%;
     }
 
-    .high-ground > .ground-label {
+    & > .ground-label {
         font-family: Impact, sans-serif;
         text-transform: uppercase;
         color: white;
         text-shadow: 0 0 8px black;
         font-size: 3rem;
         position: absolute;
-    }
 
-        .high-ground > .ground-label.person {
+        &.person {
             right: 27%;
             top: 30%;
             transform: translate(50%,-50%);
         }
 
-        .high-ground > .ground-label.channel {
+        &.channel {
             left: 22%;
             top: 45%;
             transform: translate(-50%,-50%);
         }
+    }
+}
+
+@mixin truncate() {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+@mixin responsive-table() {
+    display: flex;
+    flex-direction: column;
+
+    & > thead {
+        display: none;
+    }
+
+    tr {
+        $spacing: 12px;
+        display: block;
+        padding-bottom: $spacing;
+
+        & > th {
+            font-size: 20px;
+        }
+
+        & > th, & > td {
+            display: block;
+            flex-basis: 0;
+            border-top: none !important;
+            @include truncate();
+        }
+
+        & + tr {
+            padding-top: $spacing;
+            border-top: 1px solid #343a40;
+        }
+
+        &:not(.retain-spacing) {
+            & > th, & > td {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .table-flex-md {
+        @include responsive-table();
+    }
+}
+
+@media only screen and (max-width:576px) {
+    .table-flex-sm {
+        @include responsive-table();
+    }
+}

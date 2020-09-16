@@ -29,6 +29,7 @@
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="IGDB" Version="1.0.1" />
     <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
+    <PackageReference Include="LigerShark.WebOptimizer.Sass" Version="3.0.43-beta" />
     <PackageReference Include="linqtotwitter" Version="5.1.2" />
     <PackageReference Include="Markdig" Version="0.21.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.6" />

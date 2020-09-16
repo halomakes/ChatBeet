@@ -13,7 +13,7 @@
         <input type="text" class="form-control" data-in="this.filter" data-immediate="true">
     </div>
     <form asp-page="/Defs" method="post">
-        <table class="table">
+        <table class="table table-flex-md">
             <thead>
                 <tr>
                     <th scope="col">Key</th>
@@ -24,7 +24,7 @@
             <tbody>
                 @if (User?.Identity?.IsAuthenticated ?? false)
                 {
-                    <tr>
+                    <tr class="retain-spacing">
                         <td scope="col">
                             <label class="sr-only" asp-for="Info.Key"></label>
                             <input type="text" class="form-control" asp-for="Info.Key">
@@ -40,8 +40,8 @@
                 }
                 @foreach (var def in Model.Cells)
                 {
-                    <tr data-show="!this.filter || '@def.Key.Replace("'","\"")'.toLowerCase().includes(this.filter.toLowerCase())">
-                        <th scope="row">@def.Key</th>
+                    <tr id="@def.Key" data-show="!this.filter || '@def.Key.Replace("'","\"")'.toLowerCase().includes(this.filter.toLowerCase())">
+                        <th scope="row">@def.Key <a href="#@(def.Key)" onclick="event.preventDefault();copyTextToClipboard(this.href)" class="badge material-icons">link</a></th>
                         <td class="value">@def.Value</td>
                         <td>@def.Author</td>
                     </tr>
