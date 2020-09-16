@@ -85,6 +85,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<UserPreferencesRule, PreferenceChange>();
                 pipeline.RegisterAsyncRule<BirthdaysRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<KeywordRule, PrivateMessage>();
+                pipeline.RegisterRule<StackTraceRule, Exception>();
             });
 
             services.AddHttpClient();
@@ -187,7 +188,7 @@ namespace ChatBeet
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatBeet");
+                c.SwaggerEndpoint("v1/swagger.json", "ChatBeet");
             });
 
             var cookieOptions = new CookiePolicyOptions
