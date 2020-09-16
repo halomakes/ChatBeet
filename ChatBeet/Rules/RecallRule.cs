@@ -13,24 +13,24 @@ namespace ChatBeet.Rules
     {
         private readonly MemoryCellContext ctx;
         private readonly IrcBotConfiguration config;
-        private readonly Regex rgx;
+        private readonly Regex commandingRgx;
+        private readonly Regex interrogativeRgx;
 
         public RecallRule(MemoryCellContext ctx, IOptions<IrcBotConfiguration> options)
         {
             config = options.Value;
             this.ctx = ctx;
-            rgx = new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})recall (.*)", RegexOptions.IgnoreCase);
+            commandingRgx = new Regex($"^(?:{Regex.Escape(config.Nick)},? |{Regex.Escape(config.CommandPrefix)})(?:recall|tell me about|show me) (.+)", RegexOptions.IgnoreCase);
+            interrogativeRgx = new Regex($"^(?:{Regex.Escape(config.Nick)},? |{Regex.Escape(config.CommandPrefix)})(?:what['ʼ]?(?:s|re)|(?:what|who) (?:is|are)|what do you know about) (.+)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public override bool Matches(PrivateMessage incomingMessage) => commandingRgx.IsMatch(incomingMessage.Message) || interrogativeRgx.IsMatch(incomingMessage.Message);
 
         public async override IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var match = rgx.Match(incomingMessage.Message);
-            if (match.Success)
+            var key = GetKey(incomingMessage.Message);
+            if (!string.IsNullOrEmpty(key))
             {
-                var key = match.Groups[2].Value.Trim();
-
                 var cell = await ctx.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
                 if (cell != null)
@@ -48,6 +48,19 @@ namespace ChatBeet.Rules
                     );
                 }
             }
+        }
+
+        private string GetKey(string m)
+        {
+            var commandMatch = commandingRgx.Match(m);
+            if (commandMatch.Success)
+                return commandMatch.Groups[1].Value.Trim().RemoveLastCharacter('.');
+
+            var questionMatch = interrogativeRgx.Match(m);
+            if (questionMatch.Success)
+                return questionMatch.Groups[1].Value.Trim().RemoveLastCharacter('?');
+
+            return default;
         }
     }
 }
