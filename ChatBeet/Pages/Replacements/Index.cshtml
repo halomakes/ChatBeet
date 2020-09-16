@@ -21,7 +21,7 @@
         </div>
         <div class="collapse @(isOpen ? "show" : "")" id="Collapse-@(s.Item.Id)">
             <form method="post" asp-page="Index">
-                <table class="table my-3">
+                <table class="table my-3 table-flex-sm">
                     <thead>
                         <tr>
                             <th scope="col">Input</th>
@@ -30,7 +30,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr class="retain-spacing">
                             <td scope="col">
                                 <label class="sr-only" asp-for="Info.Input"></label>
                                 <input type="text" class="form-control" asp-for="Info.Input">

@@ -13,7 +13,7 @@
         <input type="text" class="form-control" data-in="this.filter" data-immediate="true">
     </div>
     <form asp-page="/Defs" method="post">
-        <table class="table">
+        <table class="table table-flex-md">
             <thead>
                 <tr>
                     <th scope="col">Key</th>
@@ -24,7 +24,7 @@
             <tbody>
                 @if (User?.Identity?.IsAuthenticated ?? false)
                 {
-                    <tr>
+                    <tr class="retain-spacing">
                         <td scope="col">
                             <label class="sr-only" asp-for="Info.Key"></label>
                             <input type="text" class="form-control" asp-for="Info.Key">
