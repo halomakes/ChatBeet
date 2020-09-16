@@ -17,6 +17,7 @@ namespace ChatBeet.Pages.Replacements
     {
         private readonly ReplacementContext db;
         public IEnumerable<Stat<ReplacementSet>> Stats { get; set; }
+        public int? LastUpdatedSetId { get; private set; }
 
         [BindProperty]
         public ReplacementMapping Info { get; set; }
@@ -34,6 +35,7 @@ namespace ChatBeet.Pages.Replacements
         public async Task<IActionResult> OnPostAsync()
         {
             await LoadInfo();
+            LastUpdatedSetId = Info?.SetId;
 
             if (!ModelState.IsValid)
                 return Page();
@@ -46,6 +48,7 @@ namespace ChatBeet.Pages.Replacements
 
             db.Mappings.Add(Info);
             await db.SaveChangesAsync();
+            Info = null;
 
             return Page();
         }

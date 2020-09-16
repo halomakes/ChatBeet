@@ -9,6 +9,7 @@
 
 @foreach (var s in Model.Stats)
 {
+    var isOpen = Model.LastUpdatedSetId.HasValue && Model.LastUpdatedSetId.Value == s.Item.Id;
     <div id="Set-@(s.Item.Id)" class="my-3">
         <div class="d-flex align-items-center flex-wrap">
             <h2>@s.Item.Command</h2>
@@ -18,7 +19,7 @@
                 Toggle Mappings
             </a>
         </div>
-        <div class="collapse" id="Collapse-@(s.Item.Id)">
+        <div class="collapse @(isOpen ? "show" : "")" id="Collapse-@(s.Item.Id)">
             <form method="post" asp-page="Index">
                 <table class="table my-3">
                     <thead>
