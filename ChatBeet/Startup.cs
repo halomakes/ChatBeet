@@ -130,6 +130,12 @@ namespace ChatBeet
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(opts =>
+            {
+                opts.User.AllowedUserNameCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+[]|1^{}\";
+            });
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = LogonService.Scheme;
