@@ -27,7 +27,7 @@ namespace ChatBeet.Rules
             this.db = db;
             config = opts.Value;
             this.cache = cache;
-            rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}birthday( [A-z0-9-\[\]\\\^\{{\}}]*)?", RegexOptions.IgnoreCase);
+            rgx = new Regex($@"(?:^(?:{Regex.Escape(config.Nick)},? (?:when)(?: is|['ʼ]s)? ({RegexUtils.Nick})(?:['ʼ]s?)? birthday\??))|(?:^{Regex.Escape(config.CommandPrefix)}birthday ({RegexUtils.Nick}))", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
@@ -37,7 +37,9 @@ namespace ChatBeet.Rules
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
-                var nick = match.Groups[1].Value?.Trim();
+                var naturalGroup = match.Groups[1].Value?.Trim();
+                var commandGroup = match.Groups[2].Value?.Trim();
+                var nick = string.IsNullOrEmpty(naturalGroup) ? commandGroup : naturalGroup;
                 if (!string.IsNullOrEmpty(nick))
                 {
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), await GetUserBirthday(nick));

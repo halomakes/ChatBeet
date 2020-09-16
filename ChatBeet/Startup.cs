@@ -53,7 +53,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<AutoYatoRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ArtistRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TrackRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<MemoryCellRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<RememberRule, PrivateMessage>();
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
                 pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
@@ -86,6 +86,8 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<BirthdaysRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<KeywordRule, PrivateMessage>();
                 pipeline.RegisterRule<StackTraceRule, Exception>();
+                pipeline.RegisterAsyncRule<RecallRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<WhoDefRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
