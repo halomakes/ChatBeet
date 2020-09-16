@@ -1,4 +1,4 @@
-# ChatBeet
+# ChatBeet [![Docker Pulls](https://img.shields.io/docker/pulls/halomademeapc/chatbeet?style=flat-square)](https://hub.docker.com/repository/docker/halomademeapc/chatbeet) [![Travis (.com) branch](https://img.shields.io/travis/com/halomademeapc/ChatBeet/develop?style=flat-square)](https://travis-ci.com/github/halomademeapc/ChatBeet)
 Basically a chatbot, but it's also a root vegetable. Built on [GravyBot](https://gravybot.halomademeapc.com) and [GravyIrc](https://gravyirc.halomademeapc.com).
 
 ## Included Commands
