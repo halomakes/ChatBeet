@@ -50,7 +50,7 @@ namespace ChatBeet.Configuration
 
         public class BooruConfiguration
         {
-            public IEnumerable<string> BlacklistedTags { get; set; } = new List<string>();
+            public IEnumerable<string> BlacklistedTags { get; set; }
         }
 
         public class PronounConfiguration
@@ -68,7 +68,7 @@ namespace ChatBeet.Configuration
 
         public class MessageCollectionConfiguration
         {
-            public IEnumerable<string> AllowedChannels { get; set; } = new List<string>();
+            public IEnumerable<string> AllowedChannels { get; set; }
         }
     }
 }
