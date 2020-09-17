@@ -60,12 +60,11 @@ namespace ChatBeet.Rules
                             }
                             yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {content}");
                         }
+                        else if (nick == config.Nick)
+                        {
+                            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From}: no u");
+                        }
                     }
-                }
-
-                if (nick == config.Nick)
-                {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), "no u");
                 }
             }
         }
