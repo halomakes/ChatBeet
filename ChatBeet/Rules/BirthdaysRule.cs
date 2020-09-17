@@ -27,7 +27,7 @@ namespace ChatBeet.Rules
             this.db = db;
             config = opts.Value;
             this.cache = cache;
-            rgx = new Regex($@"(?:^(?:{Regex.Escape(config.Nick)},? (?:when)(?: is|['ʼ]s)? ({RegexUtils.Nick})(?:['ʼ]s?)? birthday\??))|(?:^{Regex.Escape(config.CommandPrefix)}birthday ({RegexUtils.Nick}))", RegexOptions.IgnoreCase);
+            rgx = new Regex($@"(?:^(?:{Regex.Escape(config.Nick)},? (?:when)(?: is|['ʼ]s)? ({RegexUtils.Nick})(?:['ʼ]s?)? birthday\??))|(?:^{Regex.Escape(config.CommandPrefix)}birthday( {RegexUtils.Nick})?)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
