@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
             config = options.Value;
             this.ctx = ctx;
             commandingRgx = new Regex($"^(?:{Regex.Escape(config.Nick)},? |{Regex.Escape(config.CommandPrefix)})(?:recall|tell me about|show me) (.+)", RegexOptions.IgnoreCase);
-            interrogativeRgx = new Regex($"^(?:{Regex.Escape(config.Nick)},? |{Regex.Escape(config.CommandPrefix)})(?:what['ʼ]?(?:s|re)|(?:what|who) (?:is|are)|what do you know about) (.+)", RegexOptions.IgnoreCase);
+            interrogativeRgx = new Regex($"^(?:{Regex.Escape(config.Nick)},? |{Regex.Escape(config.CommandPrefix)})(?:(?!what['ʼ]?s new from)what['ʼ]?(?:s|re)|(?:what|who) (?:is|are)|what do you know about) (.+)", RegexOptions.IgnoreCase);
         }
 
         public override bool Matches(PrivateMessage incomingMessage) => commandingRgx.IsMatch(incomingMessage.Message) || interrogativeRgx.IsMatch(incomingMessage.Message);
