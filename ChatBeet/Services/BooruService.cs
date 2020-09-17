@@ -36,7 +36,6 @@ namespace ChatBeet.Services
 
         public async Task<string> GetRandomPostAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
         {
-            await RecordTags(requestor, tags);
             var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:safe" : "-rating:safe") : string.Empty;
             var globalBlacklist = Negate(booruConfig.BlacklistedTags);
             var userBlacklist = string.IsNullOrEmpty(requestor)
@@ -45,13 +44,12 @@ namespace ChatBeet.Services
 
             var allTags = tags.Concat(globalBlacklist).Concat(userBlacklist).Append(filter);
 
-            var results = await cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", async entry =>
+            var results = await cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-                return await gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
+                return gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
             });
-
 
             return PickImage(results);
 
@@ -121,7 +119,7 @@ namespace ChatBeet.Services
 
         private static IEnumerable<string> Negate(IEnumerable<string> tags) => tags.Select(t => $"-{t}");
 
-        private async Task RecordTags(string nick, IEnumerable<string> tags)
+        public async Task RecordTags(string nick, IEnumerable<string> tags)
         {
             try
             {
