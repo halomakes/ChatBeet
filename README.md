@@ -30,6 +30,7 @@ Example Output:
 ```
 Example Output:
 > Fall Out Boy is a band formed in 2001 in Glenview, Illinois after good friends Joe Trohman and Pete Wentz met high schooler Patrick Stump. Stump originally auditioned as a drummer, but soon became the lead singer. The following year, the band debuted with a self-released demo and followed it up with the May 28, 2002 release of Split EP, which featured Project Rocket, on Uprising Records. The group released a mini-LP, Evening Out With Your Gir
+
 > Related tags: pop punk, rock, emo, alternative, punk
 
 ### DeviantArt
@@ -58,6 +59,7 @@ ChatBeet, remember {id} = {value}
 ```
 Example Output:
 > Got it! 👍
+
 > Previous value was **kyoot**, set by carrots.
 
 ```
@@ -105,6 +107,7 @@ Example Output:
 ```
 Example Output:
 > Kouko Kaga (加賀香子) - https://s4.anilist.co/file/anilistcdn/character/large/43669.jpg
+
 > Age: 18-19 • Birth Date: July 7 • She had a perfect future planned with Mitsuo Yanagisawa as her husband, and nothing will get in her way!   She has a side of her that is not violent as Mitsuo has described.
 
 ### Dad Jokes
@@ -232,7 +235,7 @@ Example Output:
 ##### Setting Times
 If you live in a time zone other than the objectively best one (Eastern), you can indicate time zone for dates/times by adding an offset at the end.
 ```
-cb set work:start = 7am-05:00
+.cb set work:start = 7am-05:00
 ```
 
 ### Pronouns
