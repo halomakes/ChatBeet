@@ -1,4 +1,4 @@
-﻿using BooruSharp.Booru;
+using BooruSharp.Booru;
 using BooruSharp.Search.Post;
 using ChatBeet.Configuration;
 using ChatBeet.Data;
@@ -36,6 +36,7 @@ namespace ChatBeet.Services
 
         public async Task<string> GetRandomPostAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
         {
+            await RecordTags(requestor, tags);
             var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:safe" : "-rating:safe") : string.Empty;
             var globalBlacklist = Negate(booruConfig.BlacklistedTags);
             var userBlacklist = string.IsNullOrEmpty(requestor)
@@ -51,14 +52,13 @@ namespace ChatBeet.Services
                 return await gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
             });
 
+
             return PickImage(results);
 
             string PickImage(IEnumerable<SearchResult> searchResults)
             {
                 if (searchResults?.Any() ?? false)
                 {
-                    Task.Run(() => RecordTags(requestor, tags));
-
                     var img = searchResults.PickRandom();
                     var rng = new Random();
                     var resultTags = img.tags
@@ -77,11 +77,11 @@ namespace ChatBeet.Services
 
         public IEnumerable<string> GetGlobalBlacklistedTags() => booruConfig.BlacklistedTags;
 
-        public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await cache.GetOrCreateAsync(GetCacheEntry(nick), async entry =>
+        public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await cache.GetOrCreateAsync(GetCacheEntry(nick), entry =>
         {
             entry.SlidingExpiration = TimeSpan.FromMinutes(15);
 
-            return await context.Blacklists.AsQueryable()
+            return context.Blacklists.AsNoTracking()
                 .Where(b => b.Nick == nick)
                 .Select(b => b.Tag)
                 .ToListAsync();
