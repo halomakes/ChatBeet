@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ChatBeet.Models.TagStat>
+﻿@model IEnumerable<TagStat>
 @{
     var max = Model.Max(s => s.Total);
     var count = 0;
@@ -7,13 +7,26 @@
 <div class="list-group">
     @foreach (var stat in Model)
     {
-        <a class="list-group-item list-group-item-action position-relative overflow-none" asp-page="Tag" asp-route-tagname="@stat.Tag">
-            <span class="ml-2">
-                @stat.Tag.Replace("_", " ")
-                <span class="badge badge-pill badge-primary ml-1">@stat.Total</span>
-            </span>
-            <background-bar class="bg-primary" value="stat.Total" animation-delay="count * offset" collection-max="max"></background-bar>
-        </a>
+        if (stat.Mode == TagStat.StatMode.Tag)
+        {
+            <a class="list-group-item list-group-item-action position-relative overflow-none" asp-page="Tag" asp-route-tagname="@stat.Tag">
+                <span class="ml-2">
+                    @stat.Tag.Replace("_", " ")
+                    <span class="badge badge-pill badge-primary ml-1">@stat.Total</span>
+                </span>
+                <background-bar class="bg-primary" value="stat.Total" animation-delay="count * offset" collection-max="max"></background-bar>
+            </a>
+        }
+        else
+        {
+            <a class="list-group-item list-group-item-action position-relative overflow-none" asp-page="User" asp-route-nick="@stat.Tag">
+                <span class="ml-2">
+                    @stat.Tag.Replace("_", " ")
+                    <span class="badge badge-pill badge-primary ml-1">@stat.Total</span>
+                </span>
+                <background-bar class="bg-primary" value="stat.Total" animation-delay="count * offset" collection-max="max"></background-bar>
+            </a>
+        }
         count++;
     }
 </div>

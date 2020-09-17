@@ -1,4 +1,5 @@
-﻿using ChatBeet.Utilities;
+﻿using ChatBeet.Services;
+using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
@@ -25,7 +26,7 @@ namespace ChatBeet.Rules
             (0.95F, "😁", "extremely positive")
         };
 
-        public SentimentAnalysisRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, options)
+        public SentimentAnalysisRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options, NegativeResponseService nrService) : base(messageQueueService, options, nrService)
         {
             CommandName = "sentiment";
         }

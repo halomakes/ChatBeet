@@ -1,4 +1,5 @@
-﻿using ChatBeet.Utilities;
+﻿using ChatBeet.Services;
+using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
@@ -10,7 +11,7 @@ namespace ChatBeet.Rules
 {
     public class MockingTextRule : NickLookupRule
     {
-        public MockingTextRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, options)
+        public MockingTextRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options, NegativeResponseService nrService) : base(messageQueueService, options, nrService)
         {
             CommandName = "mock";
         }

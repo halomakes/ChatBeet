@@ -117,6 +117,7 @@ namespace ChatBeet
             services.AddScoped<KeywordService>();
             services.AddHttpContextAccessor();
             services.AddScoped<LogonService>();
+            services.AddScoped<NegativeResponseService>();
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));

@@ -55,7 +55,7 @@ namespace ChatBeet.Pages.Tags
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
             return await db.TagHistories.AsQueryable()
                 .GroupBy(th => th.Tag)
-                .Select(g => new TagStat { Tag = g.Key, Total = g.Count() })
+                .Select(g => new TagStat { Tag = g.Key, Total = g.Count(), Mode = TagStat.StatMode.Tag })
                 .ToListAsync();
         });
     }

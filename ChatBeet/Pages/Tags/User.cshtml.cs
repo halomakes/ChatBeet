@@ -38,7 +38,7 @@ namespace ChatBeet.Pages.Tags
                     .Where(th => th.Nick.ToLower() == Nick)
                     .GroupBy(th => th.Tag)
                     .OrderByDescending(g => g.Count())
-                    .Select(g => new TagStat { Tag = g.Key, Total = g.Count() })
+                    .Select(g => new TagStat { Tag = g.Key, Total = g.Count(), Mode = TagStat.StatMode.Tag })
                     .ToListAsync();
             });
             Stats = matchingTags;
