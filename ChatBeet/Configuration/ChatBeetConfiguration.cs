@@ -58,10 +58,10 @@ namespace ChatBeet.Configuration
 
             public class AllowedPronounsConfiguration
             {
-                public IEnumerable<string> Subjects { get; set; } = new List<string>();
-                public IEnumerable<string> Objects { get; set; } = new List<string>();
-                public IEnumerable<string> Possessives { get; set; } = new List<string>();
-                public IEnumerable<string> Reflexives { get; set; } = new List<string>();
+                public IEnumerable<string> Subjects { get; set; }
+                public IEnumerable<string> Objects { get; set; }
+                public IEnumerable<string> Possessives { get; set; }
+                public IEnumerable<string> Reflexives { get; set; }
             }
         }
 

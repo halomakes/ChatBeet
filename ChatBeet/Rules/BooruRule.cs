@@ -42,6 +42,7 @@ namespace ChatBeet.Rules
                     if (text != default)
                     {
                         yield return new PrivateMessage(incomingMessage.GetResponseTarget(), text);
+                        await booru.RecordTags(incomingMessage.From, tags);
                     }
                     else
                     {

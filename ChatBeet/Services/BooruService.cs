@@ -1,4 +1,4 @@
-﻿using BooruSharp.Booru;
+using BooruSharp.Booru;
 using BooruSharp.Search.Post;
 using ChatBeet.Configuration;
 using ChatBeet.Data;
@@ -44,11 +44,11 @@ namespace ChatBeet.Services
 
             var allTags = tags.Concat(globalBlacklist).Concat(userBlacklist).Append(filter);
 
-            var results = await cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", async entry =>
+            var results = await cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-                return await gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
+                return gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
             });
 
             return PickImage(results);
@@ -57,8 +57,6 @@ namespace ChatBeet.Services
             {
                 if (searchResults?.Any() ?? false)
                 {
-                    Task.Run(() => RecordTags(requestor, tags));
-
                     var img = searchResults.PickRandom();
                     var rng = new Random();
                     var resultTags = img.tags
@@ -77,11 +75,11 @@ namespace ChatBeet.Services
 
         public IEnumerable<string> GetGlobalBlacklistedTags() => booruConfig.BlacklistedTags;
 
-        public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await cache.GetOrCreateAsync(GetCacheEntry(nick), async entry =>
+        public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await cache.GetOrCreateAsync(GetCacheEntry(nick), entry =>
         {
             entry.SlidingExpiration = TimeSpan.FromMinutes(15);
 
-            return await context.Blacklists.AsQueryable()
+            return context.Blacklists.AsNoTracking()
                 .Where(b => b.Nick == nick)
                 .Select(b => b.Tag)
                 .ToListAsync();
@@ -121,7 +119,7 @@ namespace ChatBeet.Services
 
         private static IEnumerable<string> Negate(IEnumerable<string> tags) => tags.Select(t => $"-{t}");
 
-        private async Task RecordTags(string nick, IEnumerable<string> tags)
+        public async Task RecordTags(string nick, IEnumerable<string> tags)
         {
             try
             {
