@@ -1,3 +1,4 @@
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
@@ -11,7 +12,7 @@ namespace ChatBeet.Rules
     {
         private static readonly Regex rgx = new Regex(@"([\x00-\x7F])");
 
-        public KerningRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, options)
+        public KerningRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options, NegativeResponseService nrService) : base(messageQueueService, options, nrService)
         {
             CommandName = "kern";
         }

@@ -14,12 +14,14 @@ namespace ChatBeet.Rules
     {
         private readonly UserPreferencesService userPreferences;
         private readonly IrcBotConfiguration config;
+        private readonly NegativeResponseService negativeResponseService;
         private readonly Regex rgx;
 
-        public PronounRule(UserPreferencesService userPreferences, IOptions<IrcBotConfiguration> options)
+        public PronounRule(UserPreferencesService userPreferences, IOptions<IrcBotConfiguration> options, NegativeResponseService negativeResponseService)
         {
             this.userPreferences = userPreferences;
             config = options.Value;
+            this.negativeResponseService = negativeResponseService;
             rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}pronouns ({RegexUtils.Nick})", RegexOptions.IgnoreCase);
         }
 
@@ -34,7 +36,7 @@ namespace ChatBeet.Rules
 
                 if (nick.Equals(config.Nick, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From}: no u");
+                    yield return negativeResponseService.GetResponse(incomingMessage);
                 }
                 else
                 {

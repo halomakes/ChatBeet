@@ -1,4 +1,5 @@
-﻿using ChatBeet.Utilities;
+﻿using ChatBeet.Services;
+using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
@@ -13,11 +14,13 @@ namespace ChatBeet.Rules
     {
         protected readonly IrcBotConfiguration config;
         protected readonly MessageQueueService messageQueueService;
+        protected readonly NegativeResponseService negativeResponseService;
         protected string CommandName;
 
-        public NickLookupRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options)
+        public NickLookupRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options, NegativeResponseService negativeResponseService)
         {
             this.messageQueueService = messageQueueService;
+            this.negativeResponseService = negativeResponseService;
             config = options.Value;
         }
 
@@ -34,7 +37,7 @@ namespace ChatBeet.Rules
                     var nick = match.Groups[1].Value;
                     if (nick.Equals(config.Nick, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From}: no u").ToSingleElementSequence();
+                        return negativeResponseService.GetResponse(incomingMessage).ToSingleElementSequence();
                     }
                     else
                     {

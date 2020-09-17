@@ -1,6 +1,7 @@
 using ChatBeet.Configuration;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
@@ -19,16 +20,19 @@ namespace ChatBeet.Rules
         private readonly ReplacementContext db;
         private readonly MessageQueueService messageQueue;
         private readonly IrcBotConfiguration config;
+        private readonly NegativeResponseService negativeResponseService;
         private readonly Regex rgx;
         private static IEnumerable<ReplacementSet> ReplacementSets;
         private static DateTime LastRefreshed;
+
         private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(5);
 
-        public ReplacementSetRule(ReplacementContext db, MessageQueueService messageQueue, IOptions<IrcBotConfiguration> opts)
+        public ReplacementSetRule(ReplacementContext db, MessageQueueService messageQueue, IOptions<IrcBotConfiguration> opts, NegativeResponseService nrService)
         {
             this.db = db;
             this.messageQueue = messageQueue;
             config = opts.Value;
+            negativeResponseService = nrService;
             rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}([^\ ]+)\ ([^\ ]+)", RegexOptions.IgnoreCase);
             Initialize();
         }
@@ -62,7 +66,7 @@ namespace ChatBeet.Rules
                         }
                         else if (nick == config.Nick)
                         {
-                            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From}: no u");
+                            yield return negativeResponseService.GetResponse(incomingMessage);
                         }
                     }
                 }
