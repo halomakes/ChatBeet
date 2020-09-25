@@ -45,7 +45,7 @@ namespace ChatBeet.Services
                 entry.SlidingExpiration = TimeSpan.FromMinutes(10);
                 return -1;
             });
-            cache.Set(sequenceKey, seq++);
+            cache.Set(sequenceKey, ++seq);
 
             if (result?.Results?.Any() ?? false)
             {
