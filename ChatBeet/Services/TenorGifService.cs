@@ -39,15 +39,26 @@ namespace ChatBeet.Services
 
                 return await client.SearchAsync(search, limit: config.QueryLimit);
             });
+            var sequenceKey = $"tenor:seq:{search}";
+            var seq = cache.GetOrCreate(sequenceKey, entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromMinutes(10);
+                return -1;
+            });
+            cache.Set(sequenceKey, seq++);
 
-            return result?.Results?.Any() ?? false
-                ? result.Results
+            if (result?.Results?.Any() ?? false)
+            {
+                var options = result.Results
                     .SelectMany(r => r.Media)
                     .Where(m => m.ContainsKey(MediaType.Gif))
                     .Select(m => m[MediaType.Gif])
                     .Select(i => i.Url?.ToString())
-                    .PickRandom()
-                : null;
+                    .ToList();
+                var index = seq % options.Count();
+                return options.ElementAtOrDefault(index);
+            }
+            return default;
         }
     }
 }

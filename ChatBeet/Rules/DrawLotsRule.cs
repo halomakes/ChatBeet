@@ -43,7 +43,7 @@ namespace ChatBeet.Rules
         {
             var length = cache.GetOrCreate($"lot:{nick}:{mode}", entry =>
             {
-                entry.SlidingExpiration = TimeSpan.FromMinutes(5);
+                entry.SlidingExpiration = TimeSpan.FromMinutes(2);
 
                 var isGodLength = rng.Next(0, godChance) == 0;
                 return isGodLength ? godLength : rng.NormalNext(1, maxLength);

@@ -25,7 +25,7 @@ namespace ChatBeet.Rules
         private static IEnumerable<ReplacementSet> ReplacementSets;
         private static DateTime LastRefreshed;
 
-        private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(5);
+        private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(1);
 
         public ReplacementSetRule(ReplacementContext db, MessageQueueService messageQueue, IOptions<IrcBotConfiguration> opts, NegativeResponseService nrService)
         {
