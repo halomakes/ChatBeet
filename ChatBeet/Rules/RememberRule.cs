@@ -1,5 +1,6 @@
 ﻿using ChatBeet.Data;
 using ChatBeet.Data.Entities;
+using ChatBeet.Models;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
@@ -15,11 +16,13 @@ namespace ChatBeet.Rules
         private readonly MemoryCellContext ctx;
         private readonly IrcBotConfiguration config;
         private readonly Regex rgx;
+        private readonly MessageQueueService queue;
 
-        public RememberRule(MemoryCellContext ctx, IOptions<IrcBotConfiguration> options)
+        public RememberRule(MemoryCellContext ctx, IOptions<IrcBotConfiguration> options, MessageQueueService queue)
         {
             config = options.Value;
             this.ctx = ctx;
+            this.queue = queue;
             rgx = new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})remember (.*?)=(.*)", RegexOptions.IgnoreCase);
         }
 
@@ -72,6 +75,18 @@ namespace ChatBeet.Rules
                             incomingMessage.GetResponseTarget(),
                             $"Previous value was {IrcValues.BOLD}{existingCell.Value}{IrcValues.RESET}, set by {existingCell.Author}."
                         );
+                    }
+
+                    if (!incomingMessage.IsChannelMessage)
+                    {
+                        queue.Push(new DefinitionChange
+                        {
+                            Key = key,
+                            NewNick = incomingMessage.From,
+                            NewValue = value,
+                            OldNick = existingCell?.Author,
+                            OldValue = existingCell?.Value
+                        });
                     }
                 }
             }
