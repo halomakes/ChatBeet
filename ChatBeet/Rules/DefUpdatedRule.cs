@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ChatBeet.Rules
 {
-    public class DefUpdatedRule : MessageRuleBase<DefinitionChange>
+    public class DefUpdatedRule : IMessageRule<DefinitionChange>
     {
         private readonly IrcBotConfiguration config;
 
@@ -15,7 +15,7 @@ namespace ChatBeet.Rules
             config = opts.Value;
         }
 
-        public override IEnumerable<IClientMessage> Respond(DefinitionChange incomingMessage)
+        public IEnumerable<IClientMessage> Respond(DefinitionChange incomingMessage)
         {
             yield return new PrivateMessage(config.NotifyChannel, $"{IrcValues.BOLD}{incomingMessage.NewNick}{IrcValues.RESET} set {IrcValues.BOLD}{incomingMessage.Key}{IrcValues.RESET} = {incomingMessage.NewValue}");
             if (!string.IsNullOrEmpty(incomingMessage.OldValue))

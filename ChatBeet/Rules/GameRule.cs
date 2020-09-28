@@ -1,5 +1,4 @@
-﻿using ChatBeet.Configuration;
-using ChatBeet.Utilities;
+﻿using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
 using IGDB;
@@ -11,11 +10,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ChatBeet.Rules
 {
-    public class GameRule : AsyncMessageRuleBase<PrivateMessage>
+    public class GameRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly IGDBApi client;
@@ -30,9 +28,9 @@ namespace ChatBeet.Rules
             filter = new Regex($"^{Regex.Escape(config.CommandPrefix)}(game) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = filter.Match(incomingMessage.Message);
             if (match.Success)

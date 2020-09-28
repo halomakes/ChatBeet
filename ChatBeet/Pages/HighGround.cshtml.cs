@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ChatBeet.Models;
 using ChatBeet.Rules;
 using ChatBeet.Utilities;
 using GravyBot;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq;
 
 namespace ChatBeet.Pages
 {
@@ -36,8 +32,7 @@ namespace ChatBeet.Pages
             }
         }
 
-        [Authorize]
-        public async Task<IActionResult> OnPost()
+        public IActionResult OnPost()
         {
             if (User?.Identity?.IsAuthenticated ?? false && !string.IsNullOrEmpty(Channel) && Channel.StartsWith("#"))
             {

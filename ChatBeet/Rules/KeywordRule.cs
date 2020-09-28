@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Rules
 {
-    public class KeywordRule : AsyncMessageRuleBase<PrivateMessage>
+    public class KeywordRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly ChatBeetConfiguration cbConfig;
@@ -23,11 +23,11 @@ namespace ChatBeet.Rules
             this.service = service;
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => incomingMessage.IsChannelMessage
+        public bool Matches(PrivateMessage incomingMessage) => incomingMessage.IsChannelMessage
             && !incomingMessage.Message.StartsWith(config.CommandPrefix)
             && cbConfig.MessageCollection.AllowedChannels.Contains(incomingMessage.To);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var keywords = await GetKeywords();
             var tasks = keywords

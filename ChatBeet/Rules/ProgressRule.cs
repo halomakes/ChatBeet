@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class ProgressRule : MessageRuleBase<PrivateMessage>
+    public class ProgressRule : IMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
 
@@ -19,7 +19,7 @@ namespace ChatBeet.Rules
             config = opts.Value;
         }
 
-        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}progress (year|day|hour|minute|month|decade|century|millennium|week|yatoweek|second)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);

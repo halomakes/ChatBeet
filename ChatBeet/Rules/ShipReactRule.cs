@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class ShipReactRule : AsyncMessageRuleBase<PrivateMessage>
+    public class ShipReactRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly MessageQueueService messageQueueService;
         private readonly Regex responseRgx = new Regex(@"^([|\-A-z0-9]*): ([^{}]+) {([A-z0-9_\-\(\), ]+)}", RegexOptions.IgnoreCase);
@@ -20,9 +20,9 @@ namespace ChatBeet.Rules
             this.messageQueueService = messageQueueService;
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => incomingMessage.From == "vanvan" && responseRgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => incomingMessage.From == "vanvan" && responseRgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = responseRgx.Match(incomingMessage.Message);
             if (match.Success)

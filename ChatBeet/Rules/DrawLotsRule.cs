@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class DrawLotsRule : MessageRuleBase<PrivateMessage>
+    public class DrawLotsRule : IMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly IMemoryCache cache;
@@ -25,7 +25,7 @@ namespace ChatBeet.Rules
             this.cache = cache;
         }
 
-        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(lots|epeen)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);

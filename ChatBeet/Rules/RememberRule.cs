@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class RememberRule : AsyncMessageRuleBase<PrivateMessage>
+    public class RememberRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly MemoryCellContext ctx;
         private readonly IrcBotConfiguration config;
@@ -23,9 +23,9 @@ namespace ChatBeet.Rules
             rgx = new Regex($"^({Regex.Escape(config.Nick)}, |{Regex.Escape(config.CommandPrefix)})remember (.*?)=(.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class WaifuRule : AsyncMessageRuleBase<PrivateMessage>
+    public class WaifuRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly AnilistService client;
@@ -21,9 +21,9 @@ namespace ChatBeet.Rules
             rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(waifu|husbando) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)

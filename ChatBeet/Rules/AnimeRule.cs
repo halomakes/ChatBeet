@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class AnimeRule : AsyncMessageRuleBase<PrivateMessage>
+    public class AnimeRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly AnilistService client;
@@ -22,9 +22,9 @@ namespace ChatBeet.Rules
             filter = new Regex($"^{Regex.Escape(config.CommandPrefix)}(anime|manga|ln|light novel|ova) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = filter.Match(incomingMessage.Message);
             if (match.Success)

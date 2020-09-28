@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class TrackRule : AsyncMessageRuleBase<PrivateMessage>
+    public class TrackRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly LastFmService lastFm;
@@ -21,9 +21,9 @@ namespace ChatBeet.Rules
             rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}track (.*) by (.*)");
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
@@ -35,25 +35,20 @@ namespace ChatBeet.Rules
 
                 if (track != null)
                 {
-                    var result = track.Name;
+                    var result = $"{IrcValues.BOLD}{track.Name}{IrcValues.RESET}";
                     if (track.Duration.HasValue)
                     {
                         result += $" ({track.Duration})";
                     }
 
-                    if (!string.IsNullOrEmpty(track.AlbumName) || !string.IsNullOrEmpty(track.ArtistName))
-                    {
-                        result += " |";
-                    }
-
                     if (!string.IsNullOrEmpty(track.AlbumName))
                     {
-                        result += $" from {track.AlbumName}";
+                        result += $" from {IrcValues.BOLD}{track.AlbumName}{IrcValues.RESET}";
                     }
 
                     if (!string.IsNullOrEmpty(track.ArtistName))
                     {
-                        result += $" by {track.ArtistName}";
+                        result += $" by {IrcValues.BOLD}{track.ArtistName}{IrcValues.BOLD}";
                     }
 
                     result += $" | {track.Url}";

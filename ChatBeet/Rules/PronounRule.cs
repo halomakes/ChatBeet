@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class PronounRule : AsyncMessageRuleBase<PrivateMessage>
+    public class PronounRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly UserPreferencesService userPreferences;
         private readonly IrcBotConfiguration config;
@@ -25,9 +25,9 @@ namespace ChatBeet.Rules
             rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}pronouns ({RegexUtils.Nick})", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)

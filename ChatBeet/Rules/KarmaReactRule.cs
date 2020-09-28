@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class KarmaReactRule : MessageRuleBase<PrivateMessage>
+    public class KarmaReactRule : IMessageRule<PrivateMessage>
     {
         private readonly Regex filter;
         private static DateTime? lastReactionTime = null;
@@ -20,7 +20,7 @@ namespace ChatBeet.Rules
             filter = new Regex($@"^{Regex.Escape(options.Value.Nick)}((\+\+)|(--))$", RegexOptions.IgnoreCase);
         }
 
-        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var match = filter.Match(incomingMessage.Message);
             if (match.Success)

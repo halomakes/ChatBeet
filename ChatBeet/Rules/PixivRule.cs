@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class PixivRule : AsyncMessageRuleBase<PrivateMessage>
+    public class PixivRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly ChatBeetConfiguration.PixivConfiguration pixivConfig;
@@ -30,9 +30,9 @@ namespace ChatBeet.Rules
             rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(pixiv) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)

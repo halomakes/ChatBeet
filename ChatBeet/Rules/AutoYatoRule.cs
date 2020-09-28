@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class AutoYatoRule : MessageRuleBase<PrivateMessage>
+    public class AutoYatoRule : IMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly string autoYatoUrl;
@@ -20,7 +20,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var rgx = new Regex($@"^{Regex.Escape(config.Nick)}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
             if (rgx.IsMatch(incomingMessage.Message))

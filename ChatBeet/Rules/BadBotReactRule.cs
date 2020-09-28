@@ -8,11 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class BadBotReactRule : MessageRuleBase<PrivateMessage>
+    public class BadBotReactRule : IMessageRule<PrivateMessage>
     {
         private readonly Regex filter;
         private static DateTime? lastReactionTime = null;
-        private static string lastReaction = null;
         private static readonly TimeSpan debounce = TimeSpan.FromSeconds(20);
 
         public BadBotReactRule(IOptions<IrcBotConfiguration> options)
@@ -20,7 +19,7 @@ namespace ChatBeet.Rules
             filter = new Regex($@"^{Regex.Escape(options.Value.CommandPrefix)}(bad|shit) bot$", RegexOptions.IgnoreCase);
         }
 
-        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             if (filter.IsMatch(incomingMessage.Message))
             {

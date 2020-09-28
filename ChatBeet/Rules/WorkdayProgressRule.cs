@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace ChatBeet.Rules
 {
-    public class WorkdayProgressRule : AsyncMessageRuleBase<PrivateMessage>
+    public class WorkdayProgressRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly UserPreferencesService preferences;
@@ -24,9 +24,9 @@ namespace ChatBeet.Rules
             command = $"{config.CommandPrefix}progress workday";
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => incomingMessage.Message.Equals(command, StringComparison.InvariantCultureIgnoreCase);
+        public bool Matches(PrivateMessage incomingMessage) => incomingMessage.Message.Equals(command, StringComparison.InvariantCultureIgnoreCase);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var startPref = await preferences.Get(incomingMessage.From, UserPreference.WorkHoursStart);
             var endPref = await preferences.Get(incomingMessage.From, UserPreference.WorkHoursEnd);

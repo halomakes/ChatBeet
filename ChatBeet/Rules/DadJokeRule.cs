@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class DadJokeRule : AsyncMessageRuleBase<PrivateMessage>
+    public class DadJokeRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly DadJokeService jokeService;
         private readonly IrcBotConfiguration config;
@@ -21,9 +21,9 @@ namespace ChatBeet.Rules
             filter = new Regex($"^({Regex.Escape(config.Nick)},? ?tell.*joke)|({Regex.Escape(config.CommandPrefix)}(dad )?joke)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = filter.Match(incomingMessage.Message);
             if (match.Success)

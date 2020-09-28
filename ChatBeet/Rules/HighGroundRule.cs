@@ -4,7 +4,6 @@ using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
@@ -58,12 +57,5 @@ namespace ChatBeet.Rules
                 return new PrivateMessage(target, $"It's over, {oldKing}! {nick} has the high ground!");
             }
         }
-
-        public IEnumerable<IClientMessage> Respond(object incomingMessage) => incomingMessage switch
-        {
-            PrivateMessage pm => Respond(pm),
-            HighGroundClaim hgc => Respond(hgc),
-            _ => Enumerable.Empty<IClientMessage>()
-        };
     }
 }

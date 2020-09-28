@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class DownloadCompleteRule : MessageRuleBase<DownloadCompleteMessage>
+    public class DownloadCompleteRule : IMessageRule<DownloadCompleteMessage>
     {
         private readonly IrcBotConfiguration config;
 
@@ -16,7 +16,7 @@ namespace ChatBeet.Rules
             config = options.Value;
         }
 
-        public override IEnumerable<IClientMessage> Respond(DownloadCompleteMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(DownloadCompleteMessage incomingMessage)
         {
             if (incomingMessage.Source == "deluge" && !string.IsNullOrEmpty(incomingMessage.Name))
             {

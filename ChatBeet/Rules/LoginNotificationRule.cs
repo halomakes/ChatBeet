@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace ChatBeet.Rules
 {
-    public class LoginNotificationRule : MessageRuleBase<LoginCompleteNotification>
+    public class LoginNotificationRule : IMessageRule<LoginCompleteNotification>
     {
-        public override IEnumerable<IClientMessage> Respond(LoginCompleteNotification incomingMessage)
+        public IEnumerable<IClientMessage> Respond(LoginCompleteNotification incomingMessage)
         {
             yield return new PrivateMessage(incomingMessage.Nick, $"Notice: Someone logged in as you at {incomingMessage.Time}.");
         }

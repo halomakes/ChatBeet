@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class BooruBlacklistRule : AsyncMessageRuleBase<PrivateMessage>
+    public class BooruBlacklistRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly Regex rgx;
@@ -22,9 +22,9 @@ namespace ChatBeet.Rules
             this.booru = booru;
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
