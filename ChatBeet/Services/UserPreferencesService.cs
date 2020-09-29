@@ -149,7 +149,7 @@ namespace ChatBeet.Services
 
         private static string GetZipValidation(string value)
         {
-            var rgx = new Regex(@"(\d{5}(?:-\d{4})?)");
+            var rgx = new Regex(@"(\d{5})");
             if (!rgx.IsMatch(value))
                 return $"{value} is not a valid ZIP code.";
             return default;
