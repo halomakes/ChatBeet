@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using UnitsNet;
 using UnitsNet.Units;
 
 namespace ChatBeet.Services
@@ -66,7 +67,20 @@ namespace ChatBeet.Services
         public async Task<string> Get(string nick, UserPreference preference)
         {
             var pref = await db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
-            return pref?.Value;
+            return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
+        }
+
+        public async Task<TEnum> Get<TEnum>(string nick, UserPreference preference) where TEnum : struct, Enum => Enum.Parse<TEnum>(await Get(nick, preference));
+
+        public async Task<TEnum> Get<TEnum>(string nick, UserPreference preference, TEnum @default, TEnum? ignore = null) where TEnum : struct, Enum
+        {
+            var prefValue = await Get(nick, preference);
+            if (prefValue == default)
+                return @default;
+            var enumValue = Enum.Parse<TEnum>(await Get(nick, preference));
+            if (ignore.HasValue && ignore.Value.Equals(enumValue))
+                return @default;
+            return enumValue;
         }
 
         public Task<List<UserPreferenceSetting>> Get(string nick) => db.PreferenceSettings.AsQueryable().Where(p => p.Nick == nick).ToListAsync();
@@ -84,9 +98,9 @@ namespace ChatBeet.Services
                 UserPreference.WorkHoursEnd => GetDateValidation(value),
                 UserPreference.WorkHoursStart => GetDateValidation(value),
                 UserPreference.WeatherLocation => GetZipValidation(value),
-                UserPreference.WeatherTempUnit => GetEnumValidation<TemperatureUnit>(value, displayName),
-                UserPreference.WeatherPrecipUnit => GetEnumValidation<LengthUnit>(value, displayName),
-                UserPreference.WeatherWindUnit => GetEnumValidation<SpeedUnit>(value, displayName),
+                UserPreference.WeatherTempUnit => GetUnitValidation<TemperatureUnit>(value, displayName),
+                UserPreference.WeatherPrecipUnit => GetUnitValidation<LengthUnit>(value, displayName),
+                UserPreference.WeatherWindUnit => GetUnitValidation<SpeedUnit>(value, displayName),
                 _ => default
             };
         }
@@ -96,9 +110,9 @@ namespace ChatBeet.Services
             UserPreference.DateOfBirth => GetNormalizedDayOfYear(value),
             UserPreference.WorkHoursEnd => GetNormalizedTimeOfDay(value),
             UserPreference.WorkHoursStart => GetNormalizedTimeOfDay(value),
-            UserPreference.WeatherTempUnit => GetNormalizedEnum<TemperatureUnit>(value),
-            UserPreference.WeatherPrecipUnit => GetNormalizedEnum<LengthUnit>(value),
-            UserPreference.WeatherWindUnit => GetNormalizedEnum<SpeedUnit>(value),
+            UserPreference.WeatherTempUnit => GetNormalizedUnit<TemperatureUnit>(value),
+            UserPreference.WeatherPrecipUnit => GetNormalizedUnit<LengthUnit>(value),
+            UserPreference.WeatherWindUnit => GetNormalizedUnit<SpeedUnit>(value),
             _ => value
         };
 
@@ -107,6 +121,13 @@ namespace ChatBeet.Services
         private static string GetNormalizedTimeOfDay(string value) => DateTime.Parse(value).ToString("HH:mm:sszzz");
 
         private static string GetNormalizedEnum<TEnum>(string value) where TEnum : struct, Enum => Enum.Parse<TEnum>(value).ToString();
+
+        private static string GetNormalizedUnit<TEnum>(string value) where TEnum : struct, Enum
+        {
+            if (UnitParser.Default.TryParse<TEnum>(value, out var parsed))
+                return parsed.ToString();
+            else return GetNormalizedEnum<TEnum>(value);
+        }
 
         private static string GetCollectionValidation(string value, IEnumerable<string> collection, string displayName)
         {
@@ -141,6 +162,13 @@ namespace ChatBeet.Services
                 return $"{value} is not an available value for {displayName}.  Available values are [{string.Join(", ", Enum.GetNames(typeof(TEnum)))}].";
             }
             return default;
+        }
+
+        private static string GetUnitValidation<TEnum>(string value, string displayName) where TEnum : struct, Enum
+        {
+            if (UnitParser.Default.TryParse<TEnum>(value, out var _))
+                return default;
+            else return GetEnumValidation<TEnum>(value, displayName);
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using UnitsNet.Units;
 using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
 
 namespace ChatBeet.Rules
@@ -55,7 +56,15 @@ namespace ChatBeet.Rules
                 var currentConditions = await wmClient.GetWeatherDataByZipAsync(zip, "US");
                 if (currentConditions != default)
                 {
+                    var windUnit = await prefsService.Get(incomingMessage.From, UserPreference.WeatherWindUnit, SpeedUnit.MilePerHour, SpeedUnit.Undefined);
+                    var tempUnit = await prefsService.Get(incomingMessage.From, UserPreference.WeatherTempUnit, TemperatureUnit.DegreeFahrenheit, TemperatureUnit.Undefined);
+                    var precipUnit = await prefsService.Get(incomingMessage.From, UserPreference.WeatherPrecipUnit, LengthUnit.Inch, LengthUnit.Undefined);
+
                     yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Current conditions for {IrcValues.BOLD}{currentConditions.Name}{IrcValues.RESET}");
+                }
+                else
+                {
+                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Couldn't find any weather data for ZIP code {IrcValues.BOLD}{zip}{IrcValues.RESET}.");
                 }
             }
             else
