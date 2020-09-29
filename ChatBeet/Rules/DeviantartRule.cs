@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class DeviantartRule : AsyncMessageRuleBase<PrivateMessage>
+    public class DeviantartRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly DeviantartService daService;
         private readonly IrcBotConfiguration config;
@@ -21,9 +21,9 @@ namespace ChatBeet.Rules
             rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(da|deviantart|degenerate) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)

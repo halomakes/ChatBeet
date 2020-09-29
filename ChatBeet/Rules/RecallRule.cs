@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class RecallRule : AsyncMessageRuleBase<PrivateMessage>
+    public class RecallRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly MemoryCellContext ctx;
         private readonly IrcBotConfiguration config;
@@ -24,9 +24,9 @@ namespace ChatBeet.Rules
             interrogativeRgx = new Regex($"^(?:{Regex.Escape(config.Nick)},? |{Regex.Escape(config.CommandPrefix)})(?:(?!what['ʼ]?s new from)what['ʼ]?(?:s|re)|(?:what|who) (?:is|are)|what do you know about) (.+)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => commandingRgx.IsMatch(incomingMessage.Message) || interrogativeRgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => commandingRgx.IsMatch(incomingMessage.Message) || interrogativeRgx.IsMatch(incomingMessage.Message);
 
-        public async override IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var key = GetKey(incomingMessage.Message);
             if (!string.IsNullOrEmpty(key))

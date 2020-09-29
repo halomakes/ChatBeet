@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class ArtistRule : AsyncMessageRuleBase<PrivateMessage>
+    public class ArtistRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
         private readonly LastFmService lastFm;
@@ -22,9 +22,9 @@ namespace ChatBeet.Rules
             pattern = new Regex($"^{Regex.Escape(config.CommandPrefix)}artist (.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => pattern.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => pattern.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             if (pattern.IsMatch(incomingMessage.Message))
             {

@@ -10,27 +10,29 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public abstract class AsyncNickLookupRule : AsyncMessageRuleBase<PrivateMessage>
+    public abstract class AsyncNickLookupRule : IAsyncMessageRule<PrivateMessage>
     {
         protected readonly IrcBotConfiguration config;
         protected readonly MessageQueueService messageQueueService;
         protected readonly NegativeResponseService negativeResponseService;
+        private readonly Regex rgx;
         protected string CommandName;
 
-        public AsyncNickLookupRule(MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options, NegativeResponseService negativeResponseService)
+        public AsyncNickLookupRule(string commandName, MessageQueueService messageQueueService, IOptions<IrcBotConfiguration> options, NegativeResponseService negativeResponseService)
         {
             this.messageQueueService = messageQueueService;
             this.negativeResponseService = negativeResponseService;
             config = options.Value;
+            CommandName = commandName;
+            new Regex($@"^{Regex.Escape(config.CommandPrefix)}{Regex.Escape(CommandName)} ({RegexUtils.Nick})", RegexOptions.IgnoreCase);
         }
 
         protected abstract IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
 
-        public override IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             if (!string.IsNullOrEmpty(CommandName))
             {
-                var rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}{Regex.Escape(CommandName)} ({RegexUtils.Nick})", RegexOptions.IgnoreCase);
                 var match = rgx.Match(incomingMessage.Message);
                 if (match.Success)
                 {
@@ -54,5 +56,7 @@ namespace ChatBeet.Rules
 
             return AsyncEnumerable.Empty<IClientMessage>();
         }
+
+        public bool Matches(PrivateMessage incomingMessage) => !string.IsNullOrEmpty(CommandName) && rgx.IsMatch(incomingMessage.Message);
     }
 }

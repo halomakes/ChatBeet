@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ChatBeet.Rules
 {
-    public class StackTraceRule : MessageRuleBase<Exception>
+    public class StackTraceRule : IMessageRule<Exception>
     {
         private readonly IrcBotConfiguration config;
 
@@ -16,7 +16,7 @@ namespace ChatBeet.Rules
             config = opts.Value;
         }
 
-        public override IEnumerable<IClientMessage> Respond(Exception incomingMessage) => incomingMessage.StackTrace
+        public IEnumerable<IClientMessage> Respond(Exception incomingMessage) => incomingMessage.StackTrace
             .Replace("\r\n", "\n").Split("\n")
             .Select(line => new PrivateMessage(config.LogChannel, $"{IrcValues.YELLOW}{line}{IrcValues.RESET}"));
     }

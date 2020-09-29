@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class UserPreferencesRule : AsyncMessageRuleBase<PrivateMessage>, IMessageRule<PreferenceChange>
+    public class UserPreferencesRule : IAsyncMessageRule<PrivateMessage>, IMessageRule<PreferenceChange>
     {
         private readonly UserPreferencesService service;
         private readonly Regex rgx;
@@ -33,9 +33,9 @@ namespace ChatBeet.Rules
             rgx = new Regex($"^({Regex.Escape(botConfig.Nick)}, |{Regex.Escape(botConfig.CommandPrefix)})set (.*?)=(.*)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
@@ -54,8 +54,8 @@ namespace ChatBeet.Rules
                     }
                     else
                     {
-                        await service.Set(incomingMessage.From, preference, value);
-                        yield return new PrivateMessage(incomingMessage.From, GetConfirmationMessage(preference, value));
+                        var normalized = await service.Set(incomingMessage.From, preference, value);
+                        yield return new PrivateMessage(incomingMessage.From, GetConfirmationMessage(preference, normalized));
                     }
                 }
                 else

@@ -27,6 +27,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
 
 namespace ChatBeet
 {
@@ -88,6 +89,7 @@ namespace ChatBeet
                 pipeline.RegisterRule<StackTraceRule, Exception>();
                 pipeline.RegisterAsyncRule<RecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WhoDefRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -97,7 +99,7 @@ namespace ChatBeet
             services.AddScoped<DeviantartService>();
             services.AddScoped<AnilistClient>();
             services.AddScoped<AnilistService>();
-            services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules:Dtella"));
+            services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules"));
             services.AddScoped<TwitterService>();
             services.AddScoped<TenorGifService>();
             services.AddScoped<Gelbooru>();
@@ -118,6 +120,7 @@ namespace ChatBeet
             services.AddHttpContextAccessor();
             services.AddScoped<LogonService>();
             services.AddScoped<NegativeResponseService>();
+            services.AddScoped(provider => new OpenWeatherMapClient(Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));

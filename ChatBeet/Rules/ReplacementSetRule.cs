@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Rules
 {
-    public class ReplacementSetRule : MessageRuleBase<PrivateMessage>
+    public class ReplacementSetRule : IMessageRule<PrivateMessage>
     {
         private readonly ReplacementContext db;
         private readonly MessageQueueService messageQueue;
@@ -42,7 +42,7 @@ namespace ChatBeet.Rules
             await RefreshMappings();
         }
 
-        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success && ReplacementSets != default && ReplacementSets.Any())
@@ -73,7 +73,7 @@ namespace ChatBeet.Rules
             }
         }
 
-        private async Task RefreshMappings()
+        public async Task RefreshMappings()
         {
             if (ReplacementSets == default || (DateTime.Now - LastRefreshed > RefreshInterval))
             {

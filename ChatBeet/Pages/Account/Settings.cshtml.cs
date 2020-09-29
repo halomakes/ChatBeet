@@ -49,7 +49,7 @@ namespace ChatBeet.Pages.Account
                 {
                     Preference.Value = Preference.Value.Trim();
                     Preference.Nick = User.GetNick();
-                    await userPreferences.Set(Preference);
+                    Preference.Value = await userPreferences.Set(Preference);
                     messageQueue.Push(Preference);
                     return RedirectToPage("/Account/Settings");
                 }

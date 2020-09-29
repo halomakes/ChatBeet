@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public abstract class NickLookupRule : MessageRuleBase<PrivateMessage>
+    public abstract class NickLookupRule : IMessageRule<PrivateMessage>
     {
         protected readonly IrcBotConfiguration config;
         protected readonly MessageQueueService messageQueueService;
@@ -26,7 +26,7 @@ namespace ChatBeet.Rules
 
         protected abstract IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage, string nick, PrivateMessage lookupMessage);
 
-        public override IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
             if (!string.IsNullOrEmpty(CommandName))
             {

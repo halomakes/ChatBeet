@@ -17,6 +17,14 @@ namespace ChatBeet.Data.Entities
         [Parameter("pronoun:possessive", "Pronoun (Possessive)")]
         PossessivePronoun,
         [Parameter("pronoun:reflexive", "Pronoun (Reflexive)")]
-        ReflexivePronoun
+        ReflexivePronoun,
+        [Parameter("location:weather", "ZIP Code (Weather)")]
+        WeatherLocation,
+        [Parameter("unit:weather:temperature", "Unit (Weather Temperature)")]
+        WeatherTempUnit,
+        [Parameter("unit:weather:wind", "Unit (Wind speed)")]
+        WeatherWindUnit,
+        [Parameter("unit:weather:precip", "Unit (Precipitation)")]
+        WeatherPrecipUnit
     }
 }

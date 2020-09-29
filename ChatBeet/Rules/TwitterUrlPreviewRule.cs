@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Rules
 {
-    public class TwitterUrlPreviewRule : AsyncMessageRuleBase<PrivateMessage>
+    public class TwitterUrlPreviewRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly TwitterService tweetService;
         private readonly Regex rgx;
@@ -20,9 +20,9 @@ namespace ChatBeet.Rules
             rgx = new Regex(@"^(?!.*<.*>.*$).*twitter\.com\/.*\/status(?:es)?\/(\d+)", RegexOptions.IgnoreCase);
         }
 
-        public override bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
 
-        public override async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
