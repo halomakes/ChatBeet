@@ -20,7 +20,11 @@ namespace ChatBeet.Data.Entities
         ReflexivePronoun,
         [Parameter("location:weather", "ZIP Code (Weather)")]
         WeatherLocation,
-        [Parameter("location:weather", "Unit")]
-        Units
+        [Parameter("unit:weather:temperature", "Unit (Weather Temperature)")]
+        WeatherTempUnit,
+        [Parameter("unit:weather:wind", "Unit (Wind speed)")]
+        WeatherWindUnit,
+        [Parameter("unit:weather:precip", "Unit (Precipitation)")]
+        WeatherPrecipUnit
     }
 }

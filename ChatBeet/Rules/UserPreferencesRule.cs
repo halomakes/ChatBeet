@@ -54,8 +54,8 @@ namespace ChatBeet.Rules
                     }
                     else
                     {
-                        await service.Set(incomingMessage.From, preference, value);
-                        yield return new PrivateMessage(incomingMessage.From, GetConfirmationMessage(preference, value));
+                        var normalized = await service.Set(incomingMessage.From, preference, value);
+                        yield return new PrivateMessage(incomingMessage.From, GetConfirmationMessage(preference, normalized));
                     }
                 }
                 else
