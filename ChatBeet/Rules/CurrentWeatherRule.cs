@@ -29,7 +29,7 @@ namespace ChatBeet.Rules
             botConfig = options.Value;
             this.wmClient = wmClient;
             this.prefsService = prefsService;
-            rgx = new Regex($"{Regex.Escape(botConfig.CommandPrefix)}weather( .*)?");
+            rgx = new Regex($"{Regex.Escape(botConfig.CommandPrefix)}weather( \\d{{5}})?");
         }
 
         public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
