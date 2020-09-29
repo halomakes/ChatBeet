@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Services
@@ -76,6 +77,7 @@ namespace ChatBeet.Services
                 UserPreference.DateOfBirth => GetDateValidation(value),
                 UserPreference.WorkHoursEnd => GetDateValidation(value),
                 UserPreference.WorkHoursStart => GetDateValidation(value),
+                UserPreference.WeatherLocation => GetZipValidation(value),
                 _ => default
             };
         }
@@ -95,6 +97,14 @@ namespace ChatBeet.Services
             {
                 return $"{value} is not a valid date.";
             }
+            return default;
+        }
+
+        private static string GetZipValidation(string value)
+        {
+            var rgx = new Regex(@"(\d{5}(?:-\d{4})?)");
+            if (!rgx.IsMatch(value))
+                return $"{value} is not a valid ZIP code.";
             return default;
         }
     }
