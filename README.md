@@ -271,3 +271,13 @@ Example Output:
 ```
 Example Output:
 > Right now in **Mcconnelsville**: 🌡**13.94 °C** ⬆14.44 °C ⬇13.33 °C | Humidity: 93% | 0.12 in rain in past hour | Wind: 10.29 mph N | 🌫 mist, 🌧 moderate rain
+
+### Google Search
+*Google, the best way to Bing something*
+```
+.cb google mazda miata
+.cb g astolfo fate
+.cb feelinglucky oneplus
+```
+Example Output:
+> carrots: https://www.mazdausa.com/vehicles/mx-5-miata
