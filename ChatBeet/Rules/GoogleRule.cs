@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
         {
             config = options.Value;
             client = clientFactory.CreateClient();
-            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(g|google) (.*)", RegexOptions.IgnoreCase);
+            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(g|google|feelinglucky) (.*)", RegexOptions.IgnoreCase);
         }
 
         public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
