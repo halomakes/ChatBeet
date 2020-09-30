@@ -6,9 +6,11 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace ChatBeet.Rules
 {
@@ -35,15 +37,7 @@ namespace ChatBeet.Rules
             if (match.Success)
             {
                 var searchTerm = match.Groups[2].Value.Trim();
-                var queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
-
-                queryString.Add("q", searchTerm);
-                queryString.Add("btnI", string.Empty);
-
-                var uriBuilder = new UriBuilder("https://www.google.com/search")
-                {
-                    Query = queryString.ToString()
-                };
+                var uriBuilder = new UriBuilder($"https://www.google.com/search?btnI=1&q={WebUtility.UrlEncode(searchTerm)}");
 
                 var resultLink = await TryGetTargetLink(uriBuilder.Uri);
 
@@ -51,7 +45,7 @@ namespace ChatBeet.Rules
             }
         }
 
-        private async Task<string> TryGetTargetLink(Uri feelingLuckyUri)
+        private async Task<Uri> TryGetTargetLink(Uri feelingLuckyUri)
         {
             try
             {
@@ -69,15 +63,18 @@ namespace ChatBeet.Rules
                     var hrefMatch = Regex.Match(firstLink, @"href=\""(.*?)\""", RegexOptions.Singleline);
                     if (hrefMatch.Success)
                     {
-                        return hrefMatch.Groups[1].Value.Trim();
+                        var hrefValue = hrefMatch.Groups[1].Value.Trim();
+                        if (Uri.TryCreate(hrefValue, UriKind.Absolute, out var uri))
+                            if (!uri.Host.Contains("google"))
+                                return uri;
                     }
                 }
 
-                return feelingLuckyUri.ToString();
+                return feelingLuckyUri;
             }
             catch (Exception)
             {
-                return feelingLuckyUri.ToString();
+                return feelingLuckyUri;
             }
         }
     }
