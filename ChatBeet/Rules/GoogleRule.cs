@@ -1,6 +1,7 @@
 ﻿using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,13 @@ namespace ChatBeet.Rules
         private readonly IrcBotConfiguration config;
         private readonly HttpClient client;
         private readonly Regex rgx;
+        private readonly IMemoryCache cache;
 
-        public GoogleRule(IOptions<IrcBotConfiguration> options, IHttpClientFactory clientFactory)
+        public GoogleRule(IOptions<IrcBotConfiguration> options, IHttpClientFactory clientFactory, IMemoryCache cache)
         {
             config = options.Value;
             client = clientFactory.CreateClient();
+            this.cache = cache;
             rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(g|google|feelinglucky) (.*)", RegexOptions.IgnoreCase);
         }
 
@@ -52,8 +55,13 @@ namespace ChatBeet.Rules
         {
             try
             {
-                var page = await client.GetAsync(feelingLuckyUri);
-                var html = await page.Content.ReadAsStringAsync();
+                var html = await cache.GetOrCreateAsync($"google:{feelingLuckyUri}", async entry =>
+                {
+                    entry.SlidingExpiration = TimeSpan.FromMinutes(5);
+                    var page = await client.GetAsync(feelingLuckyUri);
+                    return await page.Content.ReadAsStringAsync();
+                });
+
                 var links = Regex.Matches(html, @"(<a.*?>.*?</a>)", RegexOptions.Singleline);
                 if (links.Any())
                 {
