@@ -10,7 +10,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace ChatBeet.Rules
 {
@@ -65,7 +64,7 @@ namespace ChatBeet.Rules
                     {
                         var hrefValue = hrefMatch.Groups[1].Value.Trim();
                         if (Uri.TryCreate(hrefValue, UriKind.Absolute, out var uri))
-                            if (!uri.Host.Contains("google"))
+                            if (!uri.Host.Contains("google") && (uri.Scheme == "https" || uri.Scheme == "http"))
                                 return uri;
                     }
                 }
