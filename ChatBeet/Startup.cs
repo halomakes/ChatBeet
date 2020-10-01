@@ -25,6 +25,7 @@ using Miki.Anilist;
 using PixivCS;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
@@ -94,6 +95,10 @@ namespace ChatBeet
             });
 
             services.AddHttpClient();
+            services.AddHttpClient("noredirect").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AllowAutoRedirect = false
+            });
 
             services.AddScoped<DadJokeService>();
             services.AddScoped<PixivAppAPI>();
