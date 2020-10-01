@@ -1,6 +1,8 @@
 ﻿using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
@@ -24,7 +26,7 @@ namespace ChatBeet.Rules
         public GoogleRule(IOptions<IrcBotConfiguration> options, IHttpClientFactory clientFactory, IMemoryCache cache)
         {
             config = options.Value;
-            client = clientFactory.CreateClient();
+            client = clientFactory.CreateClient("noredirect");
             this.cache = cache;
             rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(g|google|feelinglucky) (.*)", RegexOptions.IgnoreCase);
         }
@@ -49,14 +51,27 @@ namespace ChatBeet.Rules
         {
             try
             {
-                var html = await cache.GetOrCreateAsync($"google:{feelingLuckyUri}", async entry =>
+                var result = await cache.GetOrCreateAsync($"google:{feelingLuckyUri}", async entry =>
                 {
                     entry.SlidingExpiration = TimeSpan.FromMinutes(5);
                     var page = await client.GetAsync(feelingLuckyUri);
-                    return await page.Content.ReadAsStringAsync();
+                    return new GoogleResult
+                    {
+                        Uri = feelingLuckyUri,
+                        RedirectUri = page.Headers.Location,
+                        Body = await page.Content.ReadAsStringAsync()
+                    };
                 });
 
-                var links = Regex.Matches(html, @"(<a.*?>.*?</a>)", RegexOptions.Singleline);
+                if (result.RedirectUri != default && result.RedirectUri.AbsolutePath == "/url")
+                {
+                    var redirQuery = HttpUtility.ParseQueryString(result.RedirectUri.Query);
+                    var targetPath = redirQuery["q"];
+                    if (!string.IsNullOrEmpty(targetPath) && Uri.TryCreate(targetPath, UriKind.Absolute, out var targetUri))
+                        return targetUri;
+                }
+
+                var links = Regex.Matches(result.Body, @"(<a.*?>.*?</a>)", RegexOptions.Singleline);
                 if (links.Any())
                 {
                     var firstLink = links.FirstOrDefault().Value;
@@ -65,7 +80,7 @@ namespace ChatBeet.Rules
                     {
                         var hrefValue = hrefMatch.Groups[1].Value.Trim();
                         if (Uri.TryCreate(hrefValue, UriKind.Absolute, out var uri))
-                            if (!uri.Host.Contains("google"))
+                            if (!uri.Host.Contains("google") && (uri.Scheme == "https" || uri.Scheme == "http"))
                                 return uri;
                     }
                 }
@@ -76,6 +91,12 @@ namespace ChatBeet.Rules
             {
                 return feelingLuckyUri;
             }
+        }
+        private struct GoogleResult
+        {
+            public Uri Uri;
+            public string Body;
+            public Uri RedirectUri;
         }
     }
 }
