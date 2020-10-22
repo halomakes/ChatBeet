@@ -92,6 +92,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<WhoDefRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<GoogleRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
             });
 
             services.AddHttpClient();
@@ -134,6 +135,7 @@ namespace ChatBeet
             services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"));
             services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"));
             services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
+            services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
             services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();
