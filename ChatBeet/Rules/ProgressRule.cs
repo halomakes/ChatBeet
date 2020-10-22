@@ -21,7 +21,7 @@ namespace ChatBeet.Rules
 
         public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}progress (year|day|hour|minute|month|decade|century|millennium|week|yatoweek|second)", RegexOptions.IgnoreCase);
+            var rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}progress (year|day|hour|minute|month|decade|century|millennium|week|yatoweek|second|president|presidential term)", RegexOptions.IgnoreCase);
             var match = rgx.Match(incomingMessage.Message);
             if (match.Success)
             {
@@ -83,6 +83,16 @@ namespace ChatBeet.Rules
                     return Progress.GetBar(now, start, end, $"{IrcValues.BOLD}This millennium{IrcValues.RESET} is");
                 case "second":
                     return Progress.GetBar((double)now.Millisecond / 1000, $"{IrcValues.BOLD}This second{IrcValues.RESET} is");
+                case "president":
+                case "presidential term":
+                    // inauguration is July 20 at noon eastern time every 4 years (year after leap year)
+                    var termYears = 4;
+                    var startYear = now.Year - (now.Year % termYears) + 1;
+                    var easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                    var inauguration = new DateTimeOffset(new DateTime(startYear, 1, 20, 12, 0, 0, DateTimeKind.Unspecified), easternTimeZone.BaseUtcOffset);
+                    start = (inauguration > now ? inauguration.AddYears(-1 * termYears) : inauguration).DateTime;
+                    end = (inauguration > now ? inauguration : inauguration.AddYears(termYears)).DateTime;
+                    return Progress.GetBar(now, start, end, $"{IrcValues.BOLD}This presidential term{IrcValues.RESET} is");
                 default:
                     return null;
             };
