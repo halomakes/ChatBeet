@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using TimeZoneConverter;
 
 namespace ChatBeet.Rules
 {
@@ -88,7 +89,7 @@ namespace ChatBeet.Rules
                     // inauguration is July 20 at noon eastern time every 4 years (year after leap year)
                     var termYears = 4;
                     var startYear = now.Year - (now.Year % termYears) + 1;
-                    var easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                    var easternTimeZone = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
                     var inauguration = new DateTimeOffset(new DateTime(startYear, 1, 20, 12, 0, 0, DateTimeKind.Unspecified), easternTimeZone.BaseUtcOffset);
                     start = (inauguration > now ? inauguration.AddYears(-1 * termYears) : inauguration).DateTime;
                     end = (inauguration > now ? inauguration : inauguration.AddYears(termYears)).DateTime;
