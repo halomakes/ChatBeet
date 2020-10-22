@@ -27,20 +27,38 @@ namespace ChatBeet.Rules
 
         public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
-            var match = rgx.Match(incomingMessage.Message);
-            var suspect = match.Groups[2].Success ? match.Groups[2].Value : match.Groups[3].Value;
-            if (!string.IsNullOrEmpty(suspect))
+            if (incomingMessage.IsChannelMessage)
+            {
+                var match = rgx.Match(incomingMessage.Message);
+                var suspect = match.Groups[2].Success ? match.Groups[2].Value : match.Groups[3].Value;
+                if (!string.IsNullOrEmpty(suspect))
+                {
+                    db.Suspicions.Add(new Suspicion
+                    {
+                        Reporter = incomingMessage.From,
+                        Suspect = suspect.Trim(),
+                        TimeReported = DateTime.Now
+                    });
+                    await db.SaveChangesAsync();
+
+                    var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.Trim());
+
+                    yield return new PrivateMessage(incomingMessage.From, $"{suspect.ToPossessive()} suspicion level is now {suspicionLevel}.");
+
+                    yield return new PrivateMessage(suspect, $"{incomingMessage.From} reported you as acting suspicously. Your suspicion level is now {suspicionLevel}.");
+                }
+            }
+            else
             {
                 db.Suspicions.Add(new Suspicion
                 {
-                    Reporter = incomingMessage.From,
-                    Suspect = suspect.Trim(),
+                    Reporter = config.Nick,
+                    Suspect = incomingMessage.From,
                     TimeReported = DateTime.Now
                 });
                 await db.SaveChangesAsync();
-
-                var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.Trim());
-                yield return new PrivateMessage(incomingMessage.From, $"{suspect.ToPossessive()} suspicion level is now {suspicionLevel}.");
+                var suspicionLevel = await db.GetSuspicionLevelAsync(incomingMessage.From);
+                yield return new PrivateMessage(incomingMessage.From, $"Reporting someone in private messages is pretty sus. Your suspicion level just went up to {suspicionLevel}.");
             }
         }
     }
