@@ -44,7 +44,7 @@ namespace ChatBeet.Rules
                     {
                         if (await db.HasRecentlyReportedAsync(suspect, incomingMessage.From))
                         {
-                            yield return new PrivateMessage(incomingMessage.From, $"You must wait at least 2 minutes each time you raise suspicion against a user.");
+                            yield return new NoticeMessage(incomingMessage.From, $"You must wait at least 2 minutes each time you raise suspicion against a user.");
                         }
                         else
                         {
@@ -52,9 +52,9 @@ namespace ChatBeet.Rules
 
                             var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.Trim());
 
-                            yield return new PrivateMessage(incomingMessage.From, $"{suspect.ToPossessive()} suspicion level is now {suspicionLevel}.");
+                            yield return new NoticeMessage(incomingMessage.From, $"{suspect.ToPossessive()} suspicion level is now {suspicionLevel}.");
 
-                            yield return new PrivateMessage(suspect, $"{incomingMessage.From} reported you as acting suspiciously. Your suspicion level is now {suspicionLevel}.");
+                            yield return new NoticeMessage(suspect, $"{incomingMessage.From} reported you as acting suspiciously. Your suspicion level is now {suspicionLevel}.");
                         }
                     }
                 }
