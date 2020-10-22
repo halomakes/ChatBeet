@@ -86,7 +86,7 @@ namespace ChatBeet.Rules
                     return Progress.GetBar((double)now.Millisecond / 1000, $"{IrcValues.BOLD}This second{IrcValues.RESET} is");
                 case "president":
                 case "presidential term":
-                    // inauguration is July 20 at noon eastern time every 4 years (year after leap year)
+                    // inauguration is January 20 at noon eastern time every 4 years (year after leap year)
                     var termYears = 4;
                     var startYear = now.Year - (now.Year % termYears) + 1;
                     var easternTimeZone = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
