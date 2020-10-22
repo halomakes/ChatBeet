@@ -46,5 +46,7 @@ namespace ChatBeet.Utilities
         public static string RemoveLastCharacter(this string @string, char punctuationMark) => @string.EndsWith(punctuationMark) ? @string.RemoveLastCharacter() : @string;
 
         public static string RemoveLastCharacter(this string @string) => @string.Remove(@string.Length - 1, 1);
+
+        public static string ToPossessive(this string name) => name.EndsWith('s') ? $"{name}'" : $"{name}'s";
     }
 }

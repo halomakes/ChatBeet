@@ -5,7 +5,7 @@ namespace ChatBeet.Data
 {
     public class ReplacementContext : DbContext
     {
-        public ReplacementContext(DbContextOptions<ReplacementContext> optsBuilder) : base(optsBuilder) { }
+        public ReplacementContext(DbContextOptions<ReplacementContext> opts) : base(opts) { }
 
         public virtual DbSet<ReplacementSet> Sets { get; set; }
         public virtual DbSet<ReplacementMapping> Mappings { get; set; }
