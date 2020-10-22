@@ -131,6 +131,7 @@ Example Output:
 .cb progress day
 .cb progress hour
 .cb progress minute
+.cb progress president
 ```
 Example Output:
 > █████████████░░░░░░░░░░░░ **2020** is **53.55%** complete.
