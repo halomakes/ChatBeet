@@ -93,6 +93,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<GoogleRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<SuspicionLookupRule, PrivateMessage>();
             });
 
             services.AddHttpClient();

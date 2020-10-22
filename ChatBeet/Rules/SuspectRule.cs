@@ -20,7 +20,7 @@ namespace ChatBeet.Rules
         {
             config = options.Value;
             this.db = db;
-            rgx = new Regex($@"(^{Regex.Escape(config.CommandPrefix)}sus(?:pect)? (\S+))|(?:^(\S+)(?: is)? sus$)");
+            rgx = new Regex($@"(^{Regex.Escape(config.CommandPrefix)}sus(?:pect)? ({RegexUtils.Nick}))|(?:^({RegexUtils.Nick})(?: is)? sus$)");
         }
 
         public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);

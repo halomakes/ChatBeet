@@ -282,3 +282,17 @@ Example Output:
 ```
 Example Output:
 > carrots: https://www.mazdausa.com/vehicles/mx-5-miata
+
+### Raising Suspicion
+*There could be impostors among us, better report that*
+```
+carrots sus
+```
+Example Output:
+> carrots' suspicion level is now 69.
+
+```
+.cb suspicion carrots
+```
+Example output:
+> carrots' suspicion level is 69.  He is maximum sus.
