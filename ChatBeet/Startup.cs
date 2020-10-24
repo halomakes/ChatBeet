@@ -69,14 +69,12 @@ namespace ChatBeet
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
                 pipeline.RegisterAsyncRule<GifSearchRule, PrivateMessage>();
                 pipeline.RegisterRule<SentimentAnalysisRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<BooruRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, HighGroundClaim>();
                 pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ShipReactRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<BooruBlacklistRule, PrivateMessage>();
                 pipeline.RegisterRule<DrawLotsRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<PronounRule, PrivateMessage>();
