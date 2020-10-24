@@ -16,11 +16,11 @@ namespace ChatBeet.Rules
     public class GameRule : IAsyncMessageRule<PrivateMessage>
     {
         private readonly IrcBotConfiguration config;
-        private readonly IGDBApi client;
+        private readonly IGDBClient client;
         private readonly IMemoryCache memoryCache;
         private readonly Regex filter;
 
-        public GameRule(IOptions<IrcBotConfiguration> options, IGDBApi client, IMemoryCache memoryCache)
+        public GameRule(IOptions<IrcBotConfiguration> options, IGDBClient client, IMemoryCache memoryCache)
         {
             config = options.Value;
             this.client = client;
@@ -45,7 +45,7 @@ namespace ChatBeet.Rules
 limit 4;
 search ""{mediaName.Replace("\"", string.Empty)}"";";
 
-                    return (await client.QueryAsync<Game>(Client.Endpoints.Games, query))
+                    return (await client.QueryAsync<Game>(IGDBClient.Endpoints.Games, query))
                         .OrderByDescending(g => g.Name.Equals(mediaName, StringComparison.InvariantCultureIgnoreCase))
                         .FirstOrDefault();
                 });

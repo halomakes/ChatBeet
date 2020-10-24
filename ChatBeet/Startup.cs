@@ -5,9 +5,11 @@ using ChatBeet.Models;
 using ChatBeet.Rules;
 using ChatBeet.Services;
 using GravyBot;
+using GravyBot.Commands;
 using GravyBot.DefaultRules;
 using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
+using IGDB;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,6 +48,9 @@ namespace ChatBeet
         {
             services.AddControllers();
             services.AddRazorPages();
+
+            var botConfig = new ChatBeetConfiguration();
+            Configuration.Bind("Rules", botConfig);
 
             services.AddIrcBot(Configuration.GetSection("Irc"), pipeline =>
             {
@@ -94,6 +99,13 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<GoogleRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspicionLookupRule, PrivateMessage>();
+                pipeline.AddCommandOrchestrator();
+            });
+
+            services.AddCommandOrchestrator(builder =>
+            {
+                builder.RegisterProcessors(Assembly.GetExecutingAssembly());
+                builder.AddChannelPolicy("NoMain", botConfig.Policies["NoMain"]);
             });
 
             services.AddHttpClient();
@@ -120,7 +132,7 @@ namespace ChatBeet
             services.AddSingleton(provider =>
             {
                 var config = provider.GetRequiredService<IOptions<ChatBeetConfiguration>>().Value.Igdb;
-                return IGDB.Client.Create(config.ApiKey);
+                return new IGDB.IGDBClient(config.ClientId, config.ClientSecret);
             });
             services.AddScoped<BooruService>();
             services.AddScoped<UserPreferencesService>();
