@@ -65,7 +65,6 @@ namespace ChatBeet
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
                 pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WaifuRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<AnimeRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DeviantartRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<PixivRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
