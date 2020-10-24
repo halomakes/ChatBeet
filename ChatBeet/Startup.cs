@@ -61,15 +61,12 @@ namespace ChatBeet
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
                 pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<PixivRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
                 pipeline.RegisterRule<SentimentAnalysisRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<PronounRule, PrivateMessage>();
                 pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
                 pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
                 pipeline.RegisterRule<BadBotReactRule, PrivateMessage>();
@@ -81,7 +78,6 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<RecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WhoDefRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<GoogleRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspicionLookupRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
