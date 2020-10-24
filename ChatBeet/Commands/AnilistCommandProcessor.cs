@@ -52,5 +52,19 @@ namespace ChatBeet.Commands
                 );
             }
         }
+
+        [Command("waifu {query}")]
+        [Command("husbando {query}")]
+        public async Task<IClientMessage> GetCharacter(string query)
+        {
+            var character = await client.GetCharacterAsync(query);
+
+            return new PrivateMessage(
+                IncomingMessage.GetResponseTarget(),
+                character == default
+                ? $"Sorry, couldn't find that {TriggeringCommandName}."
+                : $"{character.FirstName} {character.LastName} ({character.NativeName}) - {character.LargeImageUrl} | {character.SiteUrl}"
+            );
+        }
     }
 }
