@@ -5,6 +5,7 @@ using ChatBeet.Models;
 using ChatBeet.Rules;
 using ChatBeet.Services;
 using GravyBot;
+using GravyBot.Commands;
 using GravyBot.DefaultRules;
 using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
@@ -47,39 +48,25 @@ namespace ChatBeet
             services.AddControllers();
             services.AddRazorPages();
 
+            var botConfig = new ChatBeetConfiguration();
+            Configuration.Bind("Rules", botConfig);
+
             services.AddIrcBot(Configuration.GetSection("Irc"), pipeline =>
             {
                 pipeline.AddSampleRules();
 
                 pipeline.RegisterAsyncRule<RecentTweetRule, PrivateMessage>();
                 pipeline.RegisterRule<AutoYatoRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<ArtistRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<TrackRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<RememberRule, PrivateMessage>();
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
                 pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<WaifuRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<AnimeRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<DeviantartRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<PixivRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
-                pipeline.RegisterRule<ProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
-                pipeline.RegisterAsyncRule<GifSearchRule, PrivateMessage>();
                 pipeline.RegisterRule<SentimentAnalysisRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<BooruRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
-                pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
-                pipeline.RegisterRule<HighGroundRule, HighGroundClaim>();
-                pipeline.RegisterAsyncRule<GameRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<ShipReactRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<BooruBlacklistRule, PrivateMessage>();
-                pipeline.RegisterRule<DrawLotsRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<PronounRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<WorkdayProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
                 pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
                 pipeline.RegisterRule<BadBotReactRule, PrivateMessage>();
@@ -91,9 +78,15 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<RecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<WhoDefRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<GoogleRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspicionLookupRule, PrivateMessage>();
+                pipeline.AddCommandOrchestrator();
+            });
+
+            services.AddCommandOrchestrator(builder =>
+            {
+                builder.RegisterProcessors(Assembly.GetExecutingAssembly());
+                builder.AddChannelPolicy("NoMain", botConfig.Policies["NoMain"]);
             });
 
             services.AddHttpClient();
@@ -120,7 +113,7 @@ namespace ChatBeet
             services.AddSingleton(provider =>
             {
                 var config = provider.GetRequiredService<IOptions<ChatBeetConfiguration>>().Value.Igdb;
-                return IGDB.Client.Create(config.ApiKey);
+                return new IGDB.IGDBClient(config.ClientId, config.ClientSecret);
             });
             services.AddScoped<BooruService>();
             services.AddScoped<UserPreferencesService>();

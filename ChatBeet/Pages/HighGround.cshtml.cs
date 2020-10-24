@@ -1,5 +1,4 @@
-using ChatBeet.Models;
-using ChatBeet.Rules;
+using ChatBeet.Commands;
 using ChatBeet.Utilities;
 using GravyBot;
 using Microsoft.AspNetCore.Mvc;
@@ -24,21 +23,12 @@ namespace ChatBeet.Pages
 
         public void OnGet()
         {
-            if (HighGroundRule.HighestNicks.AsEnumerable().Any())
+            if (HighGroundCommandProcessor.HighestNicks.AsEnumerable().Any())
             {
-                var top = HighGroundRule.HighestNicks.AsEnumerable().PickRandom();
+                var top = HighGroundCommandProcessor.HighestNicks.AsEnumerable().PickRandom();
                 Nick = top.Value;
                 Channel = top.Key;
             }
-        }
-
-        public IActionResult OnPost()
-        {
-            if (User?.Identity?.IsAuthenticated ?? false && !string.IsNullOrEmpty(Channel) && Channel.StartsWith("#"))
-            {
-                queueService.Push(new HighGroundClaim { Nick = User.GetNick(), Channel = Channel });
-            }
-            return RedirectToPage("/HighGround");
         }
     }
 }

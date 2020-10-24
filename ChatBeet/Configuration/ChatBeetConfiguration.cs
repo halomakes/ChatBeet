@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GravyBot.Commands;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace ChatBeet.Configuration
@@ -15,6 +16,7 @@ namespace ChatBeet.Configuration
         public IEnumerable<string> NegativeResponses { get; set; }
         public MessageCollectionConfiguration MessageCollection { get; set; } = new MessageCollectionConfiguration();
         public Dictionary<string, string> Urls { get; set; }
+        public Dictionary<string, ChannelPolicy> Policies { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
 
         public class TwitterConfiguration
@@ -45,7 +47,8 @@ namespace ChatBeet.Configuration
 
         public class IgdbConfiguration
         {
-            public string ApiKey { get; set; }
+            public string ClientId { get; set; }
+            public string ClientSecret { get; set; }
         }
 
         public class BooruConfiguration

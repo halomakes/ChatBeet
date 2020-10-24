@@ -1,12 +1,8 @@
 ﻿using ChatBeet.Utilities;
-using GravyBot;
+using GravyBot.Commands;
 using GravyIrc.Messages;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -14,37 +10,27 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Commands
 {
-    public class GoogleRule : IAsyncMessageRule<PrivateMessage>
+    public class GoogleCommandProcessor : CommandProcessor
     {
-        private readonly IrcBotConfiguration config;
         private readonly HttpClient client;
-        private readonly Regex rgx;
         private readonly IMemoryCache cache;
 
-        public GoogleRule(IOptions<IrcBotConfiguration> options, IHttpClientFactory clientFactory, IMemoryCache cache)
+        public GoogleCommandProcessor(IHttpClientFactory clientFactory, IMemoryCache cache)
         {
-            config = options.Value;
             client = clientFactory.CreateClient("noredirect");
             this.cache = cache;
-            rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}(g|google|feelinglucky) (.*)", RegexOptions.IgnoreCase);
         }
 
-        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
-
-        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        [Command("google {query}")]
+        [Command("feelinglucky {query}")]
+        public async Task<IClientMessage> Search(string query)
         {
-            var match = rgx.Match(incomingMessage.Message);
-            if (match.Success)
-            {
-                var searchTerm = match.Groups[2].Value.Trim();
-                var uriBuilder = new UriBuilder($"https://www.google.com/search?btnI=1&q={WebUtility.UrlEncode(searchTerm)}");
+            var uriBuilder = new UriBuilder($"https://www.google.com/search?btnI=1&q={WebUtility.UrlEncode(query)}");
+            var resultLink = await TryGetTargetLink(uriBuilder.Uri);
 
-                var resultLink = await TryGetTargetLink(uriBuilder.Uri);
-
-                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"{incomingMessage.From}: {resultLink}");
-            }
+            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"{IncomingMessage.From}: {resultLink}");
         }
 
         private async Task<Uri> TryGetTargetLink(Uri feelingLuckyUri)
@@ -92,6 +78,7 @@ namespace ChatBeet.Rules
                 return feelingLuckyUri;
             }
         }
+
         private struct GoogleResult
         {
             public Uri Uri;
