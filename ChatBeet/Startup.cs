@@ -58,13 +58,10 @@ namespace ChatBeet
 
                 pipeline.RegisterAsyncRule<RecentTweetRule, PrivateMessage>();
                 pipeline.RegisterRule<AutoYatoRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<ArtistRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<TrackRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<RememberRule, PrivateMessage>();
                 pipeline.RegisterRule<KerningRule, PrivateMessage>();
                 pipeline.RegisterRule<MockingTextRule, PrivateMessage>();
                 pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<WaifuRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DeviantartRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<PixivRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
