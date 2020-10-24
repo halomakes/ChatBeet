@@ -1,36 +1,44 @@
-﻿using ChatBeet.Configuration;
+﻿using ChatBeet.Attributes;
+using ChatBeet.Configuration;
+using ChatBeet.Data.Entities;
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
+using GravyBot.Commands;
 using GravyIrc.Messages;
 using Humanizer;
-using Microsoft.Extensions.Options;
+using IF.Lastfm.Core.Api.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using TimeZoneConverter;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Commands
 {
-    public class ProgressRule : IMessageRule<PrivateMessage>
+    public class ProgressCommandProcessor : CommandProcessor
     {
-        private readonly IrcBotConfiguration config;
+        private readonly UserPreferencesService preferences;
 
-        public ProgressRule(IOptions<IrcBotConfiguration> opts)
+        public ProgressCommandProcessor(UserPreferencesService preferences)
         {
-            config = opts.Value;
+            this.preferences = preferences;
         }
 
-        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        [Command("progress {timeUnit}")]
+        [RateLimit(5, TimeUnit.Minute)]
+        public async IAsyncEnumerable<IClientMessage> Respond(string timeUnit)
         {
-            var rgx = new Regex($"^{Regex.Escape(config.CommandPrefix)}progress (year|day|hour|minute|month|decade|century|millennium|week|yatoweek|second|president|presidential term)", RegexOptions.IgnoreCase);
-            var match = rgx.Match(incomingMessage.Message);
-            if (match.Success)
+            if (timeUnit != "workday")
             {
-                var bar = GetProgressBar(match.Groups[1].Value);
+                var bar = GetProgressBar(timeUnit);
                 if (!string.IsNullOrEmpty(bar))
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), bar);
+                    yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), bar);
                 }
+            }
+            else
+            {
+                yield return await GetWorkdayProgress();
             }
         }
 
@@ -97,6 +105,57 @@ namespace ChatBeet.Rules
                 default:
                     return null;
             };
+        }
+
+        public async Task<IClientMessage> GetWorkdayProgress()
+        {
+            var startPref = await preferences.Get(IncomingMessage.From, UserPreference.WorkHoursStart);
+            var endPref = await preferences.Get(IncomingMessage.From, UserPreference.WorkHoursEnd);
+
+            if (!IsValidDate(startPref))
+            {
+                var description = UserPreference.WorkHoursStart.GetAttribute<ParameterAttribute>().DisplayName;
+                return new PrivateMessage(IncomingMessage.From, $"No valid value set for preference {IrcValues.ITALIC}{description}{IrcValues.RESET}");
+            }
+            else if (!IsValidDate(endPref))
+            {
+                var description = UserPreference.WorkHoursEnd.GetAttribute<ParameterAttribute>().DisplayName;
+                return new PrivateMessage(IncomingMessage.From, $"No valid value set for preference {IrcValues.ITALIC}{description}{IrcValues.RESET}");
+            }
+            else
+            {
+                var now = DateTime.Now;
+                var start = NormalizeTime(DateTime.Parse(startPref), now);
+                var end = NormalizeTime(DateTime.Parse(endPref), now);
+
+                if (end < start)
+                {
+                    // handle overnight shifts
+                    if (start < now)
+                    {
+                        end = end.AddDays(1);
+                    }
+                    else
+                    {
+                        start = start.AddDays(-1);
+                    }
+                }
+
+                if (start <= now && end >= now)
+                {
+                    var bar = Progress.GetBar(now, start, end, $"{IrcValues.BOLD}Your workday{IrcValues.RESET} is");
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), bar);
+                }
+                else
+                {
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"You are outside of working hours.");
+                }
+            }
+
+            static bool IsValidDate(string val) => !string.IsNullOrEmpty(val) && DateTime.TryParse(val, out var _);
+
+            static DateTime NormalizeTime(DateTime date, DateTime baseline) =>
+                new DateTime(baseline.Year, baseline.Month, baseline.Day, date.Hour, date.Minute, date.Second);
         }
     }
 }
