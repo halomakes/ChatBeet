@@ -67,7 +67,6 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
                 pipeline.RegisterRule<ProgressRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
-                pipeline.RegisterAsyncRule<GifSearchRule, PrivateMessage>();
                 pipeline.RegisterRule<SentimentAnalysisRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterRule<HighGroundRule, PrivateMessage>();
