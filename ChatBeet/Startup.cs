@@ -76,7 +76,6 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<CommandingRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<SuspicionLookupRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
             });
 
