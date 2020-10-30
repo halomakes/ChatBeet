@@ -63,7 +63,6 @@ namespace ChatBeet
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
                 pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
                 pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
                 pipeline.RegisterRule<DefUpdatedRule, DefinitionChange>();
