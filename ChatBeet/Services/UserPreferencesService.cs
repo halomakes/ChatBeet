@@ -87,7 +87,7 @@ namespace ChatBeet.Services
 
         public Task<List<UserPreferenceSetting>> Get(IEnumerable<string> nicks, UserPreference preference) => db.PreferenceSettings.AsQueryable()
             .Where(p => p.Preference == preference)
-            .Where(p => nicks.Contains(p.Nick))
+            .Where(p => nicks.Select(n => n.ToLower()).Contains(p.Nick.ToLower()))
             .ToListAsync();
 
         public string GetValidation(UserPreference preference, string value)

@@ -41,6 +41,7 @@
                             <div class="dropdown-menu" aria-labelledby="statsDropdown">
                                 <a class="dropdown-item" asp-page="/Tags/Index">Tags</a>
                                 <a class="dropdown-item" asp-page="/Keywords/Index">Keywords</a>
+                                <a class="dropdown-item" asp-page="/Crewmates">Crewmates</a>
                             </div>
                         </li>
                         <li class="nav-item dropdown">
@@ -50,7 +51,6 @@
                             <div class="dropdown-menu" aria-labelledby="infoDropdown">
                                 <a class="dropdown-item" asp-page="/Defs">Definitions</a>
                                 <a class="dropdown-item" asp-page="/HighGround">The High Ground</a>
-                                <a class="dropdown-item" asp-page="/Crewmates">Crewmates</a>
                                 @if (isLoggedIn)
                                 {
                                     <a class="dropdown-item" asp-page="/Replacements/Index">Replacement Sets</a>

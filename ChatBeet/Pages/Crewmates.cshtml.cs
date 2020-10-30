@@ -3,6 +3,7 @@ using ChatBeet.Data.Entities;
 using ChatBeet.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,11 +35,15 @@ namespace ChatBeet.Pages
 
             var colorPrefs = await userPreferencesService.Get(mostSuspicious.Select(s => s.Nick), UserPreference.GearColor);
 
-            Ranks = mostSuspicious.Select(s => new SuspicionRank
+            Ranks = mostSuspicious.Select(s =>
             {
-                Nick = s.Nick,
-                Level = s.Count,
-                Color = colorPrefs.Where(p => p.Nick == s.Nick).Select(p => p.Value).FirstOrDefault()
+                var pref = colorPrefs.FirstOrDefault(p => p.Nick.Equals(s.Nick, StringComparison.OrdinalIgnoreCase));
+                return new SuspicionRank
+                {
+                    Nick = pref?.Nick ?? s.Nick,
+                    Level = s.Count,
+                    Color = pref?.Value
+                };
             }).ToList();
         }
 
