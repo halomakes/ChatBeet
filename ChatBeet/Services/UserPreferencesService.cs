@@ -85,6 +85,11 @@ namespace ChatBeet.Services
 
         public Task<List<UserPreferenceSetting>> Get(string nick) => db.PreferenceSettings.AsQueryable().Where(p => p.Nick == nick).ToListAsync();
 
+        public Task<List<UserPreferenceSetting>> Get(IEnumerable<string> nicks, UserPreference preference) => db.PreferenceSettings.AsQueryable()
+            .Where(p => p.Preference == preference)
+            .Where(p => nicks.Contains(p.Nick))
+            .ToListAsync();
+
         public string GetValidation(UserPreference preference, string value)
         {
             var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
