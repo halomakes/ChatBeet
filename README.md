@@ -221,19 +221,20 @@ Example Output:
 
 #### Available Preferences
 
-| Preference               | Description                    | Type                                                                                                                    |
-|--------------------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| birthday                 | Date of Birth                  | DateTime                                                                                                                |
-| pronoun:subject          | Pronoun (Subject)              | string                                                                                                                  |
-| pronoun:object           | Pronoun (Object)               | string                                                                                                                  |
-| pronoun:possessive       | Pronoun (Possessive)           | string                                                                                                                  |
-| pronoun:reflexive        | Pronoun (Reflexive)            | string                                                                                                                  |
-| work:start               | Starting Time of Workday       | DateTime                                                                                                                |
-| work:end                 | Ending Time of Workday         | DateTime                                                                                                                |
-| location:weather         | Default location for weather   | string:ZIP Code                                                                                                         |
-| unit:weather:temperature | Units to use for temperature   | [TemperatureUnit](https://github.com/angularsen/UnitsNet/blob/master/UnitsNet/GeneratedCode/Units/TemperatureUnit.g.cs) |
-| unit:weather:wind        | Units to use for wind          | [SpeedUnit](https://github.com/angularsen/UnitsNet/blob/master/UnitsNet/GeneratedCode/Units/SpeedUnit.g.cs)             |
-| unit:weather:precip      | Units to use for precipitation | [LengthUnit](https://github.com/angularsen/UnitsNet/blob/master/UnitsNet/GeneratedCode/Units/LengthUnit.g.cs)           |
+| Preference               | Description                              | Type                                                                                                                    |
+|--------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| birthday                 | Date of Birth                            | DateTime                                                                                                                |
+| pronoun:subject          | Pronoun (Subject)                        | string                                                                                                                  |
+| pronoun:object           | Pronoun (Object)                         | string                                                                                                                  |
+| pronoun:possessive       | Pronoun (Possessive)                     | string                                                                                                                  |
+| pronoun:reflexive        | Pronoun (Reflexive)                      | string                                                                                                                  |
+| work:start               | Starting Time of Workday                 | DateTime                                                                                                                |
+| work:end                 | Ending Time of Workday                   | DateTime                                                                                                                |
+| location:weather         | Default location for weather             | string:ZIP Code                                                                                                         |
+| unit:weather:temperature | Units to use for temperature             | [TemperatureUnit](https://github.com/angularsen/UnitsNet/blob/master/UnitsNet/GeneratedCode/Units/TemperatureUnit.g.cs) |
+| unit:weather:wind        | Units to use for wind                    | [SpeedUnit](https://github.com/angularsen/UnitsNet/blob/master/UnitsNet/GeneratedCode/Units/SpeedUnit.g.cs)             |
+| unit:weather:precip      | Units to use for precipitation           | [LengthUnit](https://github.com/angularsen/UnitsNet/blob/master/UnitsNet/GeneratedCode/Units/LengthUnit.g.cs)           |
+| color:gear               | Color to apply to your gear in the WebUI | string (Hex Color Code)                                                                                                 |
 
 #### Specific Examples
 

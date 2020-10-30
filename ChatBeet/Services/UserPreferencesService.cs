@@ -85,6 +85,11 @@ namespace ChatBeet.Services
 
         public Task<List<UserPreferenceSetting>> Get(string nick) => db.PreferenceSettings.AsQueryable().Where(p => p.Nick == nick).ToListAsync();
 
+        public Task<List<UserPreferenceSetting>> Get(IEnumerable<string> nicks, UserPreference preference) => db.PreferenceSettings.AsQueryable()
+            .Where(p => p.Preference == preference)
+            .Where(p => nicks.Contains(p.Nick))
+            .ToListAsync();
+
         public string GetValidation(UserPreference preference, string value)
         {
             var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
@@ -101,6 +106,7 @@ namespace ChatBeet.Services
                 UserPreference.WeatherTempUnit => GetUnitValidation<TemperatureUnit>(value, displayName),
                 UserPreference.WeatherPrecipUnit => GetUnitValidation<LengthUnit>(value, displayName),
                 UserPreference.WeatherWindUnit => GetUnitValidation<SpeedUnit>(value, displayName),
+                UserPreference.GearColor => GetColorValidation(value),
                 _ => default
             };
         }
@@ -169,6 +175,14 @@ namespace ChatBeet.Services
             if (UnitParser.Default.TryParse<TEnum>(value, out var _))
                 return default;
             else return GetEnumValidation<TEnum>(value, displayName);
+        }
+
+        private static string GetColorValidation(string value)
+        {
+            var rgx = new Regex(@"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
+            if (!rgx.IsMatch(value))
+                return $"{value} is not a valid color in Hex format.";
+            return default;
         }
     }
 }

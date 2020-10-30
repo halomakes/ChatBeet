@@ -1,16 +1,13 @@
-﻿using ChatBeet.Configuration;
-using ChatBeet.Data.Entities;
+﻿using ChatBeet.Data.Entities;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
-using OpenWeatherMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using UnitsNet;
 using UnitsNet.Units;
 using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
