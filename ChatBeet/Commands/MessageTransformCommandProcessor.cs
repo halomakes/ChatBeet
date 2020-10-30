@@ -46,5 +46,8 @@ namespace ChatBeet.Commands
                 return string.Join(string.Empty, joined).Trim();
             });
         }
+
+        private IClientMessage Process(string nick, Func<string, string> transformer) =>
+            Process(nick, lookupMessage => new PrivateMessage(IncomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {transformer(lookupMessage.Message)}"));
     }
 }

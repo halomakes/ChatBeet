@@ -21,7 +21,7 @@ namespace ChatBeet.Commands
             configuration = options.Value;
         }
 
-        protected IClientMessage Process(string nick, Func<string, string> transformer)
+        protected virtual IClientMessage Process(string nick, Func<PrivateMessage, IClientMessage> action)
         {
             if (nick.Equals(configuration.Nick, StringComparison.InvariantCultureIgnoreCase))
                 return negativeResponseService.GetResponse(IncomingMessage);
@@ -31,7 +31,7 @@ namespace ChatBeet.Commands
             if (lookupMessage == null)
                 return NotFound(nick);
 
-            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {transformer(lookupMessage.Message)}");
+            return action(lookupMessage);
         }
 
         private PrivateMessage GetLatestMessage(string nick) => messageQueueService.GetLatestMessage(nick, IncomingMessage.To, IncomingMessage);

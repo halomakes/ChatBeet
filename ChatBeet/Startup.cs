@@ -61,7 +61,6 @@ namespace ChatBeet
                 pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
                 pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
-                pipeline.RegisterRule<SentimentAnalysisRule, PrivateMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
