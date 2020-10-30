@@ -75,8 +75,8 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<BirthdaysRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<KeywordRule, PrivateMessage>();
                 pipeline.RegisterRule<StackTraceRule, Exception>();
-                pipeline.RegisterAsyncRule<RecallRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<WhoDefRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<InterrogativeRecallRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<CommandingRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspicionLookupRule, PrivateMessage>();

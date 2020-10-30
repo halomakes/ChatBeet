@@ -22,9 +22,9 @@ namespace ChatBeet.Rules
             ServiceProvider = serviceProvider;
         }
 
-        public bool Matches(PrivateMessage incomingMessage) => Pattern.IsMatch(incomingMessage.Message);
+        public virtual bool Matches(PrivateMessage incomingMessage) => Pattern.IsMatch(incomingMessage.Message);
 
-        public IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        public virtual IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
         {
             var processor = ServiceProvider.GetService<TProcessor>();
             processor.IncomingMessage = incomingMessage;
