@@ -86,7 +86,7 @@ namespace ChatBeet.Commands
             if (!string.IsNullOrEmpty(suspect))
             {
                 var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.Trim());
-                var maxLevel = await db.Suspicions.AsQueryable().GroupBy(s => s.Suspect).MaxAsync(g => g.Count());
+                var maxLevel = await db.Suspicions.AsQueryable().GroupBy(s => s.Suspect.ToLower()).MaxAsync(g => g.Count());
 
                 var descriptor = GetSuspicionDescriptor(suspicionLevel, maxLevel);
 
