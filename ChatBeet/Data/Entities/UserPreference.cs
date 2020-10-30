@@ -25,6 +25,8 @@ namespace ChatBeet.Data.Entities
         [Parameter("unit:weather:wind", "Unit (Wind speed)")]
         WeatherWindUnit,
         [Parameter("unit:weather:precip", "Unit (Precipitation)")]
-        WeatherPrecipUnit
+        WeatherPrecipUnit,
+        [Parameter("color:gear", "Gear Color")]
+        GearColor
     }
 }
