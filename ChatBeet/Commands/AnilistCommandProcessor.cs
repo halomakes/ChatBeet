@@ -17,10 +17,10 @@ namespace ChatBeet.Commands
             this.client = client;
         }
 
-        [Command("anime {query}")]
-        [Command("manga {query}")]
-        [Command("ln {query}")]
-        [Command("ova {query}")]
+        [Command("anime {query}", Description = "Get information about an anime series from AniList")]
+        [Command("manga {query}", Description = "Get infomration about a manga from AniList")]
+        [Command("ln {query}", Description = "Get information about a light novel from AniList")]
+        [Command("ova {query}", Description = "Get information about an anime OVA from AniList")]
         public async Task<IClientMessage> GetMedia(string query)
         {
             var type = TriggeringCommandName switch
@@ -53,8 +53,8 @@ namespace ChatBeet.Commands
             }
         }
 
-        [Command("waifu {query}")]
-        [Command("husbando {query}")]
+        [Command("waifu {query}", Description = "Get information about a character from AniList")]
+        [Command("husbando {query}", Description = "Get information about a character from AniList")]
         public async Task<IClientMessage> GetCharacter(string query)
         {
             var character = await client.GetCharacterAsync(query);

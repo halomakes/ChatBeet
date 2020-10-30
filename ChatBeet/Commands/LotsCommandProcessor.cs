@@ -13,7 +13,7 @@ namespace ChatBeet.Commands
         private static readonly int godChance = 10_000_000;
         private static readonly int godLength = 32;
 
-        [Command("lots")]
+        [Command("lots", Description = "Draw a lot to compare with other users.")]
         [Command("epeen")]
         [RateLimit(5, TimeUnit.Minute)]
         public IClientMessage GetLot()

@@ -23,7 +23,7 @@ namespace ChatBeet.Commands
             this.negativeResponseService = negativeResponseService;
         }
 
-        [Command("pronouns {nick}")]
+        [Command("pronouns {nick}", Description = "Get preferred pronouns for a user.")]
         public async Task<IClientMessage> GetPronouns(string nick)
         {
             if (nick.Equals(config.Nick, StringComparison.InvariantCultureIgnoreCase))

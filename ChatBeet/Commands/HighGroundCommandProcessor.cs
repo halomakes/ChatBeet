@@ -8,8 +8,8 @@ namespace ChatBeet.Commands
     {
         public static readonly Dictionary<string, string> HighestNicks = new Dictionary<string, string>();
 
-        [Command("jump")]
-        [Command("climb")]
+        [Command("jump", Description = "Claim the high ground.")]
+        [Command("climb", Description = "Claim the high ground.")]
         [ChannelOnly]
         [RateLimit(5, TimeUnit.Minute)]
         public IClientMessage Claim()

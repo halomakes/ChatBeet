@@ -66,7 +66,6 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<UserPreferencesRule, PrivateMessage>();
                 pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
                 pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
-                pipeline.RegisterRule<BadBotReactRule, PrivateMessage>();
                 pipeline.RegisterRule<DefUpdatedRule, DefinitionChange>();
                 pipeline.RegisterRule<UserPreferencesRule, PreferenceChange>();
                 pipeline.RegisterAsyncRule<BirthdaysRule, PrivateMessage>();
@@ -82,6 +81,7 @@ namespace ChatBeet
             services.AddCommandOrchestrator(builder =>
             {
                 builder.RegisterProcessors(Assembly.GetExecutingAssembly());
+                builder.RegisterProcessor<HelpCommandProcessor>();
                 builder.AddChannelPolicy("NoMain", botConfig.Policies["NoMain"]);
             });
 

@@ -16,14 +16,14 @@ namespace ChatBeet.Commands
         public MessageTransformCommandProcessor(MessageQueueService messageQueueService, NegativeResponseService negativeResponseService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, negativeResponseService, options) { }
         private static readonly Regex SpacingRegex = new Regex(@"([\x00-\x7F])");
 
-        [Command("kern {nick}")]
+        [Command("kern {nick}", Description = "Make someone's text uppercase and space it out.")]
         [ChannelOnly]
         public IClientMessage Kern(string nick)
         {
             return Process(nick, lookupMessage => SpacingRegex.Replace(lookupMessage, " $1").Replace("   ", "  ").Trim().ToUpperInvariant());
         }
 
-        [Command("mock {nick}")]
+        [Command("mock {nick}", Description = "Apply random casing to each letter in someone's message.")]
         [ChannelOnly]
         public IClientMessage Mock(string nick)
         {
@@ -33,7 +33,7 @@ namespace ChatBeet.Commands
             return Process(nick, lookupMessage => string.Concat(lookupMessage.ToCharArray().Select(RandomizeCase)));
         }
 
-        [Command("colorize {nick}")]
+        [Command("colorize {nick}", Description = "Apply random colors to someone's message")]
         [ChannelOnly]
         public IClientMessage Colorize(string nick)
         {

@@ -16,7 +16,7 @@ namespace ChatBeet.Commands
             this.tweetService = tweetService;
         }
 
-        [Command("tweet {username}")]
+        [Command("tweet {username}", Description = "Get the latest tweet from a user.")]
         public async Task<IClientMessage> GetRecentTweet(string username)
         {
             try

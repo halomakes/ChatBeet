@@ -17,7 +17,7 @@ namespace ChatBeet.Commands
             this.dbContext = dbContext;
         }
 
-        [Command("whodef {key}")]
+        [Command("whodef {key}", Description = "Check who set a peasant definition.")]
         public async Task<IClientMessage> GetAuthor(string key)
         {
             var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
@@ -31,7 +31,7 @@ namespace ChatBeet.Commands
                 return NotFound(key);
         }
 
-        [Command("recall {key}")]
+        [Command("recall {key}", Description = "Get the value of a peasant definition.")]
         public async Task<IClientMessage> GetCell(string key)
         {
             var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());

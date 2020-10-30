@@ -16,7 +16,7 @@ namespace ChatBeet.Commands
             this.gifService = gifService;
         }
 
-        [Command("gif {query}")]
+        [Command("gif {query}", Description = "Search for a GIF on Tenor")]
         public async Task<IClientMessage> SearchGifs(string query)
         {
             if (!string.IsNullOrEmpty(query))

@@ -16,8 +16,8 @@ namespace ChatBeet.Commands
             this.daService = daService;
         }
 
-        [Command("da {query}")]
-        [Command("deviantart {query}")]
+        [Command("da {query}", Description = "Get a random deviation from DeviantArt.")]
+        [Command("deviantart {query}", Description ="Get a random deviation from DeviantArt.")]
         [ChannelPolicy("NoMain")]
         public async Task<IClientMessage> GetRandomDeviation(string query)
         {

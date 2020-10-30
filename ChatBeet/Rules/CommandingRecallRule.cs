@@ -1,6 +1,7 @@
 ﻿using ChatBeet.Commands;
 using ChatBeet.Utilities;
 using GravyBot;
+using GravyBot.Commands;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System;

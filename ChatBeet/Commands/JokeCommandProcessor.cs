@@ -15,7 +15,7 @@ namespace ChatBeet.Commands
             this.jokeService = jokeService;
         }
 
-        [Command("joke")]
+        [Command("joke", Description = "Get a random (bad) joke.")]
         public async Task<IClientMessage> GetJoke()
         {
             var joke = await jokeService.GetDadJokeAsync();

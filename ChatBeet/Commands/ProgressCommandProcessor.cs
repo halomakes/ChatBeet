@@ -24,7 +24,7 @@ namespace ChatBeet.Commands
             this.preferences = preferences;
         }
 
-        [Command("progress {timeUnit}")]
+        [Command("progress {timeUnit}", Description = "Gets progress over a period of time. Options include year, day, hour, workday, president.")]
         [RateLimit(5, TimeUnit.Minute)]
         public async IAsyncEnumerable<IClientMessage> Respond(string timeUnit)
         {
@@ -42,7 +42,7 @@ namespace ChatBeet.Commands
             }
         }
 
-        private static string GetProgressBar(string mode)
+        private string GetProgressBar(string mode)
         {
             var now = DateTime.Now;
             DateTime start;
@@ -103,6 +103,7 @@ namespace ChatBeet.Commands
                     end = (inauguration > now ? inauguration : inauguration.AddYears(termYears)).DateTime;
                     return Progress.GetBar(now, start, end, $"{IrcValues.BOLD}This presidential term{IrcValues.RESET} is");
                 default:
+                    BypassRateLimit();
                     return null;
             };
         }

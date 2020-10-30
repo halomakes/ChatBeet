@@ -34,7 +34,7 @@ namespace ChatBeet.Commands
             (0.95F, "😁", "extremely positive")
         };
 
-        [Command("sentiment {nick}")]
+        [Command("sentiment {nick}", Description = "Try to assess the negativity of a user's recent messages.")]
         [ChannelOnly]
         public IClientMessage Analyze(string nick)
         {

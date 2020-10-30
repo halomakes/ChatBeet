@@ -23,8 +23,8 @@ namespace ChatBeet.Commands
             this.cache = cache;
         }
 
-        [Command("google {query}")]
-        [Command("feelinglucky {query}")]
+        [Command("google {query}", Description = "Look something up on Google using I'm Feeling Lucky")]
+        [Command("feelinglucky {query}", Description = "Look something up on Google using I'm Feeling Lucky")]
         public async Task<IClientMessage> Search(string query)
         {
             var uriBuilder = new UriBuilder($"https://www.google.com/search?btnI=1&q={WebUtility.UrlEncode(query)}");

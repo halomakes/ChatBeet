@@ -18,7 +18,7 @@ namespace ChatBeet.Commands
             this.lastFm = lastFm;
         }
 
-        [Command("artist {name}")]
+        [Command("artist {name}", Description = "Look up an artist on Last.fm")]
         public async IAsyncEnumerable<IClientMessage> GetArtist(string name)
         {
             var artist = await lastFm.GetArtistInfo(name);
@@ -61,7 +61,7 @@ namespace ChatBeet.Commands
             }
         }
 
-        [Command("track {trackName} by {artistName}")]
+        [Command("track {trackName} by {artistName}", Description = "Look up a track on Last.fm")]
         public async Task<IClientMessage> GetTrack(string trackName, string artistName)
         {
             var track = await lastFm.GetTrackInfo(trackName, artistName);

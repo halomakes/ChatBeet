@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using PixivCS;
 using PixivCS.Objects;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,20 +15,18 @@ namespace ChatBeet.Commands
 {
     public class PixivCommandProcessor : CommandProcessor
     {
-        private readonly IrcBotConfiguration config;
         private readonly ChatBeetConfiguration.PixivConfiguration pixivConfig;
         private readonly PixivAppAPI pixiv;
         private readonly IMemoryCache cache;
 
-        public PixivCommandProcessor(IOptions<IrcBotConfiguration> options, IOptions<ChatBeetConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
+        public PixivCommandProcessor(IOptions<ChatBeetConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
         {
-            config = options.Value;
             pixivConfig = dtlaOptions.Value.Pixiv;
             this.pixiv = pixiv;
             this.cache = cache;
         }
 
-        [Command("pixiv {query}")]
+        [Command("pixiv {query}", Description = "Get a random artwork from Pixiv.")]
         [ChannelPolicy("NoMain")]
         public async Task<IClientMessage> RespondAsync(string query)
         {

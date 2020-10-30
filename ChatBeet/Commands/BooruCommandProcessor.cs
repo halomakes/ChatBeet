@@ -21,8 +21,8 @@ namespace ChatBeet.Commands
             this.booru = booru;
         }
 
-        [Command("booru {tagList}")]
-        [Command("nsfwbooru {tagList}")]
+        [Command("booru {tagList}", Description = "Get a random image from gelbooru matching tags (safe only).")]
+        [Command("nsfwbooru {tagList}", Description = "Get a random image from gelbooru matching tags (questionable and explicit only).")]
         [ChannelPolicy("NoMain")]
         public async IAsyncEnumerable<IClientMessage> GetRandomPost(string tagList)
         {
@@ -31,25 +31,16 @@ namespace ChatBeet.Commands
 
             if (tags.Any())
             {
-                var leading = tags.FirstOrDefault();
-                if (leading == "blacklist" || leading == "whitelist")
+                var text = await booru.GetRandomPostAsync(applyFilter, IncomingMessage.From, tags);
+
+                if (text != default)
                 {
-                    await foreach (var res in HandleBlacklistCommand(leading, tags))
-                        yield return res;
+                    await booru.RecordTags(IncomingMessage.From, tags);
+                    yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), text);
                 }
                 else
                 {
-                    var text = await booru.GetRandomPostAsync(applyFilter, IncomingMessage.From, tags);
-
-                    if (text != default)
-                    {
-                        await booru.RecordTags(IncomingMessage.From, tags);
-                        yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), text);
-                    }
-                    else
-                    {
-                        yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tagList}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
-                    }
+                    yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tagList}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
                 }
             }
             else
@@ -58,15 +49,17 @@ namespace ChatBeet.Commands
             }
         }
 
-        private IAsyncEnumerable<IClientMessage> HandleBlacklistCommand(string command, IEnumerable<string> tags)
+        [Command("booru whitelist {tagList}", Description = "Remove tag(s) from your blacklist.")]
+        [Command("booru blacklist {tagList}", Description = "Add tag(s) to your blacklist.")]
+        public IAsyncEnumerable<IClientMessage> HandleBlacklistCommand(string tagList)
         {
-            var filteredTags = tags.Where(t => t != command);
-            if (!filteredTags.Any())
+            var tags = tagList?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            if (tags == default || !tags.Any())
                 return ListTags();
-            return command switch
+            return TriggeringCommandName switch
             {
-                "whitelist" => WhitelistTags(filteredTags),
-                "blacklist" => BlacklistTags(filteredTags),
+                "booru whitelist" => WhitelistTags(tags),
+                "booru blacklist" => BlacklistTags(tags),
                 _ => AsyncEnumerable.Empty<IClientMessage>()
             };
         }

@@ -23,7 +23,7 @@ namespace ChatBeet.Commands
             this.memoryCache = memoryCache;
         }
 
-        [Command("game {mediaName}")]
+        [Command("game {mediaName}", Description = "Look up a title on IGDB.")]
         public async Task<IClientMessage> RespondAsync(string mediaName)
         {
             var game = await memoryCache.GetOrCreateAsync($"igdb:{mediaName}", async entry =>

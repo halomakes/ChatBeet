@@ -29,7 +29,7 @@ namespace ChatBeet.Commands
             config = opts.Value;
         }
 
-        [Command("suspect {suspect}")]
+        [Command("suspect {suspect}", Description = "Report a user as being suspicious.")]
         public async IAsyncEnumerable<IClientMessage> IncreaseSuspicion(string suspect)
         {
             if (IncomingMessage.IsChannelMessage)
@@ -80,7 +80,7 @@ namespace ChatBeet.Commands
             }
         }
 
-        [Command("suspicion {suspect}")]
+        [Command("suspicion {suspect}", Description = "Check how suspicious a user is.")]
         public async Task<IClientMessage> GetSuspicionLevel(string suspect)
         {
             if (!string.IsNullOrEmpty(suspect))

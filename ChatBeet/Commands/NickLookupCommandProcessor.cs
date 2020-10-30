@@ -8,7 +8,7 @@ using System;
 
 namespace ChatBeet.Commands
 {
-    public class NickLookupCommandProcessor : CommandProcessor
+    public abstract class NickLookupCommandProcessor : CommandProcessor
     {
         private readonly MessageQueueService messageQueueService;
         private readonly NegativeResponseService negativeResponseService;
