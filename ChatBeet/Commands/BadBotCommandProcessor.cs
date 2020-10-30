@@ -13,11 +13,11 @@ namespace ChatBeet.Commands
 
         [Command("bad bot", Description = "Hurt ChatBeet's feelings.")]
         [Command("shit bot", Description = "Really hurt ChatBeet's feelings.")]
-        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+        public IEnumerable<IClientMessage> Respond()
         {
             if (!lastReactionTime.HasValue || (DateTime.Now - lastReactionTime.Value) > debounce)
             {
-                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), "*sad bot noises*");
+                yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), "*sad bot noises*");
             }
             lastReactionTime = DateTime.Now;
         }
