@@ -1,44 +1,25 @@
-﻿using ChatBeet.Services;
-using ChatBeet.Utilities;
+﻿using ChatBeet.Commands;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class DadJokeRule : IAsyncMessageRule<PrivateMessage>
+    public class DadJokeRule : CommandAliasRule<JokeCommandProcessor>
     {
-        private readonly DadJokeService jokeService;
         private readonly IrcBotConfiguration config;
-        private readonly Regex filter;
 
-        public DadJokeRule(DadJokeService jokeService, IOptions<IrcBotConfiguration> options)
+        public DadJokeRule(IOptions<IrcBotConfiguration> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
         {
-            this.jokeService = jokeService;
-            config = options.Value;
-            filter = new Regex($"^({Regex.Escape(config.Nick)},? ?tell.*joke)|({Regex.Escape(config.CommandPrefix)}(dad )?joke)", RegexOptions.IgnoreCase);
+            Pattern = new Regex($"^{Regex.Escape(options.Value.Nick)},? ?tell.*joke", RegexOptions.IgnoreCase);
         }
 
-        public bool Matches(PrivateMessage incomingMessage) => filter.IsMatch(incomingMessage.Message);
-
-        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        protected override async IAsyncEnumerable<IClientMessage> OnMatch(Match _, JokeCommandProcessor commandProcessor)
         {
-            var match = filter.Match(incomingMessage.Message);
-            if (match.Success)
-            {
-                var joke = await jokeService.GetDadJokeAsync();
-
-                if (!string.IsNullOrEmpty(joke))
-                {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), joke.Trim());
-                }
-                else
-                {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"I'm the joke. 😢");
-                }
-            }
+            yield return await commandProcessor.GetJoke();
         }
     }
 }
