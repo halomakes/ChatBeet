@@ -73,7 +73,6 @@ namespace ChatBeet
                 pipeline.RegisterRule<StackTraceRule, Exception>();
                 pipeline.RegisterAsyncRule<InterrogativeRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CommandingRecallRule, PrivateMessage>();
-                pipeline.RegisterAsyncRule<CurrentWeatherRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
             });

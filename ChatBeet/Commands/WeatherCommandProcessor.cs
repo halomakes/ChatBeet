@@ -2,64 +2,56 @@
 using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
+using GravyBot.Commands;
 using GravyIrc.Messages;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using UnitsNet;
 using UnitsNet.Units;
 using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Commands
 {
-    public class CurrentWeatherRule : IAsyncMessageRule<PrivateMessage>
+    public class WeatherCommandProcessor : CommandProcessor
     {
         private readonly OpenWeatherMapClient wmClient;
-        private readonly IrcBotConfiguration botConfig;
         private readonly UserPreferencesService prefsService;
-        private readonly Regex rgx;
 
-        public CurrentWeatherRule(IOptions<IrcBotConfiguration> options, OpenWeatherMapClient wmClient, UserPreferencesService prefsService)
+        public WeatherCommandProcessor(OpenWeatherMapClient wmClient, UserPreferencesService prefsService)
         {
-            botConfig = options.Value;
             this.wmClient = wmClient;
             this.prefsService = prefsService;
-            rgx = new Regex($"{Regex.Escape(botConfig.CommandPrefix)}weather( \\d{{5}})?");
         }
 
-        public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
-
-        public async IAsyncEnumerable<IClientMessage> RespondAsync(PrivateMessage incomingMessage)
+        [Command("weather {zipCode}", Description = "Get current weather conditions.")]
+        public async Task<IClientMessage> GetCurrentConditions(string zipCode)
         {
-            var match = rgx.Match(incomingMessage.Message);
-            var zip = match.Groups[1].Value?.Trim();
-
-            if (string.IsNullOrEmpty(zip))
+            if (string.IsNullOrEmpty(zipCode))
             {
-                zip = await prefsService.Get(incomingMessage.From, UserPreference.WeatherLocation);
+                zipCode = await prefsService.Get(IncomingMessage.From, UserPreference.WeatherLocation);
             }
             else
             {
-                var valMsg = prefsService.GetValidation(UserPreference.WeatherLocation, zip);
+                var valMsg = prefsService.GetValidation(UserPreference.WeatherLocation, zipCode);
                 if (!string.IsNullOrEmpty(valMsg))
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), valMsg);
-                    zip = default;
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), valMsg);
+                    zipCode = default;
                 }
             }
 
-            if (!string.IsNullOrEmpty(zip))
+            if (!string.IsNullOrEmpty(zipCode))
             {
-                var currentConditions = await wmClient.GetWeatherDataByZipAsync(zip, "US");
+                var currentConditions = await wmClient.GetWeatherDataByZipAsync(zipCode, "US");
                 if (currentConditions != default)
                 {
                     var complicationDetails = new List<string>();
 
-                    var windUnit = await prefsService.Get(incomingMessage.From, UserPreference.WeatherWindUnit, SpeedUnit.MilePerHour, SpeedUnit.Undefined);
-                    var tempUnit = await prefsService.Get(incomingMessage.From, UserPreference.WeatherTempUnit, TemperatureUnit.DegreeFahrenheit, TemperatureUnit.Undefined);
-                    var precipUnit = await prefsService.Get(incomingMessage.From, UserPreference.WeatherPrecipUnit, LengthUnit.Inch, LengthUnit.Undefined);
+                    var windUnit = await prefsService.Get(IncomingMessage.From, UserPreference.WeatherWindUnit, SpeedUnit.MilePerHour, SpeedUnit.Undefined);
+                    var tempUnit = await prefsService.Get(IncomingMessage.From, UserPreference.WeatherTempUnit, TemperatureUnit.DegreeFahrenheit, TemperatureUnit.Undefined);
+                    var precipUnit = await prefsService.Get(IncomingMessage.From, UserPreference.WeatherPrecipUnit, LengthUnit.Inch, LengthUnit.Undefined);
 
                     // temperature
                     string getTemp(float c) => Temperature.FromDegreesCelsius(c).ToUnit(tempUnit).ToString();
@@ -95,19 +87,17 @@ namespace ChatBeet.Rules
                     // conditions
                     complicationDetails.Add(string.Join(", ", currentConditions.Weathers.Select(w => $"{w.GetEmoji(currentConditions.DayInfo)} {w.Description}")));
 
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Right now in {IrcValues.BOLD}{currentConditions.Name}{IrcValues.RESET}: {string.Join(" | ", complicationDetails)}");
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Right now in {IrcValues.BOLD}{currentConditions.Name}{IrcValues.RESET}: {string.Join(" | ", complicationDetails)}");
                 }
                 else
                 {
-                    yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Couldn't find any weather data for ZIP code {IrcValues.BOLD}{zip}{IrcValues.RESET}.");
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Couldn't find any weather data for ZIP code {IrcValues.BOLD}{zipCode}{IrcValues.RESET}.");
                 }
             }
             else
             {
-                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), "Please specify a ZIP code or set a default one in your user preferences.");
+                return new PrivateMessage(IncomingMessage.GetResponseTarget(), "Please specify a ZIP code or set a default one in your user preferences.");
             }
         }
-
-
     }
 }
