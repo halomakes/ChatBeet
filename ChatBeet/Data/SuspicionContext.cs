@@ -8,12 +8,22 @@ namespace ChatBeet.Data
 {
     public class SuspicionContext : DbContext
     {
-        public SuspicionContext(DbContextOptions<SuspicionContext> opts) : base(opts) { }
+        private readonly TimeSpan ActivePeriod;
+
+        public SuspicionContext(DbContextOptions<SuspicionContext> opts) : base(opts)
+        {
+            ActivePeriod = TimeSpan.FromDays(7 * 4);
+        }
 
         public virtual DbSet<Suspicion> Suspicions { get; set; }
 
-        public Task<int> GetSuspicionLevelAsync(string suspect) => Suspicions
+        private DateTime ActiveWindowStart => DateTime.Now - ActivePeriod;
+
+        public IQueryable<Suspicion> ActiveSuspicions => Suspicions
             .AsQueryable()
+            .Where(s => s.TimeReported >= ActiveWindowStart);
+
+        public Task<int> GetSuspicionLevelAsync(string suspect) => ActiveSuspicions
             .CountAsync(s => s.Suspect.ToLower() == suspect.ToLower());
 
         public async Task<bool> HasRecentlyReportedAsync(string suspect, string reporter, TimeSpan debounceWindow = default)
