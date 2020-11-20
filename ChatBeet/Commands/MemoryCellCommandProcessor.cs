@@ -53,6 +53,11 @@ namespace ChatBeet.Commands
         [Command("remember {key}={value}", Description = "Create or replace a peasant definition.")]
         public async IAsyncEnumerable<IClientMessage> SetCell(string key, string value)
         {
+            // want to put as many equals on the right side as we can
+            var normalized = ParameterHelper.ForceCharacterOnRight((key, value), '=');
+            key = normalized.Item1?.Trim();
+            value = normalized.Item2?.Trim();
+
             if (string.IsNullOrEmpty(key))
             {
                 yield return new PrivateMessage(
