@@ -2,6 +2,7 @@
 using OpenGraphNet;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 
 namespace ChatBeet.Utilities
 {
@@ -11,15 +12,13 @@ namespace ChatBeet.Utilities
         {
             IEnumerable<string> GetSegments()
             {
-                if (meta.Metadata.ContainsKey("Title"))
+                if (!string.IsNullOrEmpty(meta.Title))
                 {
-                    var title = meta.Metadata["Title"].Select(m => m.Value?.Trim()).FirstOrDefault(v => !string.IsNullOrEmpty(v));
-                    if (title != default)
-                        yield return $"{IrcValues.BOLD}{title}{IrcValues.RESET}";
+                        yield return $"{IrcValues.BOLD}{HttpUtility.HtmlDecode(meta.Title)}{IrcValues.RESET}";
                 }
-                if (meta.Metadata.ContainsKey("Description"))
+                if (meta.Metadata.ContainsKey("og:description"))
                 {
-                    var description = meta.Metadata["Description"].Select(m => m.Value?.Trim()).FirstOrDefault(v => !string.IsNullOrEmpty(v));
+                    var description = HttpUtility.HtmlDecode(meta.Metadata["og:description"].Select(m => m.Value?.Trim()).FirstOrDefault(v => !string.IsNullOrEmpty(v)));
                     if (description != default)
                     {
                         if (description.Length > maxDescriptionLength)
