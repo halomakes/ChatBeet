@@ -4,6 +4,7 @@ using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("artist {name}", Description = "Look up an artist on Last.fm")]
-        public async IAsyncEnumerable<IClientMessage> GetArtist(string name)
+        public async IAsyncEnumerable<IClientMessage> GetArtist([Required] string name)
         {
             var artist = await lastFm.GetArtistInfo(name);
 
@@ -62,7 +63,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("track {trackName} by {artistName}", Description = "Look up a track on Last.fm")]
-        public async Task<IClientMessage> GetTrack(string trackName, string artistName)
+        public async Task<IClientMessage> GetTrack([Required] string trackName, [Required] string artistName)
         {
             var track = await lastFm.GetTrackInfo(trackName, artistName);
 

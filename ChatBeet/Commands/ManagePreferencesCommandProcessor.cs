@@ -7,6 +7,7 @@ using GravyIrc.Messages;
 using IF.Lastfm.Core.Api.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("set {preferenceId}={value}", Description = "Set a user preference.")]
-        public async Task<IClientMessage> SetPreference(string preferenceId, string value)
+        public async Task<IClientMessage> SetPreference([Required] string preferenceId, [Required] string value)
         {
             if (preferenceMappings.ContainsKey(preferenceId))
             {
@@ -54,7 +55,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("get {preferenceId}", Description = "Get a user preference.")]
-        public async Task<IClientMessage> GetPreference(string preferenceId)
+        public async Task<IClientMessage> GetPreference([Required] string preferenceId)
         {
             if (preferenceMappings.ContainsKey(preferenceId))
             {

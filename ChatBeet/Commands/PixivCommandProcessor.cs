@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using PixivCS;
 using PixivCS.Objects;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace ChatBeet.Commands
 
         [Command("pixiv {query}", Description = "Get a random artwork from Pixiv.")]
         [ChannelPolicy("NoMain")]
-        public async Task<IClientMessage> RespondAsync(string query)
+        public async Task<IClientMessage> RespondAsync([Required] string query)
         {
             if (!string.IsNullOrEmpty(query))
             {

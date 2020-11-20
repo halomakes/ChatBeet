@@ -6,6 +6,7 @@ using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace ChatBeet.Commands
@@ -24,7 +25,7 @@ namespace ChatBeet.Commands
         [Command("booru {tagList}", Description = "Get a random image from gelbooru matching tags (safe only).")]
         [Command("nsfwbooru {tagList}", Description = "Get a random image from gelbooru matching tags (questionable and explicit only).")]
         [ChannelPolicy("NoMain")]
-        public async IAsyncEnumerable<IClientMessage> GetRandomPost(string tagList)
+        public async IAsyncEnumerable<IClientMessage> GetRandomPost([Required] string tagList)
         {
             var tags = tagList.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var applyFilter = TriggeringCommandName != "nsfwbooru";
@@ -51,7 +52,7 @@ namespace ChatBeet.Commands
 
         [Command("booru whitelist {tagList}", Description = "Remove tag(s) from your blacklist.")]
         [Command("booru blacklist {tagList}", Description = "Add tag(s) to your blacklist.")]
-        public IAsyncEnumerable<IClientMessage> HandleBlacklistCommand(string tagList)
+        public IAsyncEnumerable<IClientMessage> HandleBlacklistCommand([Required] string tagList)
         {
             var tags = tagList?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             if (tags == default || !tags.Any())

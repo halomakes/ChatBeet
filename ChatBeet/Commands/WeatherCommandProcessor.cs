@@ -36,10 +36,7 @@ namespace ChatBeet.Commands
             {
                 var valMsg = prefsService.GetValidation(UserPreference.WeatherLocation, zipCode);
                 if (!string.IsNullOrEmpty(valMsg))
-                {
                     return new PrivateMessage(IncomingMessage.GetResponseTarget(), valMsg);
-                    zipCode = default;
-                }
             }
 
             if (!string.IsNullOrEmpty(zipCode))

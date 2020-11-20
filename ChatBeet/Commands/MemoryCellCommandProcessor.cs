@@ -6,6 +6,7 @@ using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("whodef {key}", Description = "Check who set a peasant definition.")]
-        public async Task<IClientMessage> GetAuthor(string key)
+        public async Task<IClientMessage> GetAuthor([Required] string key)
         {
             var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
@@ -37,7 +38,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("recall {key}", Description = "Get the value of a peasant definition.")]
-        public async Task<IClientMessage> GetCell(string key)
+        public async Task<IClientMessage> GetCell([Required] string key)
         {
             var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
@@ -51,7 +52,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("remember {key}={value}", Description = "Create or replace a peasant definition.")]
-        public async IAsyncEnumerable<IClientMessage> SetCell(string key, string value)
+        public async IAsyncEnumerable<IClientMessage> SetCell([Required] string key, [Required] string value)
         {
             // want to put as many equals on the right side as we can
             var normalized = ParameterHelper.ForceCharacterOnRight((key, value), '=');

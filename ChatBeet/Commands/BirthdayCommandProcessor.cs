@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using MoreLinq;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +26,9 @@ namespace ChatBeet.Commands
         }
 
         [Command("birthday {nick}", Description = "Check when a user's special day is.")]
-        public async Task<IClientMessage> LookupBirthday(string nick)
+        public async Task<IClientMessage> LookupBirthday(
+            [RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
+            )
         {
             if (!string.IsNullOrEmpty(nick))
                 return new PrivateMessage(IncomingMessage.GetResponseTarget(), await GetUserBirthday(nick));

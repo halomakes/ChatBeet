@@ -3,6 +3,7 @@ using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Commands
@@ -17,9 +18,9 @@ namespace ChatBeet.Commands
         }
 
         [Command("da {query}", Description = "Get a random deviation from DeviantArt.")]
-        [Command("deviantart {query}", Description ="Get a random deviation from DeviantArt.")]
+        [Command("deviantart {query}", Description = "Get a random deviation from DeviantArt.")]
         [ChannelPolicy("NoMain")]
-        public async Task<IClientMessage> GetRandomDeviation(string query)
+        public async Task<IClientMessage> GetRandomDeviation([Required] string query)
         {
             if (!string.IsNullOrEmpty(query))
             {
