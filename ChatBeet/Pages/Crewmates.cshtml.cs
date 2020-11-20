@@ -25,8 +25,7 @@ namespace ChatBeet.Pages
 
         public async Task OnGet()
         {
-            var mostSuspicious = await suspicionContext.Suspicions
-                .AsQueryable()
+            var mostSuspicious = await suspicionContext.ActiveSuspicions
                 .GroupBy(s => s.Suspect.ToLower())
                 .Select(g => new { Nick = g.Key, Count = g.Count() })
                 .OrderByDescending(t => t.Count)
