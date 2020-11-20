@@ -6,6 +6,7 @@ using IGDB;
 using IGDB.Models;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("game {mediaName}", Description = "Look up a title on IGDB.")]
-        public async Task<IClientMessage> RespondAsync(string mediaName)
+        public async Task<IClientMessage> RespondAsync([Required] string mediaName)
         {
             var game = await memoryCache.GetOrCreateAsync($"igdb:{mediaName}", async entry =>
             {

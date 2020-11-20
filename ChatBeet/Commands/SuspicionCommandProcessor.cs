@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("suspect {suspect}", Description = "Report a user as being suspicious.")]
-        public async IAsyncEnumerable<IClientMessage> IncreaseSuspicion(string suspect)
+        public async IAsyncEnumerable<IClientMessage> IncreaseSuspicion([Required] string suspect)
         {
             if (IncomingMessage.IsChannelMessage)
             {
@@ -81,7 +82,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("suspicion {suspect}", Description = "Check how suspicious a user is.")]
-        public async Task<IClientMessage> GetSuspicionLevel(string suspect)
+        public async Task<IClientMessage> GetSuspicionLevel([Required] string suspect)
         {
             if (!string.IsNullOrEmpty(suspect))
             {

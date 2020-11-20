@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using SampleClassification.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace ChatBeet.Commands
@@ -36,7 +37,9 @@ namespace ChatBeet.Commands
 
         [Command("sentiment {nick}", Description = "Try to assess the negativity of a user's recent messages.")]
         [ChannelOnly]
-        public IClientMessage Analyze(string nick)
+        public IClientMessage Analyze(
+            [Required, RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
+            )
         {
             return Process(nick, lookupMessage =>
             {

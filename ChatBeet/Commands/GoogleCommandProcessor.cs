@@ -4,6 +4,7 @@ using GravyBot.Commands;
 using GravyIrc.Messages;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Commands
@@ -22,7 +23,7 @@ namespace ChatBeet.Commands
 
         [Command("google {query}", Description = "Look something up on Google using I'm Feeling Lucky")]
         [Command("feelinglucky {query}", Description = "Look something up on Google using I'm Feeling Lucky")]
-        public async IAsyncEnumerable<IClientMessage> Search(string query)
+        public async IAsyncEnumerable<IClientMessage> Search([Required] string query)
         {
             var resultLink = await searchService.GetFeelingLuckyResultAsync(query);
             if (!resultLink.Host.Contains("google.com", StringComparison.OrdinalIgnoreCase))

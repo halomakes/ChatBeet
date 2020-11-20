@@ -3,6 +3,7 @@ using ChatBeet.Utilities;
 using GravyBot.Commands;
 using GravyIrc.Messages;
 using LinqToTwitter;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Commands
@@ -17,7 +18,9 @@ namespace ChatBeet.Commands
         }
 
         [Command("tweet {username}", Description = "Get the latest tweet from a user.")]
-        public async Task<IClientMessage> GetRecentTweet(string username)
+        public async Task<IClientMessage> GetRecentTweet(
+            [Required, RegularExpression(@"^@?[A-Za-z0-9_]{1,15}$", ErrorMessage = "Enter a valid Twitter handle.")] string username
+            )
         {
             try
             {
