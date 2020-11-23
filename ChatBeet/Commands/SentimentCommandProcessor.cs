@@ -1,4 +1,5 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Attributes;
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
@@ -37,9 +38,7 @@ namespace ChatBeet.Commands
 
         [Command("sentiment {nick}", Description = "Try to assess the negativity of a user's recent messages.")]
         [ChannelOnly]
-        public IClientMessage Analyze(
-            [Required, RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
-            )
+        public IClientMessage Analyze([Required, Nick(allowCaret: true)] string nick)
         {
             return Process(nick, lookupMessage =>
             {

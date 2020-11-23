@@ -1,4 +1,5 @@
-﻿using ChatBeet.Data.Entities;
+﻿using ChatBeet.Attributes;
+using ChatBeet.Data.Entities;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
@@ -25,9 +26,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("pronouns {nick}", Description = "Get preferred pronouns for a user.")]
-        public async Task<IClientMessage> GetPronouns(
-            [Required, RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
-            )
+        public async Task<IClientMessage> GetPronouns([Required, Nick] string nick)
         {
             if (nick.Equals(config.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
