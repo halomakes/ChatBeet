@@ -117,7 +117,7 @@ namespace ChatBeet
             services.AddScoped<NegativeResponseService>();
             services.AddScoped(provider => new OpenWeatherMapClient(Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
             services.AddScoped<GoogleSearchService>();
-            services.AddScoped<LinkPreviewSerivce>();
+            services.AddScoped<LinkPreviewService>();
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));

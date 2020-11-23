@@ -26,15 +26,15 @@ namespace ChatBeet.Commands
             if (nick.Equals(configuration.Nick, StringComparison.InvariantCultureIgnoreCase))
                 return negativeResponseService.GetResponse(IncomingMessage);
 
-            var lookupMessage = GetLatestMessage(nick);
+            var lookupMessage = nick == "^"
+                ? messageQueueService.GetLatestMessage(IncomingMessage.To, IncomingMessage)
+                : messageQueueService.GetLatestMessage(nick, IncomingMessage.To, IncomingMessage);
 
             if (lookupMessage == null)
                 return NotFound(nick);
 
             return action(lookupMessage);
         }
-
-        private PrivateMessage GetLatestMessage(string nick) => messageQueueService.GetLatestMessage(nick, IncomingMessage.To, IncomingMessage);
 
         private IClientMessage NotFound(string nick) => new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Couldn't find a recent message from {IrcValues.BOLD}{nick}{IrcValues.RESET}.");
     }

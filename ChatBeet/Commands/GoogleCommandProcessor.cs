@@ -12,10 +12,10 @@ namespace ChatBeet.Commands
     public class GoogleCommandProcessor : CommandProcessor
     {
 
-        private readonly LinkPreviewSerivce previewSerivce;
+        private readonly LinkPreviewService previewSerivce;
         private readonly GoogleSearchService searchService;
 
-        public GoogleCommandProcessor(GoogleSearchService searchService, LinkPreviewSerivce previewSerivce)
+        public GoogleCommandProcessor(GoogleSearchService searchService, LinkPreviewService previewSerivce)
         {
             this.searchService = searchService;
             this.previewSerivce = previewSerivce;

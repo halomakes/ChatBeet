@@ -1,4 +1,5 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Attributes;
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
@@ -19,18 +20,14 @@ namespace ChatBeet.Commands
 
         [Command("kern {nick}", Description = "Make someone's text uppercase and space it out.")]
         [ChannelOnly]
-        public IClientMessage Kern(
-            [Required, RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
-            )
+        public IClientMessage Kern([Required, Nick(allowCaret: true)] string nick)
         {
             return Process(nick, lookupMessage => SpacingRegex.Replace(lookupMessage, " $1").Replace("   ", "  ").Trim().ToUpperInvariant());
         }
 
         [Command("mock {nick}", Description = "Apply random casing to each letter in someone's message.")]
         [ChannelOnly]
-        public IClientMessage Mock(
-            [Required, RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
-            )
+        public IClientMessage Mock([Required, Nick(allowCaret: true)] string nick)
         {
             return Process(nick, lookupMessage => string.Concat(RandomizeCase(lookupMessage)));
 
@@ -51,9 +48,7 @@ namespace ChatBeet.Commands
 
         [Command("colorize {nick}", Description = "Apply random colors to someone's message")]
         [ChannelOnly]
-        public IClientMessage Colorize(
-            [Required, RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
-            )
+        public IClientMessage Colorize([Required, Nick(allowCaret: true)] string nick)
         {
             var colors = new List<string> { IrcValues.AQUA, IrcValues.BLUE, IrcValues.BROWN, IrcValues.GREEN, IrcValues.LIME, IrcValues.ORANGE, IrcValues.PINK, IrcValues.PURPLE, IrcValues.RED, IrcValues.ROYAL, IrcValues.YELLOW };
             return Process(nick, lookupMessage =>

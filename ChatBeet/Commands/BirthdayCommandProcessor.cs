@@ -1,4 +1,5 @@
-﻿using ChatBeet.Data;
+﻿using ChatBeet.Attributes;
+using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Utilities;
 using GravyBot;
@@ -26,9 +27,7 @@ namespace ChatBeet.Commands
         }
 
         [Command("birthday {nick}", Description = "Check when a user's special day is.")]
-        public async Task<IClientMessage> LookupBirthday(
-            [RegularExpression(@"[A-z_\-\[\]\\^{}|`][A-z0-9_\-\[\]\\^{}|`]+", ErrorMessage = "Enter a valid IRC nick.")] string nick
-            )
+        public async Task<IClientMessage> LookupBirthday([Nick] string nick)
         {
             if (!string.IsNullOrEmpty(nick))
                 return new PrivateMessage(IncomingMessage.GetResponseTarget(), await GetUserBirthday(nick));
