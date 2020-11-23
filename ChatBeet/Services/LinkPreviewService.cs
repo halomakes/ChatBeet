@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Services
 {
-    public class LinkPreviewSerivce
+    public class LinkPreviewService
     {
         private readonly IMemoryCache cache;
 
-        public LinkPreviewSerivce(IMemoryCache cache)
+        public LinkPreviewService(IMemoryCache cache)
         {
             this.cache = cache;
         }

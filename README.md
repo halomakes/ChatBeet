@@ -297,3 +297,13 @@ Example Output:
 ```
 Example output:
 > carrots' suspicion level is 69.  He is maximum sus.
+
+### Previewing Links
+*That's sketch, click on it for me.*
+```
+.cb preview www.mazda.com
+```
+Example Output:
+> **MAZDA MOTOR CORPORATION GLOBAL WEBSITE** | Global Website of Mazda Motor Corporation - brand stories, design and technology as well as company profile, IR and CSR.
+
+You can also leave the URL off and it'll grab the first one it can find in scrollback.
