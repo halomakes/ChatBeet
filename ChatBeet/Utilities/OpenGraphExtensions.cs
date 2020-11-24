@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using OpenGraphNet;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 
 namespace ChatBeet.Utilities
@@ -27,7 +28,7 @@ namespace ChatBeet.Utilities
             {
                 if (!string.IsNullOrEmpty(meta.Title))
                 {
-                    return meta.Title;
+                    return WebUtility.HtmlDecode(meta.Title);
                 }
                 else
                 {
@@ -36,7 +37,7 @@ namespace ChatBeet.Utilities
                     {
                         var title = GetHtmlDoc().DocumentNode.Descendants("title").FirstOrDefault();
                         if (title != default && !string.IsNullOrEmpty(title.InnerText))
-                            return title.InnerText;
+                            return WebUtility.HtmlDecode(title.InnerText);
                     }
                     catch
                     {
@@ -53,7 +54,7 @@ namespace ChatBeet.Utilities
                 {
                     var ogDescription = HttpUtility.HtmlDecode(meta.Metadata["og:description"].Select(m => m.Value?.Trim()).FirstOrDefault(v => !string.IsNullOrEmpty(v)));
                     if (ogDescription != default)
-                        return ogDescription;
+                        return WebUtility.HtmlDecode(ogDescription);
                 }
 
                 // look for meta tag
@@ -65,7 +66,7 @@ namespace ChatBeet.Utilities
                     {
                         var desc = node.Attributes["content"];
                         if (!string.IsNullOrEmpty(desc?.Value))
-                            return desc.Value;
+                            return WebUtility.HtmlDecode(desc.Value);
                     }
                 }
                 catch
