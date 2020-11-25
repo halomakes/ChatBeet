@@ -114,7 +114,7 @@ Example Output:
 *Maybe you can't revive a dead channel, but you **can** spam it with bad jokes*
 ```
 ChatBeet, tell me a dad joke.
-.cb dad joke
+.cb joke
 ```
 Example Output:
 > How does the moon cut his hair? Eclipse it.
@@ -307,3 +307,11 @@ Example Output:
 > **MAZDA MOTOR CORPORATION GLOBAL WEBSITE** | Global Website of Mazda Motor Corporation - brand stories, design and technology as well as company profile, IR and CSR.
 
 You can also leave the URL off and it'll grab the first one it can find in scrollback.
+
+### Doggos
+*Get a random goodboi*
+```
+.cb doggo
+```
+Example Output:
+> https://cdn2.thedogapi.com/images/AcXu5OATT.jpg **American Bulldog** — bred for | Friendly, Assertive, Energetic, Loyal, Gentle, Confident, Dominant

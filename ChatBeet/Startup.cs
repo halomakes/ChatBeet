@@ -118,6 +118,11 @@ namespace ChatBeet
             services.AddScoped(provider => new OpenWeatherMapClient(Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
             services.AddScoped<GoogleSearchService>();
             services.AddScoped<LinkPreviewService>();
+            services.AddScoped(provider =>
+            {
+                var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
+                return new DogApi.DogApiClient(client, Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
+            });
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
