@@ -24,6 +24,8 @@ namespace ChatBeet.Pages
         public void OnGet([FromQuery] string channel)
         {
             ChannelName = string.IsNullOrEmpty(channel) ? config.MainChannel : channel.Trim();
+            if (!ChannelName.StartsWith('#'))
+                ChannelName = $"#{ChannelName}";
             Rate = speedoService.GetRecentMessageCount(ChannelName, TimeSpan.FromMinutes(1));
         }
     }

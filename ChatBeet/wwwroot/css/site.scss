@@ -279,11 +279,11 @@ $dimmed: .4;
 
 @keyframes blink {
     0%,100% {
-        opacity: $dimmed;
+        opacity: 1;
     }
 
     80% {
-        opacity: 1;
+        opacity: $dimmed;
     }
 }
 
@@ -313,7 +313,7 @@ $dimmed: .4;
             background-color: #c32614;
 
             &.sb-indicator--active {
-                animation: blink 1s ease forwards infinite;
+                animation: blink 1s ease forwards 3;
             }
         }
 

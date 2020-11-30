@@ -6,9 +6,9 @@
 <div class="speedo" id="speedo-root">
 
     <div class="d-flex flex-row flex-wrap align-items-center justify-content-between">
-        <h1>Message Speed in @Model.ChannelName</h1>
+        <h1>Message Rate in @Model.ChannelName</h1>
         <select class="custom-select speedo__mode-toggle" data-in="this.displayMode" style="width:initial">
-            <option value="car" selected>Car</option>
+            <option value="dial" selected>Dial</option>
             <option value="sb">Spaceball I</option>
         </select>
     </div>
@@ -29,19 +29,22 @@
         </div>
         <div class="trapezoid-post"></div>
     </div>
-    <div data-show="this.displayMode=='car'">
-        <span>car</span>
+    <div data-show="this.displayMode=='dial'" class="d-flex justify-content-center">
+        <canvas id="car-speedo" style="width:80vw;height:20vw;max-width:800px;" data-show="this.displayMode=='dial'"></canvas>
     </div>
-    <div>
-        <span data-display="this.rate"></span>
-        <span>messages per minute</span>
-    </div>
+    <h3 class="text-center mt-5">
+        <span data-display="this.rate" class="font-weight-bold"></span>
+        <span data-show="this.rate == 1">message</span>
+        <span data-hide="this.rate == 1">messages</span>
+        <span>per minute</span>
+    </h3>
     <input asp-for="ChannelName" data-in="this.channelName" type="hidden" />
 </div>
 
 @section scripts{
+    <script type="text/javascript" src="https://bernii.github.io/gauge.js/dist/gauge.min.js"></script>
     <script type="text/javascript" src="~/js/speedo.js"></script>
     <script type="text/javascript">
-        speedo.rate = @Model.Rate;
+        speedo.setValue(@Model.Rate);
     </script>
 }
