@@ -16,8 +16,8 @@ namespace ChatBeet.Commands
             this.speedoService = speedoService;
         }
 
-        [Command("speedo {timeSpan}", Description = "Get the message rate in the current channel")]
-        [Command("speedometer {timeSpan}", Description = "Get the message rate in the current channel")]
+        [Command("speed {timeSpan}", Description = "Get the message rate in the current channel")]
+        [Command("chatrate {timeSpan}", Description = "Get the message rate in the current channel")]
         [ChannelOnly]
         public IClientMessage GetMessageRate(string timeSpan)
         {

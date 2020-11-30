@@ -73,6 +73,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<InterrogativeRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CommandingRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
             });
 
