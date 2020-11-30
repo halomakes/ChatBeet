@@ -1,0 +1,47 @@
+﻿@page
+@model ChatBeet.Pages.SpeedometerModel
+@{
+    ViewBag.Title = $"Speedometer for {Model.ChannelName}";
+}
+<div class="speedo" id="speedo-root">
+
+    <div class="d-flex flex-row flex-wrap align-items-center justify-content-between">
+        <h1>Message Speed in @Model.ChannelName</h1>
+        <select class="custom-select speedo__mode-toggle" data-in="this.displayMode" style="width:initial">
+            <option value="car" selected>Car</option>
+            <option value="sb">Spaceball I</option>
+        </select>
+    </div>
+
+    <div data-show="this.displayMode=='sb'" class="trapezoid-container mt-4">
+        <div class="trapezoid-pre"></div>
+        <div class="trapezoid-content sb-gauge pt-2">
+            <span>Hyperjet Engine Status</span>
+            <div class="sb-indicator sb-indicator--light" data-class="sb-indicator--active" data-class-condition="this.meetsThreshold(0.2)">
+                Light Speed
+            </div>
+            <div class="sb-indicator sb-indicator--ridiculous" data-class="sb-indicator--active" data-class-condition="this.meetsThreshold(0.5)">
+                Ridiculous Speed
+            </div>
+            <div class="sb-indicator sb-indicator--ludicrous" data-class="sb-indicator--active" data-class-condition="this.meetsThreshold(0.8)">
+                Ludicrous Speed
+            </div>
+        </div>
+        <div class="trapezoid-post"></div>
+    </div>
+    <div data-show="this.displayMode=='car'">
+        <span>car</span>
+    </div>
+    <div>
+        <span data-display="this.rate"></span>
+        <span>messages per minute</span>
+    </div>
+    <input asp-for="ChannelName" data-in="this.channelName" type="hidden" />
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="~/js/speedo.js"></script>
+    <script type="text/javascript">
+        speedo.rate = @Model.Rate;
+    </script>
+}
