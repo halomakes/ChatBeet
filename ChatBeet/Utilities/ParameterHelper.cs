@@ -13,7 +13,7 @@
             {
                 var index = pair.Item1.IndexOf(divider);
                 var start = pair.Item1.Substring(0, index);
-                var end = string.Concat(pair.Item1.Substring(index + 1, pair.Item1.Length - index - 2), divider, pair.Item2);
+                var end = string.Concat(pair.Item1.Substring(index + 1, pair.Item1.Length - index - 1), divider, pair.Item2);
                 return (start, end);
             }
             return pair;
