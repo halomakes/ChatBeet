@@ -18,6 +18,7 @@ namespace ChatBeet.Configuration
         public Dictionary<string, string> Urls { get; set; }
         public Dictionary<string, ChannelPolicy> Policies { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
+        public string MainChannel { get; set; }
 
         public class TwitterConfiguration
         {

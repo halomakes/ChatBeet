@@ -123,6 +123,7 @@ namespace ChatBeet
                 var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
                 return new DogApi.DogApiClient(client, Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
             });
+            services.AddScoped<SpeedometerService>();
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
