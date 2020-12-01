@@ -73,6 +73,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<InterrogativeRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<CommandingRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
             });
 
@@ -123,6 +124,7 @@ namespace ChatBeet
                 var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
                 return new DogApi.DogApiClient(client, Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
             });
+            services.AddScoped<SpeedometerService>();
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));

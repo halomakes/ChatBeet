@@ -274,3 +274,76 @@ body {
         background: none;
     }
 }
+
+$dimmed: .4;
+
+@keyframes blink {
+    0%,100% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: $dimmed;
+    }
+}
+
+.sb-gauge {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.4rem;
+    font-stretch: condensed;
+
+    .sb-indicator {
+        display: block;
+        padding: 8px;
+        position: relative;
+        transition: opacity .3s ease;
+        margin: 12px;
+
+        &.sb-indicator--light {
+            background-color: #23a83b;
+        }
+
+        &.sb-indicator--ridiculous {
+            background-color: #e99303;
+        }
+
+        &.sb-indicator--ludicrous {
+            background-color: #c32614;
+
+            &.sb-indicator--active {
+                animation: blink 1s ease forwards 3;
+            }
+        }
+
+        &:not(.sb-indicator--active) {
+            opacity: $dimmed;
+        }
+    }
+}
+
+.trapezoid-container {
+    $color: black;
+    $flare-size: 28px;
+    $flare-height: 220px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    & > .trapezoid-content {
+        background-color: $color;
+        min-height: $flare-height;
+    }
+
+    & > .trapezoid-pre {
+        border-top: $flare-height solid $color;
+        border-left: $flare-size solid transparent;
+    }
+
+    & > .trapezoid-post {
+        border-top: $flare-height solid $color;
+        border-right: $flare-size solid transparent;
+    }
+}
