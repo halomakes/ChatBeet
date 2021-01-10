@@ -29,6 +29,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Untappd.Client;
 using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
 
 namespace ChatBeet
@@ -125,6 +126,13 @@ namespace ChatBeet
                 return new DogApi.DogApiClient(client, Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
             });
             services.AddScoped<SpeedometerService>();
+            services.AddScoped(provider =>
+            {
+                var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
+                var opts = Options.Create(config.Value.Untappd);
+                var clientFactory = provider.GetService<IHttpClientFactory>();
+                return new UntappdClient(clientFactory.CreateClient(), opts);
+            });
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));

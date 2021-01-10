@@ -26,6 +26,7 @@ namespace ChatBeet.Services
         /// <param name="handle">Handle of username to look up</param>
         /// <param name="mediaOnly">Indicates if results should filter to only tweets with media attached</param>
         /// <param name="randomize">Whether or not to pick a random result from the set</param>
+        /// <param name="filter">Filter to apply prior to randomization</param>
         /// <returns>Recent tweet with an image attached</returns>
         public async Task<Status> GetRecentTweet(string handle, bool mediaOnly = true, bool randomize = true, Func<Status, bool> filter = null)
         {

@@ -1,6 +1,7 @@
 ﻿using GravyBot.Commands;
 using System.Collections.Generic;
 using System.Globalization;
+using Untappd.Client;
 
 namespace ChatBeet.Configuration
 {
@@ -15,6 +16,7 @@ namespace ChatBeet.Configuration
         public PronounConfiguration Pronouns { get; set; } = new PronounConfiguration();
         public IEnumerable<string> NegativeResponses { get; set; }
         public MessageCollectionConfiguration MessageCollection { get; set; } = new MessageCollectionConfiguration();
+        public UntappdConfig Untappd { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public Dictionary<string, ChannelPolicy> Policies { get; set; }
         public static CultureInfo Culture = new CultureInfo("en-US");
