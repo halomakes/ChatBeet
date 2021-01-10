@@ -40,5 +40,27 @@ namespace ChatBeet.Commands
                 return new PrivateMessage(IncomingMessage.GetResponseTarget(), "Sorry, couldn't find that account.");
             }
         }
+
+        [Command("astolfo", Description = "Fill the void in your soul with something random from @astolfomedia."), RateLimit(2, TimeUnit.Minute)]
+        public async Task<IClientMessage> GetAstolfo()
+        {
+            try
+            {
+                var tweet = await tweetService.GetRecentTweet("astolfomedia", true, true);
+
+                if (tweet == default)
+                {
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), "Sorry, couldn't find anything recent.");
+                }
+                else
+                {
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), tweet.ToIrcMessage());
+                }
+            }
+            catch (TwitterQueryException)
+            {
+                return new PrivateMessage(IncomingMessage.GetResponseTarget(), "Sorry, couldn't find that account.");
+            }
+        }
     }
 }
