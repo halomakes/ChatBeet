@@ -46,7 +46,7 @@ namespace ChatBeet.Commands
         {
             try
             {
-                var tweet = await tweetService.GetRecentTweet("astolfomedia", true, true);
+                var tweet = await tweetService.GetRecentTweet("astolfomedia", true, true, filter: s => !s.FullText.ToLower().Contains("nsfw"));
 
                 if (tweet == default)
                 {
@@ -68,7 +68,7 @@ namespace ChatBeet.Commands
         {
             try
             {
-                var tweet = await tweetService.GetRandomTweetByHashtag("miata", true);
+                var tweet = await tweetService.GetRandomTweetByHashtag("miata", true, filter: s => s.FullText.ToLower().Contains("miata"));
 
                 if (tweet == default)
                 {
