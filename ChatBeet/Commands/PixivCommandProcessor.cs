@@ -28,7 +28,6 @@ namespace ChatBeet.Commands
         }
 
         [Command("pixiv {query}", Description = "Get a random artwork from Pixiv.")]
-        [ChannelPolicy("NoMain")]
         public async Task<IClientMessage> RespondAsync([Required] string query)
         {
             if (!string.IsNullOrEmpty(query))
