@@ -2,6 +2,8 @@
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,16 +14,22 @@ namespace ChatBeet.Commands
     public class BeerCommandProcessor : CommandProcessor
     {
         private readonly UntappdClient client;
+        private readonly IMemoryCache cache;
 
-        public BeerCommandProcessor(UntappdClient client)
+        public BeerCommandProcessor(UntappdClient client, IMemoryCache cache)
         {
             this.client = client;
+            this.cache = cache;
         }
 
         [Command("beer {beerName}", Description = "Get info about a beer on Untappd.")]
         public async Task<IClientMessage> FindBeerAsync([Required] string beerName)
         {
-            var results = await client.SearchBeers(beerName);
+            var results = await cache.GetOrCreateAsync($"beer:{beerName}", entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromMinutes(3);
+                return client.SearchBeers(beerName);
+            });
 
             if (results?.Response?.Beers?.Items?.Any() ?? false)
             {
