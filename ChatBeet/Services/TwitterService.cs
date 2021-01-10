@@ -27,7 +27,7 @@ namespace ChatBeet.Services
         /// <param name="mediaOnly">Indicates if results should filter to only tweets with media attached</param>
         /// <param name="randomize">Whether or not to pick a random result from the set</param>
         /// <returns>Recent tweet with an image attached</returns>
-        public async Task<Status> GetRecentTweet(string handle, bool mediaOnly = true, bool randomize = true)
+        public async Task<Status> GetRecentTweet(string handle, bool mediaOnly = true, bool randomize = true, Func<Status, bool> filter = null)
         {
             var tweets = await cache.GetOrCreateAsync($"twitter:{handle}", async entry =>
             {
@@ -40,18 +40,20 @@ namespace ChatBeet.Services
                     .Where(s => s.RetweetedStatus.StatusID == 0)
                     .Where(s => s.InReplyToStatusID == 0)
                     .Where(s => s.TweetMode == TweetMode.Extended)
-                    .Take(10)
+                    .Take(30)
                     .ToListAsync();
             });
 
-            var filtered = tweets.Where(s => !mediaOnly || s.Entities.MediaEntities.Any());
+            var filtered = tweets
+                .Where(s => !mediaOnly || s.Entities.MediaEntities.Any())
+                .Where(s => filter == null || filter(s));
 
             return randomize
                 ? filtered.PickRandom()
                 : filtered.FirstOrDefault();
         }
 
-        public async Task<Status> GetRandomTweetByHashtag(string hashtag, bool mediaOnly = true)
+        public async Task<Status> GetRandomTweetByHashtag(string hashtag, bool mediaOnly = true, Func<Status, bool> filter = null)
         {
             var searches = await cache.GetOrCreateAsync($"twitter:#{hashtag}", async entry =>
             {
@@ -67,7 +69,9 @@ namespace ChatBeet.Services
                     .ToListAsync();
             });
 
-            var filtered = searches.SelectMany(s => s.Statuses).Where(s => !mediaOnly || s.Entities.MediaEntities.Any());
+            var filtered = searches.SelectMany(s => s.Statuses)
+                .Where(s => !mediaOnly || s.Entities.MediaEntities.Any())
+                .Where(s => filter == null || filter(s));
 
             return filtered.PickRandom();
         }
