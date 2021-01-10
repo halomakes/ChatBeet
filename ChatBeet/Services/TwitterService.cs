@@ -24,7 +24,7 @@ namespace ChatBeet.Services
         /// Get a random recent tweet with an image from an account on Twitter
         /// </summary>
         /// <param name="handle">Handle of username to look up</param>
-        /// <param name="count">Number of results to fetch</param>
+        /// <param name="mediaOnly">Indicates if results should filter to only tweets with media attached</param>
         /// <param name="randomize">Whether or not to pick a random result from the set</param>
         /// <returns>Recent tweet with an image attached</returns>
         public async Task<Status> GetRecentTweet(string handle, bool mediaOnly = true, bool randomize = true)
@@ -49,6 +49,27 @@ namespace ChatBeet.Services
             return randomize
                 ? filtered.PickRandom()
                 : filtered.FirstOrDefault();
+        }
+
+        public async Task<Status> GetRandomTweetByHashtag(string hashtag, bool mediaOnly = true)
+        {
+            var searches = await cache.GetOrCreateAsync($"twitter:#{hashtag}", async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+                var twitterContext = await GetContext();
+
+                return await twitterContext.Search
+                    .Where(s => s.Type == SearchType.Search)
+                    .Where(s => s.IncludeEntities == true)
+                    .Where(s => s.TweetMode == TweetMode.Extended)
+                    .Where(s => s.Query == hashtag)
+                    .Where(s => s.Count == 100)
+                    .ToListAsync();
+            });
+
+            var filtered = searches.SelectMany(s => s.Statuses).Where(s => !mediaOnly || s.Entities.MediaEntities.Any());
+
+            return filtered.PickRandom();
         }
 
         /// <summary>
