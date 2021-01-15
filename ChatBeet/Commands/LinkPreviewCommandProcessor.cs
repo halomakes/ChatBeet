@@ -42,8 +42,9 @@ namespace ChatBeet.Commands
                     if (meta != default)
                         return new PrivateMessage(IncomingMessage.GetResponseTarget(), meta.ToIrcSummary(maxDescriptionLength: 400));
                 }
-                catch
+                catch (Exception e)
                 {
+                    messageQueue.Push(e);
                     return new NoticeMessage(IncomingMessage.From, $"Couldn't fetch {IrcValues.ITALIC}{parsedUri}{IrcValues.RESET}.  Make sure it's absolute and publicly accessible.");
                 }
             }
