@@ -19,7 +19,7 @@ namespace ChatBeet.Configuration
         public UntappdConfig Untappd { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public Dictionary<string, ChannelPolicy> Policies { get; set; }
-        public static CultureInfo Culture = new CultureInfo("en-US");
+        public static CultureInfo Culture = new("en-US");
         public string MainChannel { get; set; }
 
         public class TwitterConfiguration

@@ -6,7 +6,7 @@ namespace ChatBeet.Commands
 {
     public class HighGroundCommandProcessor : CommandProcessor
     {
-        public static readonly Dictionary<string, string> HighestNicks = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> HighestNicks = new();
 
         [Command("jump", Description = "Claim the high ground.")]
         [Command("climb", Description = "Claim the high ground.")]

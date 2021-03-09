@@ -22,7 +22,7 @@ namespace ChatBeet.Commands
             this.messageQueueService = messageQueueService;
         }
 
-        private static readonly List<(float rating, string emoji, string description)> Ratings = new List<(float rating, string emoji, string description)>
+        private static readonly List<(float rating, string emoji, string description)> Ratings = new()
         {
             (0.05F, "🤬", "extremely negative"),
             (0.15F, "😡", "very negative"),

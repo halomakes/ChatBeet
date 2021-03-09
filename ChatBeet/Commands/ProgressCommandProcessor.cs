@@ -182,7 +182,7 @@ namespace ChatBeet.Commands
             static bool IsValidDate(string val) => !string.IsNullOrEmpty(val) && DateTime.TryParse(val, out var _);
 
             static DateTime NormalizeTime(DateTime date, DateTime baseline) =>
-                new DateTime(baseline.Year, baseline.Month, baseline.Day, date.Hour, date.Minute, date.Second);
+                new(baseline.Year, baseline.Month, baseline.Day, date.Hour, date.Minute, date.Second);
         }
     }
 }

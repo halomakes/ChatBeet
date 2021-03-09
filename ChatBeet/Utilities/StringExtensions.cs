@@ -13,7 +13,7 @@ namespace ChatBeet.Utilities
         public static string TruncateMessage(this string message) => $"{message.TruncateToByteLimit(IrcValues.MAX_BYTES - 2)}…";
 
         public static string TruncateToByteLimit(this string @string, int maxLength) =>
-            new string(@string.TakeWhile((c, i) => Encoding.UTF8.GetByteCount(@string.Substring(0, i + 1)) <= maxLength).ToArray());
+            new(@string.TakeWhile((c, i) => Encoding.UTF8.GetByteCount(@string.Substring(0, i + 1)) <= maxLength).ToArray());
 
         public static string StripMarkdown(this string @string)
         {
