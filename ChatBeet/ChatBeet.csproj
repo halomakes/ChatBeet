@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>c79cf495-2496-4295-ad2d-49b3d2c73886</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <Version>2.10.0</Version>
+    <Version>2.11.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
@@ -23,9 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BooruSharp" Version="2.11.0" />
+    <PackageReference Include="BooruSharp" Version="3.0.2" />
     <PackageReference Include="DogApi" Version="0.1.0" />
-    <PackageReference Include="GravyBot" Version="1.4.0" />
+    <PackageReference Include="GravyBot" Version="1.4.1" />
     <PackageReference Include="GravyBot.Commands" Version="1.2.0" />
     <PackageReference Include="GravyBot.SampleRules" Version="1.3.0" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
@@ -33,7 +33,7 @@
     <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
     <PackageReference Include="LigerShark.WebOptimizer.Sass" Version="3.0.43-beta" />
     <PackageReference Include="linqtotwitter" Version="5.1.3" />
-    <PackageReference Include="Markdig" Version="0.22.0" />
+    <PackageReference Include="Markdig" Version="0.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.9" />
@@ -46,14 +46,14 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="Miki.Anilist" Version="0.6.3" />
     <PackageReference Include="morelinq" Version="3.3.2" />
-    <PackageReference Include="OpenGraph-Net" Version="3.2.4" />
+    <PackageReference Include="OpenGraph-Net" Version="3.2.6" />
     <PackageReference Include="OpenWeatherMap.Standard" Version="1.3.0" />
     <PackageReference Include="PixivCS" Version="0.5.12" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
     <PackageReference Include="TenorClient" Version="1.0.3" />
-    <PackageReference Include="TimeZoneConverter" Version="3.3.0" />
-    <PackageReference Include="UnitsNet" Version="4.75.0" />
+    <PackageReference Include="TimeZoneConverter" Version="3.4.0" />
+    <PackageReference Include="UnitsNet" Version="4.85.0" />
     <PackageReference Include="Untappd.Client" Version="0.1.0" />
   </ItemGroup>
 

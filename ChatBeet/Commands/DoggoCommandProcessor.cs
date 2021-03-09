@@ -45,7 +45,7 @@ namespace ChatBeet.Commands
             catch (Exception e)
             {
                 return new NoticeMessage(IncomingMessage.From, "Sorry, couldn't find any doggos right now.  Maybe they're all taking a nap?");
-                throw e;
+                throw;
             }
         }
 

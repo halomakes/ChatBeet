@@ -59,7 +59,7 @@ namespace ChatBeet.Services
                 {
                     var img = searchResults.PickRandom();
                     var rng = new Random();
-                    var resultTags = img.tags
+                    var resultTags = img.Tags
                         .Select(t => (MatchesInput: tags.Contains(t), Tag: t))
                         .OrderByDescending(p => p.MatchesInput)
                         .ThenBy(p => rng.Next())
@@ -67,7 +67,7 @@ namespace ChatBeet.Services
                         .Take(10)
                         .OrderBy(t => rng.Next());
                     var tagList = string.Join(", ", resultTags);
-                    return $"{img.fileUrl} ({img.rating}) - {tagList}";
+                    return $"{img.FileUrl} ({img.Rating}) - {tagList}";
                 }
                 return default;
             }
