@@ -16,7 +16,7 @@ namespace ChatBeet.Commands
     public class MessageTransformCommandProcessor : NickLookupCommandProcessor
     {
         public MessageTransformCommandProcessor(MessageQueueService messageQueueService, NegativeResponseService negativeResponseService, IOptions<IrcBotConfiguration> options) : base(messageQueueService, negativeResponseService, options) { }
-        private static readonly Regex SpacingRegex = new Regex(@"([\x00-\x7F])");
+        private static readonly Regex SpacingRegex = new(@"([\x00-\x7F])");
 
         [Command("kern {nick}", Description = "Make someone's text uppercase and space it out.")]
         [ChannelOnly]

@@ -9,7 +9,7 @@ namespace ChatBeet.Commands
     public class LotsCommandProcessor : CommandProcessor
     {
         private static readonly int maxLength = 16;
-        private static readonly Random rng = new Random();
+        private static readonly Random rng = new();
         private static readonly int godChance = 10_000_000;
         private static readonly int godLength = 32;
 
@@ -35,6 +35,6 @@ namespace ChatBeet.Commands
             };
         }
 
-        private static string GetBar(int length, char @char) => new string(Enumerable.Repeat(@char, length).ToArray());
+        private static string GetBar(int length, char @char) => new(Enumerable.Repeat(@char, length).ToArray());
     }
 }
