@@ -9,6 +9,7 @@ using GravyBot.Commands;
 using GravyBot.DefaultRules;
 using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
+using Meowtrix.PixivApi;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,7 +24,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Miki.Anilist;
-using PixivCS;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -92,7 +92,7 @@ namespace ChatBeet
             });
 
             services.AddScoped<DadJokeService>();
-            services.AddScoped<PixivAppAPI>();
+            services.AddScoped<PixivApiClient>();
             services.AddScoped<DeviantartService>();
             services.AddScoped<AnilistClient>();
             services.AddScoped<AnilistService>();

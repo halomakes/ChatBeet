@@ -34,6 +34,7 @@
     <PackageReference Include="LigerShark.WebOptimizer.Sass" Version="3.0.43-beta" />
     <PackageReference Include="linqtotwitter" Version="6.5.0" />
     <PackageReference Include="Markdig" Version="0.23.0" />
+    <PackageReference Include="Meowtrix.PixivApi" Version="0.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.4" />
@@ -48,7 +49,6 @@
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="OpenGraph-Net" Version="3.2.6" />
     <PackageReference Include="OpenWeatherMap.Standard" Version="1.3.0" />
-    <PackageReference Include="PixivCS" Version="0.5.12" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.0" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
     <PackageReference Include="TenorClient" Version="1.0.3" />
