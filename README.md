@@ -315,3 +315,11 @@ You can also leave the URL off and it'll grab the first one it can find in scrol
 ```
 Example Output:
 > https://cdn2.thedogapi.com/images/AcXu5OATT.jpg **American Bulldog** — bred for | Friendly, Assertive, Energetic, Loyal, Gentle, Confident, Dominant
+
+### Demand Sauce
+*You need it for... research purposes.*
+```
+.cb sauce https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/21a0c5e7-82ff-45b1-860c-6c88a6100257/ddm3hwm-b548b579-4603-4750-bf12-7111f1608d5f.png
+```
+Example Output:
+> 78.41% match on deviantArt: https://deviantart.com/view/823175014
