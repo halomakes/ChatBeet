@@ -2,7 +2,7 @@
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyIrc.Messages;
-using LinqToTwitter.Common;
+using LinqToTwitter;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;

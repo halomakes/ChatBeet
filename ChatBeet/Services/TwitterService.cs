@@ -1,8 +1,6 @@
 ﻿using ChatBeet.Configuration;
 using ChatBeet.Utilities;
 using LinqToTwitter;
-using LinqToTwitter.Common;
-using LinqToTwitter.OAuth;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
@@ -89,7 +87,7 @@ namespace ChatBeet.Services
             var twitterContext = await GetContext();
 
             return await twitterContext.Status
-                .Where(s => s.Type == StatusType.User)
+                .Where(s => s.Type == StatusType.Show)
                 .Where(s => s.StatusID == id || s.ID == id)
                 .Where(s => s.TweetMode == TweetMode.Extended)
                 .FirstOrDefaultAsync();
