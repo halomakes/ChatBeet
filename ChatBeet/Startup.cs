@@ -24,6 +24,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Miki.Anilist;
+using PixivCS;
+using SauceNET;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -132,6 +134,11 @@ namespace ChatBeet
                 var opts = Options.Create(config.Value.Untappd);
                 var clientFactory = provider.GetService<IHttpClientFactory>();
                 return new UntappdClient(clientFactory.CreateClient(), opts);
+            });
+            services.AddScoped(provider =>
+            {
+                var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
+                return new SauceNETClient(config.Value.Sauce);
             });
 
             services.AddHostedService<ContextInitializer>();

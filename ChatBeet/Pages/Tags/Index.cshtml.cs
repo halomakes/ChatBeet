@@ -15,7 +15,7 @@ namespace ChatBeet.Pages.Tags
     {
         private readonly BooruContext db;
         private readonly IMemoryCache cache;
-        private static readonly Random rng = new Random();
+        private static readonly Random rng = new();
 
         public IEnumerable<TagStat> GeneralStats { get; private set; }
         public IEnumerable<TagStat> RandomStats { get; private set; }
