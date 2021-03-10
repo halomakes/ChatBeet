@@ -3,10 +3,10 @@ using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
+using Meowtrix.PixivApi;
+using Meowtrix.PixivApi.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using PixivCS;
-using PixivCS.Objects;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,14 +17,16 @@ namespace ChatBeet.Commands
     public class PixivCommandProcessor : CommandProcessor
     {
         private readonly ChatBeetConfiguration.PixivConfiguration pixivConfig;
-        private readonly PixivAppAPI pixiv;
+        private readonly PixivApiClient pixiv;
         private readonly IMemoryCache cache;
 
-        public PixivCommandProcessor(IOptions<ChatBeetConfiguration> dtlaOptions, PixivAppAPI pixiv, IMemoryCache cache)
+        public PixivCommandProcessor(IOptions<ChatBeetConfiguration> dtlaOptions, PixivApiClient pixiv, IMemoryCache cache)
         {
             pixivConfig = dtlaOptions.Value.Pixiv;
             this.pixiv = pixiv;
             this.cache = cache;
+            this.pixiv.DefaultRequestHeaders.AcceptLanguage.Add(new(ChatBeetConfiguration.Culture.Name));
+
         }
 
         [Command("pixiv {query}", Description = "Get a random artwork from Pixiv.")]
@@ -36,8 +38,8 @@ namespace ChatBeet.Commands
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-                    await pixiv.AuthAsync(pixivConfig.UserId, pixivConfig.Password);
-                    return await pixiv.GetSearchIllustAsync(query);
+                    var (authTime, authResponse) = await pixiv.AuthAsync(pixivConfig.RefreshToken);
+                    return await pixiv.SearchIllustsAsync(authToken: authResponse.AccessToken, word: query);
                 });
 
                 var text = PickImage(results);
@@ -53,7 +55,7 @@ namespace ChatBeet.Commands
 
                 static string PickImage(SearchIllustResult searchResults)
                 {
-                    if (searchResults?.Illusts?.Any() ?? false)
+                    if (searchResults?.Illusts.Any() ?? false)
                     {
                         var img = searchResults.Illusts.PickRandom();
                         return $"{IrcValues.BOLD}{img.Title}{IrcValues.RESET} by {IrcValues.BOLD}{img.User?.Name}{IrcValues.RESET} - https://www.pixiv.net/en/artworks/{img.Id}";
