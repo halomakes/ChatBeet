@@ -38,7 +38,7 @@ namespace ChatBeet.Commands
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-                    var (authTime, authResponse) = await pixiv.AuthAsync(pixivConfig.UserId, pixivConfig.Password);
+                    var (authTime, authResponse) = await pixiv.AuthAsync(pixivConfig.RefreshToken);
                     return await pixiv.SearchIllustsAsync(authToken: authResponse.AccessToken, word: query);
                 });
 
