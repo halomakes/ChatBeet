@@ -148,6 +148,7 @@ namespace ChatBeet
             services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"));
             services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
             services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
+            services.AddDbContext<ProgressContext>(opts => opts.UseSqlite("Data Source=db/progress.db"));
             services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();
