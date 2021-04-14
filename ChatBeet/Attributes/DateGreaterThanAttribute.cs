@@ -17,10 +17,10 @@ namespace ChatBeet.Attributes
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var earlierDate = (DateTime)value;
+            var laterDate = (DateTime)value;
             var referencedProperty = validationContext.ObjectType.GetProperty(DateToCompareToFieldName);
 
-            var laterDate = (DateTime)referencedProperty.GetValue(validationContext.ObjectInstance, null);
+            var earlierDate = (DateTime)referencedProperty.GetValue(validationContext.ObjectInstance, null);
 
             if (laterDate > earlierDate)
             {
