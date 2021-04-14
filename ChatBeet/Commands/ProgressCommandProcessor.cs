@@ -1,5 +1,6 @@
 ﻿using ChatBeet.Attributes;
 using ChatBeet.Configuration;
+using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
@@ -10,6 +11,7 @@ using Humanizer;
 using IF.Lastfm.Core.Api.Helpers;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using TimeZoneConverter;
 
@@ -18,16 +20,37 @@ namespace ChatBeet.Commands
     public class ProgressCommandProcessor : CommandProcessor
     {
         private readonly UserPreferencesService preferences;
+        private readonly ProgressContext dbContext;
         private readonly DateTime now;
 
-        public ProgressCommandProcessor(UserPreferencesService preferences)
+        public ProgressCommandProcessor(UserPreferencesService preferences, ProgressContext dbContext)
         {
             this.preferences = preferences;
+            this.dbContext = dbContext;
             now = DateTime.Now;
         }
 
-        [Command("progress {timeUnit}", Description = "Gets progress over a period of time. Options include year, day, hour, workday, president.")]
-        public IClientMessage GetGeneralMessage([Required] string timeUnit) => new NoticeMessage(IncomingMessage.From, "Enter a valid time unit.");
+        [Command("progress {timeUnit}", Description = "Gets progress over a period of time.")]
+        public async Task<IClientMessage> GetCustomTime([Required] string timeUnit)
+        {
+            string content = "Enter a valid time unit.";
+            var unit = await dbContext.FixedTimeRanges.FirstOrDefaultAsync(r => r.Key.ToLower() == timeUnit.Trim().ToLower());
+            if (unit != default)
+            {
+                var now = DateTime.Now;
+                if (now < unit.StartDate)
+                    content = string.IsNullOrWhiteSpace(unit.BeforeRangeMessage)
+                        ? Progress.FormatTemplate(0, unit.Template)
+                        : unit.BeforeRangeMessage;
+                else if (now > unit.EndDate)
+                    content = string.IsNullOrWhiteSpace(unit.AfterRangeMessage)
+                        ? Progress.FormatTemplate(100, unit.Template)
+                        : unit.AfterRangeMessage;
+                else
+                    content = Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template);
+            }
+            return new PrivateMessage(IncomingMessage.GetResponseTarget(), content);
+        }
 
         [Command("progress year", Description = "Get progress for the current year.")]
         [RateLimit(5, TimeUnit.Minute)]
@@ -113,7 +136,7 @@ namespace ChatBeet.Commands
         [Command("progress second", Description = "Get progress for the current millennium.")]
         [RateLimit(5, TimeUnit.Minute)]
         public IClientMessage GetSecond() =>
-            new PrivateMessage(IncomingMessage.GetResponseTarget(), Progress.GetBar((double)now.Millisecond / 1000, $"{IrcValues.BOLD}This second{IrcValues.RESET} is"));
+            new PrivateMessage(IncomingMessage.GetResponseTarget(), Progress.GetDescription((double)now.Millisecond / 1000, $"{IrcValues.BOLD}This second{IrcValues.RESET} is"));
 
         [Command("progress president", Description = "Get progress for the current US presidential term.")]
         [RateLimit(5, TimeUnit.Minute)]
@@ -130,7 +153,7 @@ namespace ChatBeet.Commands
         }
 
         private IClientMessage ProgressResult(DateTime start, DateTime end, string preFormat) =>
-            new PrivateMessage(IncomingMessage.GetResponseTarget(), Progress.GetBar(now, start, end, preFormat));
+            new PrivateMessage(IncomingMessage.GetResponseTarget(), Progress.GetDescription(now, start, end, preFormat));
 
         [Command("progress workday", Description = "Get progress for your current workday.")]
         [RateLimit(5, TimeUnit.Minute)]
@@ -170,7 +193,7 @@ namespace ChatBeet.Commands
 
                 if (start <= now && end >= now)
                 {
-                    var bar = Progress.GetBar(now, start, end, $"{IrcValues.BOLD}Your workday{IrcValues.RESET} is");
+                    var bar = Progress.GetDescription(now, start, end, $"{IrcValues.BOLD}Your workday{IrcValues.RESET} is");
                     return new PrivateMessage(IncomingMessage.GetResponseTarget(), bar);
                 }
                 else
