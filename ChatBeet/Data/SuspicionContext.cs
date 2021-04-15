@@ -17,7 +17,7 @@ namespace ChatBeet.Data
 
         public virtual DbSet<Suspicion> Suspicions { get; set; }
 
-        private DateTime ActiveWindowStart => DateTime.Now - ActivePeriod;
+        public DateTime ActiveWindowStart => DateTime.Now - ActivePeriod;
 
         public IQueryable<Suspicion> ActiveSuspicions => Suspicions
             .AsQueryable()
