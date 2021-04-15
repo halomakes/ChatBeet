@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChatBeet.Commands
 {
@@ -23,30 +24,34 @@ namespace ChatBeet.Commands
         }
 
         [Command("booru {tagList}", Description = "Get a random image from gelbooru matching tags (safe only).")]
+        [RateLimit(30, TimeUnit.Second)]
+        public async Task<IClientMessage> GetRandomSafePost([Required] string tagList) => await GetPost(true, tagList);
+
         [Command("nsfwbooru {tagList}", Description = "Get a random image from gelbooru matching tags (questionable and explicit only).")]
         [ChannelPolicy("NoMain")]
-        public async IAsyncEnumerable<IClientMessage> GetRandomPost([Required] string tagList)
+        public async Task<IClientMessage> GetRandomPost([Required] string tagList) => await GetPost(false, tagList);
+
+        private async Task<IClientMessage> GetPost(bool safeOnly, string tagList)
         {
             var tags = tagList.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var applyFilter = TriggeringCommandName != "nsfwbooru";
 
             if (tags.Any())
             {
-                var text = await booru.GetRandomPostAsync(applyFilter, IncomingMessage.From, tags);
+                var text = await booru.GetRandomPostAsync(safeOnly, IncomingMessage.From, tags);
 
                 if (text != default)
                 {
                     await booru.RecordTags(IncomingMessage.From, tags);
-                    yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), text);
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), text);
                 }
                 else
                 {
-                    yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tagList}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tagList}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
                 }
             }
             else
             {
-                yield return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Please specify tag/tags. See available list here: https://gelbooru.com/index.php?page=tags&s=list");
+                return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Please specify tag/tags. See available list here: https://gelbooru.com/index.php?page=tags&s=list");
             }
         }
 
