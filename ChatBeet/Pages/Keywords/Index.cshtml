@@ -23,7 +23,7 @@
                     @{
                         var max = statSet.Stats.Max(s => s.Hits);
                     }
-                    @foreach (var stat in statSet.Stats)
+                    @foreach (var stat in statSet.Stats.Take(10))
                     {
                         <li class="list-group-item list-group-item-action position-relative overflow-none">
                             <span class="ml-2 d-flex align-items-center flex-wrap">
