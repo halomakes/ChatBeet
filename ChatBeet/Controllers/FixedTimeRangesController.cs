@@ -20,14 +20,19 @@ namespace ChatBeet.Controllers
             this.dbContext = dbContext;
         }
 
-        // GET: api/FixedTimeRanges
+        /// <summary>
+        /// Get all time ranges
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FixedTimeRange>>> GetFixedTimeRanges()
         {
             return await dbContext.FixedTimeRanges.AsQueryable().ToListAsync();
         }
 
-        // GET: api/FixedTimeRanges/5
+        /// <summary>
+        /// Get a time range
+        /// </summary>
+        /// <param name="id">ID of the time range</param>
         [HttpGet("{id}")]
         public async Task<ActionResult<FixedTimeRange>> GetFixedTimeRange(string id)
         {
@@ -41,8 +46,11 @@ namespace ChatBeet.Controllers
             return fixedTimeRange;
         }
 
-        // PUT: api/FixedTimeRanges/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Update a time range
+        /// </summary>
+        /// <param name="id">ID of the time range</param>
+        /// <param name="fixedTimeRange">Values to set</param>
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> PutFixedTimeRange(string id, FixedTimeRange fixedTimeRange)
         {
@@ -72,8 +80,10 @@ namespace ChatBeet.Controllers
             return NoContent();
         }
 
-        // POST: api/FixedTimeRanges
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Create a time range
+        /// </summary>
+        /// <param name="fixedTimeRange">Data to create</param>
         [HttpPost, Authorize]
         public async Task<ActionResult<FixedTimeRange>> PostFixedTimeRange(FixedTimeRange fixedTimeRange)
         {
@@ -97,7 +107,10 @@ namespace ChatBeet.Controllers
             return CreatedAtAction("GetFixedTimeRange", new { id = fixedTimeRange.Key }, fixedTimeRange);
         }
 
-        // DELETE: api/FixedTimeRanges/5
+        /// <summary>
+        /// Delete a time range
+        /// </summary>
+        /// <param name="id">ID of time range</param>
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteFixedTimeRange(string id)
         {
