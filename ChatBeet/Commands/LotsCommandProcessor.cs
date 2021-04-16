@@ -14,25 +14,26 @@ namespace ChatBeet.Commands
         private static readonly int godLength = 32;
 
         [Command("lots", Description = "Draw a lot to compare with other users.")]
-        [Command("epeen")]
-        [RateLimit(5, TimeUnit.Minute)]
+        [RateLimit(2, TimeUnit.Minute)]
         public IClientMessage GetLot()
         {
-            var bar = BuildLot(TriggeringCommandName);
-            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"{bar} {IncomingMessage.From}");
+            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"{GetBar(GetLength(), '-')} {IncomingMessage.From}");
         }
 
-        private string BuildLot(string mode)
+        [Command("epeen")]
+        [RateLimit(2, TimeUnit.Minute)]
+        public IClientMessage CompareLength()
+        {
+            var today = DateTime.Now;
+            if(today.Month == 4 && today.Day == 16)
+                return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"{GetBar(godLength, '=')} {IncomingMessage.From} Happy national horny day!");
+            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"{GetBar(GetLength(), '=')} {IncomingMessage.From}");
+        }
+
+        private int GetLength()
         {
             var isGodLength = rng.Next(0, godChance) == 0;
-            var length = isGodLength ? godLength : rng.NormalNext(1, maxLength);
-
-            return mode switch
-            {
-                "lots" => GetBar(length, '-'),
-                "epeen" => $"8{GetBar(length, '=')}D",
-                _ => default
-            };
+            return isGodLength ? godLength : rng.NormalNext(1, maxLength);
         }
 
         private static string GetBar(int length, char @char) => new(Enumerable.Repeat(@char, length).ToArray());
