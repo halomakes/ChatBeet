@@ -26,8 +26,8 @@ namespace ChatBeet.Commands
         {
             var today = DateTime.Now;
             if(today.Month == 4 && today.Day == 16)
-                return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"{GetBar(godLength, '=')} {IncomingMessage.From} Happy national horny day!");
-            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"{GetBar(GetLength(), '=')} {IncomingMessage.From}");
+                return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"8{GetBar(godLength, '=')}D {IncomingMessage.From} Happy national horny day!");
+            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"8{GetBar(GetLength(), '=')}D {IncomingMessage.From}");
         }
 
         private int GetLength()
