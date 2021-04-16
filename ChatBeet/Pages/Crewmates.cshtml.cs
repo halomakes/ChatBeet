@@ -1,5 +1,6 @@
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
+using ChatBeet.Models;
 using ChatBeet.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -44,13 +45,6 @@ namespace ChatBeet.Pages
                     Color = pref?.Value
                 };
             }).ToList();
-        }
-
-        public struct SuspicionRank
-        {
-            public string Nick;
-            public int Level;
-            public string Color;
         }
     }
 }
