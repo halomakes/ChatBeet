@@ -1,0 +1,51 @@
+﻿@page
+@model ChatBeet.Pages.FixedTimeRanges.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Fixed Time Ranges</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr class="d-none d-lg-table-row">
+            <th>
+                @Html.DisplayNameFor(m => m.FixedTimeRange[0].Key)
+            </th>
+            <th class="d-none d-lg-table-cell">
+                @Html.DisplayNameFor(model => model.FixedTimeRange[0].Template)
+            </th>
+            <th class="d-none d-lg-table-cell">
+                @Html.DisplayNameFor(model => model.FixedTimeRange[0].StartDate)
+            </th>
+            <th class="d-none d-lg-table-cell">
+                @Html.DisplayNameFor(model => model.FixedTimeRange[0].EndDate)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.FixedTimeRange)
+        {
+            <tr>
+                <td>
+                    <a asp-page="./Details" asp-route-id="@item.Key">
+                        @Html.DisplayFor(m => item.Key)
+                    </a>
+                </td>
+                <td class="d-none d-lg-table-cell">
+                    @Html.DisplayFor(modelItem => item.Template)
+                </td>
+                <td class="d-none d-lg-table-cell">
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td class="d-none d-lg-table-cell">
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
