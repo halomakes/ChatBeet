@@ -25,7 +25,18 @@
                 <span class="ml-2 d-flex align-items-center flex-wrap">
                     <span>@range.Key</span>
                     <span class="flex-grow-1"></span>
-                    <span>@range.Template.Replace("{percentage}", $"{percentage / 100:P}")</span>
+                    @if (percentage == 100 && !string.IsNullOrWhiteSpace(range.AfterRangeMessage))
+                    {
+                        <span>@range.AfterRangeMessage</span>
+                    }
+                    else if (percentage == 0 && !string.IsNullOrWhiteSpace(range.BeforeRangeMessage))
+                    {
+                        <span>@range.BeforeRangeMessage</span>
+                    }
+                    else
+                    {
+                        <span>@range.Template.Replace("{percentage}", $"{percentage / 100:P}")</span>
+                    }
                 </span>
                 <background-bar class="bg-primary" value="Convert.ToInt32(percentage)" animation-delay="count * offset" collection-max="100"></background-bar>
             </a>
