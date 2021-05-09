@@ -1,0 +1,55 @@
+﻿@page
+@model ChatBeet.Pages.FixedTimeRanges.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>FixedTimeRange</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="FixedTimeRange.Key" />
+            <div class="form-group">
+                <label asp-for="FixedTimeRange.Template" class="control-label"></label>
+                <input asp-for="FixedTimeRange.Template" class="form-control" />
+                <span asp-validation-for="FixedTimeRange.Template" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FixedTimeRange.BeforeRangeMessage" class="control-label"></label>
+                <input asp-for="FixedTimeRange.BeforeRangeMessage" class="form-control" />
+                <span asp-validation-for="FixedTimeRange.BeforeRangeMessage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FixedTimeRange.AfterRangeMessage" class="control-label"></label>
+                <input asp-for="FixedTimeRange.AfterRangeMessage" class="form-control" />
+                <span asp-validation-for="FixedTimeRange.AfterRangeMessage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FixedTimeRange.StartDate" class="control-label"></label>
+                <input asp-for="FixedTimeRange.StartDate" class="form-control" />
+                <span asp-validation-for="FixedTimeRange.StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FixedTimeRange.EndDate" class="control-label"></label>
+                <input asp-for="FixedTimeRange.EndDate" class="form-control" />
+                <span asp-validation-for="FixedTimeRange.EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
