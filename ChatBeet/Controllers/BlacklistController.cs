@@ -3,6 +3,7 @@ using ChatBeet.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Controllers
@@ -18,6 +19,21 @@ namespace ChatBeet.Controllers
         {
             this.booru = booru;
         }
+
+        /// <summary>
+        /// Get tags currently on your blacklist
+        /// </summary>
+        [HttpGet, Authorize]
+        public async Task<ActionResult<IEnumerable<string>>> Get()
+        {
+            return Ok(await booru.GetBlacklistedTags(User?.Identity?.Name));
+        }
+
+        /// <summary>
+        /// Get globally blacklisted tags
+        /// </summary>
+        [HttpGet("global")]
+        public ActionResult<IEnumerable<string>> GetGlobal() => Ok(booru.GetGlobalBlacklistedTags());
 
         /// <summary>
         /// Remove tags from your booru blacklist
