@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "Index";
+    var count = 0;
+    var offset = 200;
 }
 
 <h1>Fixed Time Ranges</h1>
@@ -10,42 +12,24 @@
 <p>
     <a asp-page="Create" class="btn btn-primary">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr class="d-none d-lg-table-row">
-            <th>
-                @Html.DisplayNameFor(m => m.FixedTimeRange[0].Key)
-            </th>
-            <th class="d-none d-lg-table-cell">
-                @Html.DisplayNameFor(model => model.FixedTimeRange[0].Template)
-            </th>
-            <th class="d-none d-lg-table-cell">
-                @Html.DisplayNameFor(model => model.FixedTimeRange[0].StartDate)
-            </th>
-            <th class="d-none d-lg-table-cell">
-                @Html.DisplayNameFor(model => model.FixedTimeRange[0].EndDate)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.FixedTimeRange)
+<div class="my-4">
+    <div class="list-group">
+        @foreach (var range in Model.FixedTimeRange.Reverse())
         {
-            <tr>
-                <td>
-                    <a asp-page="./Details" asp-route-id="@item.Key">
-                        @Html.DisplayFor(m => item.Key)
-                    </a>
-                </td>
-                <td class="d-none d-lg-table-cell">
-                    @Html.DisplayFor(modelItem => item.Template)
-                </td>
-                <td class="d-none d-lg-table-cell">
-                    @Html.DisplayFor(modelItem => item.StartDate)
-                </td>
-                <td class="d-none d-lg-table-cell">
-                    @Html.DisplayFor(modelItem => item.EndDate)
-                </td>
-            </tr>
+            var percentage = (DateTime.Now - range.StartDate) * 100 / (range.EndDate - range.StartDate);
+            if (percentage > 100)
+                percentage = 100;
+            else if (percentage < 0)
+                percentage = 0;
+            <a asp-page="./Details" asp-route-id="@range.Key" class="list-group-item list-group-item-action position-relative overflow-none">
+                <span class="ml-2 d-flex align-items-center flex-wrap">
+                    <span>@range.Key</span>
+                    <span class="flex-grow-1"></span>
+                    <span>@range.Template.Replace("{percentage}", $"{percentage / 100:P}")</span>
+                </span>
+                <background-bar class="bg-primary" value="Convert.ToInt32(percentage)" animation-delay="count * offset" collection-max="100"></background-bar>
+            </a>
+            count++;
         }
-    </tbody>
-</table>
+    </div>
+</div>
