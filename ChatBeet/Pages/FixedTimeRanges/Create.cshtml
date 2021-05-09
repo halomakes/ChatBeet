@@ -7,7 +7,7 @@
 
 <h1>Create</h1>
 
-<h4>FixedTimeRange</h4>
+<h4>Fixed Time Range</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -43,15 +43,13 @@
                 <input asp-for="FixedTimeRange.EndDate" class="form-control" />
                 <span asp-validation-for="FixedTimeRange.EndDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="d-flex flex-wrap">
+                <a asp-page="./Index" class="btn btn-outline-light my-2 mr-2">Back to List</a>
+                <span class="flex-grow-1"></span>
+                <input type="submit" value="Create" class="btn btn-primary my-2" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-page="Index">Back to List</a>
 </div>
 
 @section Scripts {

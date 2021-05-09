@@ -8,7 +8,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4>FixedTimeRange</h4>
+    <h4>@Model.FixedTimeRange.Key</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -43,7 +43,9 @@
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.FixedTimeRange.Key">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+<div class="d-flex flex-wrap">
+    <a asp-page="./Index" class="btn btn-outline-light my-2 mr-2">Back to List</a>
+    <span class="flex-grow-1"></span>
+    <a asp-page="./Edit" asp-route-id="@Model.FixedTimeRange.Key" class="btn btn-primary mr-2 my-2">Edit</a>
+    <a asp-page="./Delete" asp-route-id="@Model.FixedTimeRange.Key" class="btn btn-outline-danger my-2">Delete</a>
 </div>
