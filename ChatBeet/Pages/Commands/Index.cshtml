@@ -1,0 +1,69 @@
+﻿@page
+@model ChatBeet.Pages.Commands.IndexModel
+@using System.Text.RegularExpressions
+@{
+    ViewBag.Title = "Commands";
+    var ParameterRgx = new Regex(@"(\{[^\{\}]+\})+", RegexOptions.Compiled);
+}
+
+<h1>Commands</h1>
+<p class="text-warning font-italic">
+    Note that this page does not currently cover dynamic commands and aliases.
+</p>
+
+
+<div id="accordion">
+    @foreach (var binding in Model.Builder.Bindings.OrderBy(b => b.Key))
+    {
+        var id = TagBuilder.CreateSanitizedId(binding.Key, "_");
+        <div class="card">
+            <div class="card-header d-flex justify-content-between flex-wrap align-items-md-center flex-md-row flex-column align-items-start" id="heading-@id" data-toggle="collapse" data-target="#collapse-@id" aria-expanded="false" aria-controls="collapse-@id">
+                <h4 class="mb-0">
+                    @binding.Key
+                </h4>
+                @if (!string.IsNullOrWhiteSpace(binding.Value.Command.Description))
+                {
+                    <span>@binding.Value.Command.Description</span>
+                }
+            </div>
+
+            <div id="collapse-@id" class="collapse" aria-labelledby="heading-@id" data-parent="#accordion">
+                <div class="card-body">
+                    <h5>Example Usage</h5>
+                    <code>
+                        <span class="text-white-50">@Model.CommandPrefix</span>
+                        @foreach (var segment in ParameterRgx.Split(binding.Value.Command.CommandFormat))
+                        {
+                            if (segment.StartsWith("{"))
+                            {
+                                <text>@segment</text>
+                            }
+                            else
+                            {
+                                <span class="text-white">@segment</span>
+                            }
+                        }
+                    </code>
+
+                    @if (binding.Value.Command.ParameterNames.Any())
+                    {
+                        <h5>Parameters</h5>
+                        <ul>
+                            @foreach (var parameter in binding.Value.Command.ParameterNames)
+                            {
+                                <li>@parameter</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<h2>Policies</h2>
+@foreach (var policy in Model.Builder.Policies)
+{
+    <b>@policy.Key</b><text>:</text>
+    <p>@policy.Value.Mode channels @string.Join(", ", policy.Value.Channels)</p>
+}
