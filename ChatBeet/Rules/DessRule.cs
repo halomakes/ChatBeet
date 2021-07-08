@@ -18,7 +18,7 @@ namespace ChatBeet.Rules
 
         protected override async IAsyncEnumerable<IClientMessage> OnMatch(Match match, BooruCommandProcessor commandProcessor)
         {
-            yield return await commandProcessor.GetRandomPost("akatsuki_kirika");
+            yield return await commandProcessor.GetRandomSafePost("akatsuki_kirika");
         }
     }
 }

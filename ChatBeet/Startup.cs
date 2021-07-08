@@ -24,7 +24,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Miki.Anilist;
-using PixivCS;
 using SauceNET;
 using System;
 using System.IO;
@@ -77,6 +76,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<CommandingRecallRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
+                pipeline.RegisterAsyncRule<DessRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
             });
 
