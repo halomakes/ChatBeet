@@ -93,6 +93,7 @@ namespace ChatBeet
                 AllowAutoRedirect = false
             });
 
+            services.AddScoped<ComplimentService>();
             services.AddScoped<DadJokeService>();
             services.AddScoped<PixivApiClient>();
             services.AddScoped<DeviantartService>();
