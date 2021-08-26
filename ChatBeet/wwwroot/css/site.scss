@@ -172,6 +172,10 @@ body {
             border-top: none !important;
             @include truncate();
         }
+        
+        & > td.value {
+            word-break: break-word;
+        }
 
         & + tr {
             padding-top: $spacing;
