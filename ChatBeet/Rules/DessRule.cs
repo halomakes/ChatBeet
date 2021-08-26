@@ -13,7 +13,7 @@ namespace ChatBeet.Rules
     {
         public DessRule(IOptions<IrcBotConfiguration> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
         {
-            Pattern = new Regex(@"!dess", RegexOptions.IgnoreCase);
+            Pattern = new Regex(@"^!dess$", RegexOptions.IgnoreCase);
         }
 
         protected override async IAsyncEnumerable<IClientMessage> OnMatch(Match match, BooruCommandProcessor commandProcessor)
