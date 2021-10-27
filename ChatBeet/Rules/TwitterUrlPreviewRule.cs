@@ -17,7 +17,7 @@ namespace ChatBeet.Rules
         public TwitterUrlPreviewRule(TwitterService tweetService)
         {
             this.tweetService = tweetService;
-            rgx = new Regex(@"^(?!.*<.*>.*$).*twitter\.com\/.*\/status(?:es)?\/(\d+)", RegexOptions.IgnoreCase);
+            rgx = new Regex(@"^(?!.*<.*>.*$).*(?:twitter\.com|nitter.+)\/.*\/status(?:es)?\/(\d+)", RegexOptions.IgnoreCase);
         }
 
         public bool Matches(PrivateMessage incomingMessage) => rgx.IsMatch(incomingMessage.Message);
