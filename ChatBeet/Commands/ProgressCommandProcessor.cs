@@ -9,6 +9,7 @@ using GravyBot.Commands;
 using GravyIrc.Messages;
 using Humanizer;
 using IF.Lastfm.Core.Api.Helpers;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;

@@ -27,6 +27,7 @@ using Miki.Anilist;
 using SauceNET;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -77,6 +78,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DessRule, PrivateMessage>();
+                pipeline.RegisterRule<AmazonSmileRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
             });
 
@@ -91,6 +93,10 @@ namespace ChatBeet
             services.AddHttpClient("noredirect").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
                 AllowAutoRedirect = false
+            });
+            services.AddHttpClient("compression").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AutomaticDecompression = DecompressionMethods.All
             });
 
             services.AddScoped<ComplimentService>();

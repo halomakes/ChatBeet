@@ -7,9 +7,7 @@ using GravyBot.Commands;
 using GravyIrc.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using MoreLinq;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 

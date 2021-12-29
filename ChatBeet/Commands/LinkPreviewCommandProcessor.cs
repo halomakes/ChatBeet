@@ -38,9 +38,14 @@ namespace ChatBeet.Commands
             {
                 try
                 {
-                    var meta = await previewService.GetMetadataAsync(parsedUri);
+                    var meta = await previewService.GetDocumentAsync(parsedUri);
                     if (meta != default)
-                        return new PrivateMessage(IncomingMessage.GetResponseTarget(), meta.ToIrcSummary(maxDescriptionLength: 400));
+                    {
+                        var summary = meta.ToIrcSummary(maxDescriptionLength: 400);
+                        if (!string.IsNullOrEmpty(summary))
+                            return new PrivateMessage(IncomingMessage.GetResponseTarget(), summary);
+                    }
+                    return new NoticeMessage(IncomingMessage.From, $"Sorry, I couldn't parse details from that page.");
                 }
                 catch (Exception e)
                 {
