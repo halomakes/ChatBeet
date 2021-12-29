@@ -5,6 +5,7 @@ using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
