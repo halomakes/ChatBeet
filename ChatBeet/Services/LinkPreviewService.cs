@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using OpenGraphNet;
+﻿using HtmlAgilityPack;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace ChatBeet.Services
 {
@@ -13,16 +13,18 @@ namespace ChatBeet.Services
         private readonly IMemoryCache cache;
         private readonly HttpClient client;
 
-        public LinkPreviewService(IMemoryCache cache, HttpClient client)
+        public LinkPreviewService(IMemoryCache cache, IHttpClientFactory clientFactory)
         {
             this.cache = cache;
-            this.client = client;
+            client = clientFactory.CreateClient("compression");
         }
 
-        public async Task<OpenGraph> GetMetadataAsync(Uri url)
+        public async Task<HtmlDocument> GetDocumentAsync(Uri url)
         {
             var content = await GetUrlContentAsync(url);
-            return OpenGraph.ParseHtml(content);
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(content);
+            return htmlDoc;
         }
 
         private Task<string> GetUrlContentAsync(Uri url) => cache.GetOrCreateAsync($"opengraph:{url}", async entry =>

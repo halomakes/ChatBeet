@@ -29,7 +29,7 @@ namespace ChatBeet.Commands
             if (!resultLink.Host.Contains("google.com", StringComparison.OrdinalIgnoreCase))
             {
                 // not a google link, try to generate preview
-                var metaTask = previewSerivce.GetMetadataAsync(resultLink);
+                var metaTask = previewSerivce.GetDocumentAsync(resultLink);
                 var timeoutTask = Task.Delay(TimeSpan.FromSeconds(2));
                 await Task.WhenAny(metaTask, timeoutTask);
 
