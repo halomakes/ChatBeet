@@ -78,6 +78,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DessRule, PrivateMessage>();
+                pipeline.RegisterRule<AmazonSmileRule, PrivateMessage>();
                 pipeline.AddCommandOrchestrator();
             });
 
