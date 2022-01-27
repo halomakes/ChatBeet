@@ -17,7 +17,7 @@ namespace ChatBeet.Data.Entities
         /// Format template for responses
         /// </summary>
         /// <remarks>Any instances of {percentage} will be replaced</remarks>
-        [Required, RegularExpression(@".*\{percentage\}.*", ErrorMessage = "Template must contain a {{percentage}} token."), MaxLength(200)]
+        [Required, RegularExpression(@".*\{(?:percentage)|(?:elapsed)|(?:remaining)\}.*", ErrorMessage = "Template must contain a {{percentage}}, {{elapsed}}, or {{remaining}} token."), MaxLength(200)]
         public string Template { get; set; } = "This custom range is {percentage} complete.";
 
         /// <summary>

@@ -41,11 +41,11 @@ namespace ChatBeet.Commands
                 var now = DateTime.Now;
                 if (now < unit.StartDate)
                     content = string.IsNullOrWhiteSpace(unit.BeforeRangeMessage)
-                        ? Progress.FormatTemplate(0, unit.Template)
+                        ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
                         : unit.BeforeRangeMessage;
                 else if (now > unit.EndDate)
                     content = string.IsNullOrWhiteSpace(unit.AfterRangeMessage)
-                        ? Progress.FormatTemplate(100, unit.Template)
+                        ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
                         : unit.AfterRangeMessage;
                 else
                     content = Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template);
