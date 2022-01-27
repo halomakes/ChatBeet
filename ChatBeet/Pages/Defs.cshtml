@@ -1,5 +1,6 @@
 ﻿@page
 @model ChatBeet.Pages.DefsModel
+@using ChatBeet.Utilities
 @{
     ViewBag.Title = "Definitions";
 }
@@ -42,7 +43,7 @@
                 {
                     <tr id="@def.Key" data-show="!this.filter || '@def.Key.Replace("'","\"")'.toLowerCase().includes(this.filter.toLowerCase())">
                         <th scope="row">@def.Key <a href="#@(def.Key)" onclick="event.preventDefault();copyTextToClipboard(this.href)" class="badge material-icons">link</a></th>
-                        <td class="value">@def.Value</td>
+                        <td class="value">@def.Value.RemoveIrcFormatting()</td>
                         <td>@def.Author</td>
                     </tr>
                 }

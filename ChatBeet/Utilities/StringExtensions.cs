@@ -50,5 +50,7 @@ namespace ChatBeet.Utilities
         public static string ToPossessive(this string name) => name.EndsWith('s') ? $"{name}'" : $"{name}'s";
 
         public static bool EqualsIgnoreCase(this string @string, string comparison) => @string.Equals(comparison, StringComparison.OrdinalIgnoreCase);
+
+        public static string RemoveIrcFormatting(this string @string) => string.Concat(@string.Where(c => !char.IsControl(c)));
     }
 }

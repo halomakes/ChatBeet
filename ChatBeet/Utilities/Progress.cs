@@ -32,9 +32,9 @@ namespace ChatBeet.Utilities
             });
         }
 
-        private static TimeSpan ForcePositive(TimeSpan ts) => ts < TimeSpan.Zero ? TimeSpan.Zero : ts;
+        public static TimeSpan ForcePositive(TimeSpan ts) => ts < TimeSpan.Zero ? TimeSpan.Zero : ts;
 
-        private static double ForceRange(double percentage) => percentage switch
+        public static double ForceRange(double percentage) => percentage switch
         {
             < 0 => 0,
             > 100 => 100,
