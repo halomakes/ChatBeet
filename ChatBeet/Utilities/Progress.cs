@@ -34,10 +34,11 @@ namespace ChatBeet.Utilities
 
         public static TimeSpan ForcePositive(TimeSpan ts) => ts < TimeSpan.Zero ? TimeSpan.Zero : ts;
 
-        public static double ForceRange(double percentage) => percentage switch
+        public static double ForceRange(double percentage, bool isUnit = false) => (percentage, isUnit) switch
         {
-            < 0 => 0,
-            > 100 => 100,
+            ( < 0, _) => 0,
+            ( > 100, false) => 100,
+            ( > 1, true) => 1,
             _ => percentage
         };
 
@@ -52,16 +53,11 @@ namespace ChatBeet.Utilities
             return $"{bar}  {filledTemplate}";
         }
 
-        private static double GetRatio(DateTime now, DateTime start, DateTime end) => ForceRange((now - start) / (end - start));
+        private static double GetRatio(DateTime now, DateTime start, DateTime end) => ForceRange((now - start) / (end - start), isUnit: true);
 
         private static (string percentage, string bar) GetPercentAndBar(double ratio)
         {
-            var segments = ratio switch
-            {
-                >= 1 => barLength,
-                <= 0 => 0,
-                _ => Convert.ToInt32(ratio * barLength)
-            };
+            var segments = Convert.ToInt32(ForceRange(ratio, isUnit: true) * barLength);
             var percentage = ratio * 100;
 
             var filled = string.Concat(Enumerable.Repeat('█', segments));
@@ -70,6 +66,17 @@ namespace ChatBeet.Utilities
             var bar = $"{IrcValues.GREEN}{filled}{IrcValues.GREY}{empty}{IrcValues.RESET}";
 
             return (percentageDesc, bar);
+        }
+
+        public static double GetPercentage(DateTime start, DateTime end)
+        {
+            var now = DateTime.Now;
+            if (now > end)
+                return 100;
+            else if (now < start)
+                return 0;
+            else
+                return ForceRange((now - start) * 100 / (end - start));
         }
     }
 }

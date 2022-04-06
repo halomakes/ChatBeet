@@ -19,7 +19,7 @@
     <div class="list-group">
         @foreach (var range in Model.FixedTimeRange.Reverse())
         {
-            var percentage = Progress.ForceRange((now - range.StartDate) * 100 / (range.EndDate - range.StartDate));
+            var percentage = Progress.GetPercentage(range.StartDate, range.EndDate);
 
             <a asp-page="./Details" asp-route-id="@range.Key" class="list-group-item list-group-item-action position-relative overflow-none">
                 <span class="ml-2 d-flex align-items-center flex-wrap">
