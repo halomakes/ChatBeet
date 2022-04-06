@@ -56,11 +56,16 @@ namespace ChatBeet.Utilities
 
         private static (string percentage, string bar) GetPercentAndBar(double ratio)
         {
-            var segments = Convert.ToInt32(ratio * barLength);
+            var segments = ratio switch
+            {
+                >= 1 => barLength,
+                <= 0 => 0,
+                _ => Convert.ToInt32(ratio * barLength)
+            };
             var percentage = ratio * 100;
 
-            var filled = string.Concat(Enumerable.Range(0, segments).Select(_ => '█'));
-            var empty = string.Concat(Enumerable.Range(0, barLength - segments).Select(_ => '░'));
+            var filled = string.Concat(Enumerable.Repeat('█', segments));
+            var empty = string.Concat(Enumerable.Repeat('░', barLength - segments));
             var percentageDesc = $"{IrcValues.BOLD}{percentage:F}%".Colorize(Convert.ToInt32(percentage));
             var bar = $"{IrcValues.GREEN}{filled}{IrcValues.GREY}{empty}{IrcValues.RESET}";
 
