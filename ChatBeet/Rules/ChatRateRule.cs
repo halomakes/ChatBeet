@@ -5,6 +5,7 @@ using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
@@ -16,9 +17,13 @@ namespace ChatBeet.Rules
             Pattern = new Regex($"^{Regex.Escape(Configuration.Nick)},? how fast (?:are )?we going\\??", RegexOptions.IgnoreCase);
         }
 
-        protected override async IAsyncEnumerable<IClientMessage> OnMatch(Match match, SpeedometerCommandProcessor commandProcessor)
+        protected override IAsyncEnumerable<IClientMessage> OnMatch(Match match, SpeedometerCommandProcessor commandProcessor)
         {
-            yield return commandProcessor.GetMessageRate(default);
+            IEnumerable<IClientMessage> OnMatchSync()
+            {
+                yield return commandProcessor.GetMessageRate(default);
+            }
+            return OnMatchSync().ToAsyncEnumerable();
         }
     }
 }

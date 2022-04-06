@@ -39,7 +39,7 @@ namespace ChatBeet.Commands
             {
                 var text = await booru.GetRandomPostAsync(safeOnly, IncomingMessage.From, tags);
 
-                if (text != default)
+                if (text is not null)
                 {
                     await booru.RecordTags(IncomingMessage.From, tags);
                     return new PrivateMessage(IncomingMessage.GetResponseTarget(), text);
@@ -68,6 +68,13 @@ namespace ChatBeet.Commands
                 "booru blacklist" => BlacklistTags(tags),
                 _ => AsyncEnumerable.Empty<IClientMessage>()
             };
+        }
+
+        [Command("astolfo", Description = "Fill the void in your soul with an Astolfo picture."), RateLimit(30, TimeUnit.Second)]
+        public async Task<IClientMessage> GetAstolfo()
+        {
+            var text = await booru.GetRandomPostAsync(true, IncomingMessage.From, "astolfo_(fate)");
+            return new PrivateMessage(IncomingMessage.GetResponseTarget(), text ?? "Sorry, couldn't find locate those succulent thighs.");
         }
 
         private async IAsyncEnumerable<IClientMessage> ListTags()
