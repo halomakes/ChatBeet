@@ -11,7 +11,6 @@ namespace ChatBeet.Commands
 {
     public class GoogleCommandProcessor : CommandProcessor
     {
-
         private readonly LinkPreviewService previewSerivce;
         private readonly GoogleSearchService searchService;
 

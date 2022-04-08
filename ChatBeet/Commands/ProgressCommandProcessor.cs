@@ -69,6 +69,14 @@ namespace ChatBeet.Commands
             return ProgressResult(start, start.AddDays(1), $"{IrcValues.BOLD}Today{IrcValues.RESET} is");
         }
 
+        [Command("progress yatoday", Description = "Get progress for the current day, but one hour in the past. It's objectively better. ")]
+        [RateLimit(5, TimeUnit.Minute)]
+        public IClientMessage GetOffsetDay()
+        {
+            var start = new DateTime(now.Year, now.Month, now.Day).AddHours(1);
+            return ProgressResult(start, start.AddDays(1), $"(in the {IrcValues.ITALIC}objectively better{IrcValues.RESET} time zone) {IrcValues.BOLD}Today{IrcValues.RESET} is");
+        }
+
         [Command("progress hour", Description = "Get progress for the current hour.")]
         [RateLimit(5, TimeUnit.Minute)]
         public IClientMessage GetHour()

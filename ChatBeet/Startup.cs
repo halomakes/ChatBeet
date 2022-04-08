@@ -4,6 +4,7 @@ using ChatBeet.Data;
 using ChatBeet.Models;
 using ChatBeet.Rules;
 using ChatBeet.Services;
+using Genbox.WolframAlpha;
 using GravyBot;
 using GravyBot.Commands;
 using GravyBot.DefaultRules;
@@ -147,6 +148,7 @@ namespace ChatBeet
                 var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
                 return new SauceNETClient(config.Value.Sauce);
             });
+            services.AddSingleton(provider => new WolframAlphaClient(Configuration.GetValue<string>("Rules:Wolfram:AppId")));
 
             services.AddHostedService<ContextInitializer>();
             services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
