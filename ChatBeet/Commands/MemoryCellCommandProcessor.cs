@@ -29,7 +29,7 @@ namespace ChatBeet.Commands
         {
             var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
-            if (cell != null)
+            if (cell is not null)
                 return new PrivateMessage(
                     IncomingMessage.GetResponseTarget(),
                     $"{IrcValues.BOLD}{cell.Key}{IrcValues.RESET} was set by {IrcValues.BOLD}{cell.Author}{IrcValues.RESET}"
@@ -43,7 +43,7 @@ namespace ChatBeet.Commands
         {
             var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
-            if (cell != null)
+            if (cell is not null)
                 return new PrivateMessage(
                     IncomingMessage.GetResponseTarget(),
                     $"{IrcValues.BOLD}{cell.Key}{IrcValues.RESET}: {cell.Value}"
@@ -113,6 +113,19 @@ namespace ChatBeet.Commands
                     });
                 }
             }
+        }
+
+        [Command("append {key}+={value}", Description = "Add something on to an existing definition.")]
+        public async IAsyncEnumerable<IClientMessage> AppendCell([Required] string key, [Required] string value)
+        {
+            var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
+            if (cell is not null)
+            {
+                await foreach (var message in SetCell(key, $"{cell.Value} | {value.Trim()}"))
+                    yield return message;
+            }
+            else
+                yield return NotFound(key);
         }
 
         private IClientMessage NotFound(string key) => new PrivateMessage(

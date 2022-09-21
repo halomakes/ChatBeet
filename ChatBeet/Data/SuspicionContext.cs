@@ -12,7 +12,7 @@ namespace ChatBeet.Data
 
         public SuspicionContext(DbContextOptions<SuspicionContext> opts) : base(opts)
         {
-            ActivePeriod = TimeSpan.FromDays(7 * 4);
+            ActivePeriod = DateTime.Now.AddYears(2) - DateTime.Now;
         }
 
         public virtual DbSet<Suspicion> Suspicions { get; set; }

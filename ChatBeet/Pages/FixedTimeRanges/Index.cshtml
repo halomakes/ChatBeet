@@ -1,10 +1,13 @@
 ﻿@page
 @model ChatBeet.Pages.FixedTimeRanges.IndexModel
+@using ChatBeet.Utilities
+@using Humanizer
 
 @{
     ViewData["Title"] = "Fixed Time Ranges";
     var count = 0;
     var offset = 200;
+    var now = DateTime.Now;
 }
 
 <h1>Fixed Time Ranges</h1>
@@ -16,11 +19,8 @@
     <div class="list-group">
         @foreach (var range in Model.FixedTimeRange.Reverse())
         {
-            var percentage = (DateTime.Now - range.StartDate) * 100 / (range.EndDate - range.StartDate);
-            if (percentage > 100)
-                percentage = 100;
-            else if (percentage < 0)
-                percentage = 0;
+            var percentage = Progress.GetPercentage(range.StartDate, range.EndDate);
+
             <a asp-page="./Details" asp-route-id="@range.Key" class="list-group-item list-group-item-action position-relative overflow-none">
                 <span class="ml-2 d-flex align-items-center flex-wrap">
                     <span>@range.Key</span>
@@ -35,7 +35,17 @@
                     }
                     else
                     {
-                        <span>@range.Template.Replace("{percentage}", $"{percentage / 100:P}")</span>
+                        <span>
+                            @{
+                                var elapsed = Progress.ForcePositive(now - range.StartDate);
+                                var remaining = Progress.ForcePositive(range.EndDate - now);
+                                var formatted = range.Template
+                                    .Replace(@"{percentage}", $"{percentage / 100:P}")
+                                    .Replace(@"{remaining}", remaining.Humanize())
+                                    .Replace(@"{elapsed}", elapsed.Humanize());
+                            }
+                            @formatted
+                        </span>
                     }
                 </span>
                 <background-bar class="bg-primary" value="Convert.ToInt32(percentage)" animation-delay="count * offset" collection-max="100"></background-bar>

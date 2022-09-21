@@ -41,11 +41,11 @@ namespace ChatBeet.Commands
                 var now = DateTime.Now;
                 if (now < unit.StartDate)
                     content = string.IsNullOrWhiteSpace(unit.BeforeRangeMessage)
-                        ? Progress.FormatTemplate(0, unit.Template)
+                        ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
                         : unit.BeforeRangeMessage;
                 else if (now > unit.EndDate)
                     content = string.IsNullOrWhiteSpace(unit.AfterRangeMessage)
-                        ? Progress.FormatTemplate(100, unit.Template)
+                        ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
                         : unit.AfterRangeMessage;
                 else
                     content = Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template);
@@ -67,6 +67,14 @@ namespace ChatBeet.Commands
         {
             var start = new DateTime(now.Year, now.Month, now.Day);
             return ProgressResult(start, start.AddDays(1), $"{IrcValues.BOLD}Today{IrcValues.RESET} is");
+        }
+
+        [Command("progress yatoday", Description = "Get progress for the current day, but one hour in the past. It's objectively better. ")]
+        [RateLimit(5, TimeUnit.Minute)]
+        public IClientMessage GetOffsetDay()
+        {
+            var start = new DateTime(now.Year, now.Month, now.Day).AddHours(1);
+            return ProgressResult(start, start.AddDays(1), $"(in the {IrcValues.ITALIC}objectively better{IrcValues.RESET} time zone) {IrcValues.BOLD}Today{IrcValues.RESET} is");
         }
 
         [Command("progress hour", Description = "Get progress for the current hour.")]
