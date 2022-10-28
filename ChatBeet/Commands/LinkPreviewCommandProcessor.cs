@@ -1,10 +1,12 @@
 ﻿using ChatBeet.Attributes;
+using ChatBeet.Converters;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
 using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -22,23 +24,24 @@ namespace ChatBeet.Commands
         }
 
         [Command("preview {uri}", Description = "Parse a link preview from a URI."), ChannelOnly]
-        public async Task<IClientMessage> PreviewLink([Uri] string uri)
+        public async Task<IClientMessage> PreviewLink([Uri, TypeConverter(typeof(UrlTypeConverter))] Uri uri)
         {
-            if (string.IsNullOrEmpty(uri))
+            if (uri is null)
             {
                 var rgx = new Regex(RegexUtils.Uri, RegexOptions.IgnoreCase);
                 var lookupMessage = messageQueue.GetLatestMessage(IncomingMessage.To, rgx);
                 if (lookupMessage == default)
                     return new NoticeMessage(IncomingMessage.From, $"Couldn't find a URI to preview.");
                 var match = rgx.Match(lookupMessage.Message);
-                uri = match.Value;
+                if (Uri.TryCreate(match.Value, UriKind.Absolute, out var historic))
+                    uri = historic;
             }
 
-            if (Uri.TryCreate(uri, UriKind.Absolute, out var parsedUri) || Uri.TryCreate($"https://{uri}", UriKind.Absolute, out parsedUri))
+            if (uri is not null)
             {
                 try
                 {
-                    var meta = await previewService.GetDocumentAsync(parsedUri);
+                    var meta = await previewService.GetDocumentAsync(uri);
                     if (meta != default)
                     {
                         var summary = meta.ToIrcSummary(maxDescriptionLength: 400);
@@ -50,7 +53,7 @@ namespace ChatBeet.Commands
                 catch (Exception e)
                 {
                     messageQueue.Push(e);
-                    return new NoticeMessage(IncomingMessage.From, $"Couldn't fetch {IrcValues.ITALIC}{parsedUri}{IrcValues.RESET}.  Make sure it's absolute and publicly accessible.");
+                    return new NoticeMessage(IncomingMessage.From, $"Couldn't fetch {IrcValues.ITALIC}{uri}{IrcValues.RESET}.  Make sure it's absolute and publicly accessible.");
                 }
             }
 

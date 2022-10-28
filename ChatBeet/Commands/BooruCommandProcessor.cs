@@ -1,11 +1,12 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Converters;
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,16 +26,14 @@ namespace ChatBeet.Commands
 
         [Command("booru {tagList}", Description = "Get a random image from gelbooru matching tags (safe only).")]
         [RateLimit(30, TimeUnit.Second)]
-        public async Task<IClientMessage> GetRandomSafePost([Required] string tagList) => await GetPost(true, tagList);
+        public async Task<IClientMessage> GetRandomSafePost([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] params string[] tagList) => await GetPost(true, tagList);
 
         [Command("nsfwbooru {tagList}", Description = "Get a random image from gelbooru matching tags (questionable and explicit only).")]
         [ChannelPolicy("NoMain")]
-        public async Task<IClientMessage> GetRandomPost([Required] string tagList) => await GetPost(false, tagList);
+        public async Task<IClientMessage> GetRandomPost([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] params string[] tagList) => await GetPost(false, tagList);
 
-        private async Task<IClientMessage> GetPost(bool safeOnly, string tagList)
+        private async Task<IClientMessage> GetPost(bool safeOnly, [TypeConverter(typeof(SpaceSeparatedListConverter))] string[] tags)
         {
-            var tags = tagList.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
             if (tags.Any())
             {
                 var text = await booru.GetRandomPostAsync(safeOnly, IncomingMessage.From, tags);
@@ -46,7 +45,7 @@ namespace ChatBeet.Commands
                 }
                 else
                 {
-                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tagList}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tags}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
                 }
             }
             else
@@ -57,9 +56,8 @@ namespace ChatBeet.Commands
 
         [Command("booru whitelist {tagList}", Description = "Remove tag(s) from your blacklist.")]
         [Command("booru blacklist {tagList}", Description = "Add tag(s) to your blacklist.")]
-        public IAsyncEnumerable<IClientMessage> HandleBlacklistCommand([Required] string tagList)
+        public IAsyncEnumerable<IClientMessage> HandleBlacklistCommand([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] string[] tags)
         {
-            var tags = tagList?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             if (tags == default || !tags.Any())
                 return ListTags();
             return TriggeringCommandName switch

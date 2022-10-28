@@ -1,5 +1,6 @@
 ﻿@page
 @model ChatBeet.Pages.Commands.IndexModel
+@using ChatBeet.Utilities
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using Humanizer
@@ -64,6 +65,7 @@
 
                                         <li>
                                             <code>@parameter.Name</code>
+                                            <span class="text-white-50">(@parameter.GetFriendlyTypeName())</span>
                                             @if (validators.Any())
                                             {
                                                 <ul>

@@ -1,10 +1,12 @@
 ﻿using ChatBeet.Attributes;
+using ChatBeet.Converters;
 using ChatBeet.Utilities;
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
 using SauceNET;
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,9 +23,9 @@ namespace ChatBeet.Commands
         }
 
         [Command("sauce {imageUrl}", Description = "Get sauce for an image based on its url.")]
-        public async Task<IClientMessage> DemandSauce([Required, Uri] string imageUrl) // lol
+        public async Task<IClientMessage> DemandSauce([Required, Uri, TypeConverter(typeof(UrlTypeConverter))] Uri imageUrl) // lol
         {
-            var results = await sauceClient.GetSauceAsync(imageUrl);
+            var results = await sauceClient.GetSauceAsync(imageUrl.AbsolutePath);
             var bestMatch = results?.Results?.OrderByDescending(r => double.TryParse(r.Similarity, out var p) ? p : 0).FirstOrDefault();
             if (bestMatch != default)
             {

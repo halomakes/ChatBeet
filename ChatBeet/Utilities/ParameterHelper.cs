@@ -1,4 +1,7 @@
-﻿namespace ChatBeet.Utilities
+﻿using System;
+using System.Reflection;
+
+namespace ChatBeet.Utilities
 {
     public static class ParameterHelper
     {
@@ -17,6 +20,14 @@
                 return (start, end);
             }
             return pair;
+        }
+
+        public static string GetFriendlyTypeName(this ParameterInfo parameter)
+        {
+            var parameterType = parameter.ParameterType;
+            if (parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                return $"{parameterType.GetGenericArguments()[0].Name}?";
+            return parameterType.Name;
         }
     }
 }

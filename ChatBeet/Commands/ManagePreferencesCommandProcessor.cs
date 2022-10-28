@@ -30,7 +30,7 @@ namespace ChatBeet.Commands
             this.service = service;
         }
 
-        [Command("set {preferenceId}={value}", Description = "Set a user preference.")]
+        [Command("preference set {preferenceId}={value}", Description = "Set a user preference.")]
         public async Task<IClientMessage> SetPreference([Required] string preferenceId, [Required] string value)
         {
             if (preferenceMappings.ContainsKey(preferenceId))
@@ -54,7 +54,7 @@ namespace ChatBeet.Commands
             }
         }
 
-        [Command("get {preferenceId}", Description = "Get a user preference.")]
+        [Command("preference get {preferenceId}", Description = "Get a user preference.")]
         public async Task<IClientMessage> GetPreference([Required] string preferenceId)
         {
             if (preferenceMappings.ContainsKey(preferenceId))
