@@ -33,7 +33,7 @@ namespace ChatBeet.Commands
                 if (lookupMessage == default)
                     return new NoticeMessage(IncomingMessage.From, $"Couldn't find a URI to preview.");
                 var match = rgx.Match(lookupMessage.Message);
-                if (Uri.TryCreate(match.Value, UriKind.Absolute, out var historic))
+                if (Uri.TryCreate(match.Value, UriKind.Absolute, out var historic) || Uri.TryCreate($"https://{match.Value}", UriKind.Absolute, out historic))
                     uri = historic;
             }
 
