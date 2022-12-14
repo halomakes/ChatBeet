@@ -29,7 +29,13 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   deploy:
     needs: publish
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Update Droplet
-        run: /home/github/update-chatbeet.sh
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          key: ${{ secrets.secrets.DROPLET_KEY }}
+          port: ${{ secrets.DROPLET_PORT }}
+          script: ${{ secrets.DROPLET_SCRIPT }}
