@@ -5,11 +5,8 @@ on:
     branches: [ "develop" ]
 
 jobs:
-
-  build:
-
+  publish:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Log in to Docker Hub
@@ -30,11 +27,15 @@ jobs:
           push: true
           tags: halomademeapc/chatbeet:latest
           labels: ${{ steps.meta.outputs.labels }}
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
       - name: Update Droplet
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USERNAME }}
-          password: ${{ secrets.DROPLET_PASSWORD }}
+          key: ${{ secrets.secrets.DROPLET_KEY }}
           port: ${{ secrets.DROPLET_PORT }}
           script: ${{ secrets.DROPLET_SCRIPT }}
