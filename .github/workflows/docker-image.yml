@@ -32,9 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update Droplet
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USERNAME }}
-          key: ${{ secrets.secrets.DROPLET_KEY }}
+          password: ${{ secrets.secrets.DROPLET_PASSWORD }}
           script: ${{ secrets.DROPLET_SCRIPT }}
