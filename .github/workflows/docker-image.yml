@@ -37,5 +37,4 @@ jobs:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USERNAME }}
           key: ${{ secrets.secrets.DROPLET_KEY }}
-          port: ${{ secrets.DROPLET_PORT }}
           script: ${{ secrets.DROPLET_SCRIPT }}
