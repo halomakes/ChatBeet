@@ -19,6 +19,7 @@ namespace ChatBeet.Commands
         private static readonly Regex SpacingRegex = new(@"([\x00-\x7F])");
 
         [Command("kern {nick}", Description = "Make someone's text uppercase and space it out.")]
+        [Command("kem {nick}", Description = "Make someone's text uppercase and space it out, gh0s1-style.")]
         [ChannelOnly]
         public IClientMessage Kern([Required, Nick(allowCaret: true)] string nick)
         {
