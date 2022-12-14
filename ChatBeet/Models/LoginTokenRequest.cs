@@ -12,5 +12,13 @@ namespace ChatBeet.Models
 
         [Display(Name = "Remember Me")]
         public bool Persist { get; set; }
+
+        public LoginMode Mode { get; set; }
+
+        public enum LoginMode
+        {
+            Code,
+            Link
+        }
     }
 }

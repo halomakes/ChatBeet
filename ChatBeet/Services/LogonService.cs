@@ -27,7 +27,7 @@ namespace ChatBeet.Services
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task SendLoginTokenAsync(string nick)
+        public async Task SendLoginTokenAsync(string nick, LoginTokenRequest.LoginMode mode = LoginTokenRequest.LoginMode.Code)
         {
             var user = await GetUserAsync(nick);
             // send token
@@ -39,7 +39,7 @@ namespace ChatBeet.Services
 
             var token = await userManager.GenerateUserTokenAsync(user, TokenProvider, TokenAction);
 
-            messageQueue.Push(new LoginTokenRequest { Nick = nick, AuthToken = token });
+            messageQueue.Push(new LoginTokenRequest { Nick = nick, AuthToken = token, Mode = mode });
         }
 
         public Task<IdentityUser> GetUserAsync(string nick) => userManager.FindByNameAsync(nick.Trim().ToLower());

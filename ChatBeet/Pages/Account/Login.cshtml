@@ -36,11 +36,28 @@ else
             <span class="text-danger" asp-validation-for="LoginInfo.AuthToken"></span>
         </div>
         <div class="form-check">
-            <input type="checkbox" class="form-check-input" asp-for="LoginInfo.Persist">
+            <input type="checkbox" class="form-check-input" asp-for="LoginInfo.Persist" checked>
             <label class="form-check-label" asp-for="LoginInfo.Persist"></label>
         </div>
         <input asp-for="LoginInfo.Nick" type="hidden" />
         <input asp-for="ReturnUrl" type="hidden" />
         <button type="submit" class="btn btn-primary mt-2">Submit</button>
+        <script type="text/javascript">
+            function ready(fn) {
+              if (document.readyState !== 'loading') {
+                fn();
+              } else {
+                document.addEventListener('DOMContentLoaded', fn);
+              }
+            }
+
+            ready(() => {
+                if(window.location.hash){
+                    const input = document.getElementById('@Html.IdFor(m => m.LoginInfo.AuthToken)');
+                    input.value = window.location.hash.substring(1);
+                    input.form.submit();
+                }
+            });
+        </script>
     </form>
 }

@@ -45,7 +45,7 @@ namespace ChatBeet.Commands
                 }
                 else
                 {
-                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {tags}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
+                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {string.Join(", ", tags)}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
                 }
             }
             else

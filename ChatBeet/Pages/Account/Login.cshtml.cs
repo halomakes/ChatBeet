@@ -23,7 +23,7 @@ namespace ChatBeet.Pages.Account
 
         public string ValidationMessage { get; set; }
 
-        public IActionResult OnGet(string ReturnUrl = default)
+        public IActionResult OnGet(string ReturnUrl = default, [FromQuery(Name ="n")] string nick = default)
         {
             if (User?.Identity?.IsAuthenticated ?? false)
             {
@@ -31,6 +31,13 @@ namespace ChatBeet.Pages.Account
             }
 
             this.ReturnUrl = ReturnUrl;
+
+            if (!string.IsNullOrEmpty(nick))
+            {
+                LoginInfo ??= new();
+                LoginInfo.Nick = nick;
+            }
+
             return Page();
         }
 
