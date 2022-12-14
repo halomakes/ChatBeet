@@ -28,7 +28,7 @@ jobs:
           context: .
           file: ChatBeet/Dockerfile
           push: true
-          tags: latest
+          tags: halomademeapc/chatbeet:latest
           labels: ${{ steps.meta.outputs.labels }}
       - name: Update Droplet
         uses: appleboy/ssh-action@v0.1.6
