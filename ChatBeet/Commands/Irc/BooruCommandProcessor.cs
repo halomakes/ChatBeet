@@ -36,7 +36,7 @@ namespace ChatBeet.Commands.Irc
         {
             if (tags.Any())
             {
-                var text = await booru.GetRandomPostAsync(safeOnly, IncomingMessage.From, tags);
+                var text = await booru.GetRandomPostFormattedAsync(safeOnly, IncomingMessage.From, tags);
 
                 if (text is not null)
                 {
@@ -71,7 +71,7 @@ namespace ChatBeet.Commands.Irc
         [Command("astolfo", Description = "Fill the void in your soul with an Astolfo picture."), RateLimit(30, TimeUnit.Second)]
         public async Task<IClientMessage> GetAstolfo()
         {
-            var text = await booru.GetRandomPostAsync(true, IncomingMessage.From, "astolfo_(fate)");
+            var text = await booru.GetRandomPostFormattedAsync(true, IncomingMessage.From, "astolfo_(fate)");
             return new PrivateMessage(IncomingMessage.GetResponseTarget(), text ?? "Sorry, couldn't find locate those succulent thighs.");
         }
 

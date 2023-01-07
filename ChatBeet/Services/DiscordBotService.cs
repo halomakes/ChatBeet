@@ -42,6 +42,12 @@ namespace ChatBeet.Services
             };
 
             commands.RegisterCommands<AnilistCommandModule>();
+            commands.RegisterCommands<BadBotCommandModule>();
+            commands.RegisterCommands<BeerCommandModule>();
+            commands.RegisterCommands<BirthdayCommandModule>();
+            commands.RegisterCommands<BonkCommandModule>();
+            commands.RegisterCommands<BooruCommandModule>();
+            commands.RegisterCommands<ComplimentCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
