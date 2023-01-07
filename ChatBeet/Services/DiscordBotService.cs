@@ -1,5 +1,9 @@
-﻿using DSharpPlus;
+﻿using ChatBeet.Commands.Discord;
+using DSharpPlus;
+using DSharpPlus.CommandsNext;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,10 +12,12 @@ namespace ChatBeet.Services
     public class DiscordBotService : BackgroundService
     {
         private readonly DiscordClient _client;
+        private readonly IServiceProvider _services;
 
-        public DiscordBotService(DiscordClient client)
+        public DiscordBotService(DiscordClient client, IServiceProvider services)
         {
             _client = client;
+            _services = services;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -22,14 +28,15 @@ namespace ChatBeet.Services
 
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            await _client.ConnectAsync();
-            _client.MessageCreated += async (s, e) =>
+            var provider = new ServiceCollection();
+
+            var commands = _client.UseCommandsNext(new CommandsNextConfiguration
             {
-                if (e.Message.Content.ToLower() == ".cb test")
-                {
-                    await e.Message.RespondAsync("it's working");
-                }
-            };
+                StringPrefixes = new[] { ".cb " },
+                Services = _services
+            });
+            commands.RegisterCommands<AnilistCommandModule>();
+            await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
 
