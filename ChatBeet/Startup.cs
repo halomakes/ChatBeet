@@ -4,6 +4,7 @@ using ChatBeet.Data;
 using ChatBeet.Models;
 using ChatBeet.Rules;
 using ChatBeet.Services;
+using DSharpPlus;
 using Genbox.WolframAlpha;
 using GravyBot;
 using GravyBot.Commands;
@@ -216,6 +217,16 @@ namespace ChatBeet
             {
                 pipeline.CompileScssFiles();
             });
+
+            // discord stuff
+            services.Configure<DiscordConfiguration>(c =>
+            {
+                c.Token = Configuration.GetValue<string>("Discord:Token");
+                c.TokenType = TokenType.Bot;
+                c.Intents = DiscordIntents.MessageContents | DiscordIntents.AllUnprivileged;
+            });
+            services.AddTransient<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
+            services.AddHostedService<DiscordBotService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
