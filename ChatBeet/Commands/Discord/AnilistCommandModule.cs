@@ -1,4 +1,5 @@
 ﻿using ChatBeet.Services;
+using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -39,7 +40,9 @@ namespace ChatBeet.Commands.Discord
                     Description = media.Description,
                     Title = media.EnglishTitle
                 };
-                var text = $"{Formatter.Bold(media.EnglishTitle)} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {media.Score}%";
+                var text = @$"{Formatter.Bold(media.EnglishTitle)} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {media.Score}%
+{media.Description.RemoveSpoilers()}
+{Formatter.MaskedUrl("View on AniList", new Uri(media.Url))}";
 
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                     .WithContent(text)
@@ -67,7 +70,10 @@ namespace ChatBeet.Commands.Discord
                     Url = character.SiteUrl,
                     Description = $"{character.FirstName} {character.LastName}"
                 };
-                var text = $"{character.FirstName} {character.LastName} ({character.NativeName}) {Environment.NewLine}{character.Description}";
+                var fullName = Formatter.Bold($"{character.FirstName} {character.LastName}");
+                var text = @$"{fullName} ({character.NativeName})
+{character.Description.RemoveSpoilers()}
+{Formatter.MaskedUrl("View on AniList", new Uri(character.SiteUrl))}";
 
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                     .WithContent(text)
