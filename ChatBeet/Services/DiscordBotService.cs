@@ -1,7 +1,6 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
 using DSharpPlus.SlashCommands;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -48,6 +47,9 @@ namespace ChatBeet.Services
             commands.RegisterCommands<BonkCommandModule>();
             commands.RegisterCommands<BooruCommandModule>();
             commands.RegisterCommands<ComplimentCommandModule>();
+            commands.RegisterCommands<DoggoCommandModule>();
+            commands.RegisterCommands<GoogleCommandModule>();
+            commands.RegisterCommands<MemoryCellCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
