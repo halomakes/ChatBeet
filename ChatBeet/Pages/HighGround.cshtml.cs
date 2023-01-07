@@ -1,4 +1,4 @@
-using ChatBeet.Commands;
+using ChatBeet.Commands.Irc;
 using ChatBeet.Utilities;
 using GravyBot;
 using Microsoft.AspNetCore.Mvc;

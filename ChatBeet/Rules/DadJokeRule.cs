@@ -1,4 +1,4 @@
-﻿using ChatBeet.Commands;
+﻿using ChatBeet.Commands.Irc;
 using GravyBot;
 using GravyBot.Commands;
 using GravyIrc.Messages;
