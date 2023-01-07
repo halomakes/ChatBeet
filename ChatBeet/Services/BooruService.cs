@@ -32,9 +32,21 @@ namespace ChatBeet.Services
             this.messageQueue = messageQueue;
         }
 
-        public Task<string> GetRandomPostAsync(bool? safeContentOnly, string requestor, params string[] tags) => GetRandomPostAsync(safeContentOnly, requestor, tags.AsEnumerable());
+        [Obsolete("Remove with IRC")]
+        public Task<string> GetRandomPostFormattedAsync(bool? safeContentOnly, string requestor, params string[] tags) => GetRandomPostFormattedAsync(safeContentOnly, requestor, tags.AsEnumerable());
 
-        public async Task<string> GetRandomPostAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
+        [Obsolete("Remove with IRC")]
+        public async Task<string> GetRandomPostFormattedAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
+        {
+            var result = await GetRandomPostAsync(safeContentOnly, requestor, tags);
+            if (result is MediaSearchResult media)
+                return $"{media.ImageUrl} ({media.Rating}) - {string.Join(", ", media.Tags)}";
+            return default;
+        }
+
+        public Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, string requestor, params string[] tags) => GetRandomPostAsync(safeContentOnly, requestor, tags.AsEnumerable());
+
+        public async Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
         {
             var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:sensitive" : "-rating:sensitive") : string.Empty;
             var globalBlacklist = Negate(booruConfig.BlacklistedTags);
@@ -53,7 +65,7 @@ namespace ChatBeet.Services
 
             return PickImage(results);
 
-            string PickImage(IEnumerable<SearchResult> searchResults)
+            MediaSearchResult? PickImage(IEnumerable<SearchResult> searchResults)
             {
                 if (searchResults?.Any() ?? false)
                 {
@@ -63,11 +75,10 @@ namespace ChatBeet.Services
                         .Select(t => (MatchesInput: tags.Contains(t), Tag: t))
                         .OrderByDescending(p => p.MatchesInput)
                         .ThenBy(p => rng.Next())
-                        .Select(p => p.MatchesInput ? $"{IrcValues.BOLD}{IrcValues.GREEN}{p.Tag}{IrcValues.RESET}" : p.Tag)
+                        .Select(p => p.Tag)
                         .Take(10)
                         .OrderBy(t => rng.Next());
-                    var tagList = string.Join(", ", resultTags);
-                    return $"{img.FileUrl} ({img.Rating}) - {tagList}";
+                    return new(img.FileUrl, img.PostUrl, img.Rating, resultTags);
                 }
                 return default;
             }
@@ -133,5 +144,7 @@ namespace ChatBeet.Services
                 messageQueue.Push(e);
             }
         }
+
+        public record struct MediaSearchResult(Uri ImageUrl, Uri PageUrl, Rating Rating, IEnumerable<string> Tags);
     }
 }
