@@ -1,8 +1,9 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
-using DSharpPlus.CommandsNext;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,11 +13,13 @@ namespace ChatBeet.Services
     public class DiscordBotService : BackgroundService
     {
         private readonly DiscordClient _client;
+        private readonly ILogger<DiscordBotService> _logger;
         private readonly IServiceProvider _services;
 
-        public DiscordBotService(DiscordClient client, IServiceProvider services)
+        public DiscordBotService(DiscordClient client, ILogger<DiscordBotService> logger, IServiceProvider services)
         {
             _client = client;
+            _logger = logger;
             _services = services;
         }
 
@@ -28,13 +31,16 @@ namespace ChatBeet.Services
 
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            var provider = new ServiceCollection();
-
-            var commands = _client.UseCommandsNext(new CommandsNextConfiguration
+            var commands = _client.UseSlashCommands(new SlashCommandsConfiguration
             {
-                StringPrefixes = new[] { ".cb " },
                 Services = _services
             });
+            commands.SlashCommandErrored += (e, x) =>
+            {
+                _logger.LogError(x.Exception, "Slash command failed");
+                return Task.CompletedTask;
+            };
+
             commands.RegisterCommands<AnilistCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);

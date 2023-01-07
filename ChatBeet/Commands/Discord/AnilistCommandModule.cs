@@ -1,8 +1,5 @@
 ﻿using ChatBeet.Services;
-using ChatBeet.Utilities;
 using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Miki.Anilist;
@@ -11,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Commands.Discord
 {
-    [ModuleLifespan(ModuleLifespan.Transient)]
-    public class AnilistCommandModule : BaseCommandModule
+    [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
+    public class AnilistCommandModule : ApplicationCommandModule
     {
         private readonly AnilistService client;
 
@@ -21,17 +18,15 @@ namespace ChatBeet.Commands.Discord
             this.client = client;
         }
 
-        [Command("anime"), Description("Get information about an anime series from AniList")]
         [SlashCommand("anime", "Get information about an anime series from AniList")]
-        public Task GetAnime(CommandContext ctx, [RemainingText] string query) => GetMedia(ctx, query, MediaType.ANIME);
+        public Task GetAnime(InteractionContext ctx, [Option("query", "Anime to search for")] string query) => GetMedia(ctx, query, MediaType.ANIME);
 
 
-        [Command("manga"), Description("Get infomration about a manga from AniList")]
         [SlashCommand("manga", "Get information about a manga from AniList")]
-        public Task GetManga(CommandContext ctx, [RemainingText] string query) => GetMedia(ctx, query, MediaType.MANGA);
+        public Task GetManga(InteractionContext ctx, [Option("query", "Manga to search for")] string query) => GetMedia(ctx, query, MediaType.MANGA);
 
 
-        private async Task GetMedia(CommandContext ctx, string query, MediaType type)
+        private async Task GetMedia(InteractionContext ctx, string query, MediaType type)
         {
             var media = await client.GetMediaAsync(query, type);
 
@@ -46,18 +41,21 @@ namespace ChatBeet.Commands.Discord
                 };
                 var text = $"{Formatter.Bold(media.EnglishTitle)} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {media.Score}%";
 
-                await ctx.RespondAsync(text, embed);
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                    .WithContent(text)
+                    .AddEmbed(embed)
+                    );
             }
             else
             {
-                await ctx.RespondAsync($"Sorry, couldn't find that {type.ToString().ToLower()}.");
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                    .WithContent($"Sorry, couldn't find that {type.ToString().ToLower()}.")
+                    );
             }
         }
 
-        [Command("waifu"), Description("Get information about a character from AniList")]
-        [Aliases("husbando")]
         [SlashCommand("waifu", "Get information about a character from AniList")]
-        public async Task GetCharacter(CommandContext ctx, [RemainingText] string query)
+        public async Task GetCharacter(InteractionContext ctx, [Option("query", "Name of the character to search for")] string query)
         {
             var character = await client.GetCharacterAsync(query);
 
@@ -71,11 +69,16 @@ namespace ChatBeet.Commands.Discord
                 };
                 var text = $"{character.FirstName} {character.LastName} ({character.NativeName}) {Environment.NewLine}{character.Description}";
 
-                await ctx.RespondAsync(text, embed);
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                    .WithContent(text)
+                    .AddEmbed(embed)
+                    );
             }
             else
             {
-                await ctx.RespondAsync($"Sorry, couldn't find that character.");
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                    .WithContent($"Sorry, couldn't find that character.")
+                    );
             }
         }
     }
