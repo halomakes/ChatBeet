@@ -92,4 +92,8 @@ public class AnilistCommandModule : ApplicationCommandModule
                 );
         }
     }
+
+    [SlashCommand("husbando", "Get information about a character from AniList")]
+    public Task GetCharacterAlias(InteractionContext ctx, [Option("character", "Name of the character to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query)
+        => GetCharacter(ctx, query);
 }
