@@ -1,5 +1,6 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ namespace ChatBeet.Services
     {
         private readonly DiscordClient _client;
         private readonly ILogger<DiscordBotService> _logger;
-        public readonly IServiceProvider _services;
+        private readonly IServiceProvider _services;
 
         public DiscordBotService(DiscordClient client, ILogger<DiscordBotService> logger, IServiceProvider services)
         {
@@ -44,6 +45,11 @@ namespace ChatBeet.Services
                 _logger.LogError(x.Exception, "Autocomplete failed");
                 return Task.CompletedTask;
             };
+            commands.ContextMenuErrored += (e, x) =>
+            {
+                _logger.LogError(x.Exception, "Context Menu failed");
+                return Task.CompletedTask;
+            };
 
             commands.RegisterCommands<AnilistCommandModule>();
             commands.RegisterCommands<BadBotCommandModule>();
@@ -57,6 +63,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<MemoryCellCommandModule>();
             commands.RegisterCommands<SystemInfoCommandModule>();
             commands.RegisterCommands<SuspicionCommandModule>();
+            commands.RegisterCommands<MessageTransformCommandProcessor>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }

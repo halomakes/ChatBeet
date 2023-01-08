@@ -16,6 +16,8 @@ namespace ChatBeet.Services
             config = opts.Value;
         }
 
+        public string GetResponseString() => config.NegativeResponses.PickRandom();
+
         public IClientMessage GetResponse(string target, string nick) => new PrivateMessage(target, $"{nick}: {config.NegativeResponses.PickRandom()}");
 
         public IClientMessage GetResponse(PrivateMessage pm) => GetResponse(pm.GetResponseTarget(), pm.From);

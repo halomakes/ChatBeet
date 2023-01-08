@@ -24,4 +24,13 @@ public class ComplimentCommandModule : ApplicationCommandModule
                 .WithContent($"{Formatter.Mention(user)}: {compliment}")
                 );
     }
+
+    [ContextMenu(ApplicationCommandType.UserContextMenu, "Compliment")]
+    public async Task Compliment(ContextMenuContext ctx)
+    {
+        var compliment = await service.GetComplimentAsync();
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent($"{Formatter.Mention(ctx.TargetUser)}: {compliment}")
+                );
+    }
 }

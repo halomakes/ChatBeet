@@ -5,9 +5,7 @@ using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using GravyBot;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,21 +18,21 @@ public class SuspicionCommandModule : ApplicationCommandModule
 {
     private readonly SuspicionContext db;
     private readonly UserPreferencesService prefsService;
-    private readonly IrcBotConfiguration config;
+    private readonly DiscordClient client;
     private readonly NegativeResponseService negativeResponseService;
 
-    public SuspicionCommandModule(SuspicionContext db, UserPreferencesService prefsService, IOptions<IrcBotConfiguration> opts, NegativeResponseService negativeResponseService)
+    public SuspicionCommandModule(SuspicionContext db, UserPreferencesService prefsService, DiscordClient client, NegativeResponseService negativeResponseService)
     {
         this.db = db;
         this.prefsService = prefsService;
         this.negativeResponseService = negativeResponseService;
-        config = opts.Value;
+        this.client = client;
     }
 
     [SlashCommand("report", "Report a user as being suspicious.")]
     public async Task IncreaseSuspicion(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
-        if (suspect.Username.Trim().Equals(config.Nick, StringComparison.OrdinalIgnoreCase))
+        if (suspect.Equals(client.CurrentUser))
         {
             await negativeResponseService.Respond(ctx);
         }
