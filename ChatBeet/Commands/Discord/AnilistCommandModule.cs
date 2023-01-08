@@ -1,4 +1,5 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Commands.Discord.Autocomplete;
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -21,11 +22,11 @@ public class AnilistCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("anime", "Get information about an anime series from AniList")]
-    public Task GetAnime(InteractionContext ctx, [Option("query", "Anime to search for")] string query) => GetMedia(ctx, query, MediaType.ANIME);
+    public Task GetAnime(InteractionContext ctx, [Option("media", "Anime to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query) => GetMedia(ctx, query, MediaType.ANIME);
 
 
     [SlashCommand("manga", "Get information about a manga from AniList")]
-    public Task GetManga(InteractionContext ctx, [Option("query", "Manga to search for")] string query) => GetMedia(ctx, query, MediaType.MANGA);
+    public Task GetManga(InteractionContext ctx, [Option("media", "Manga to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query) => GetMedia(ctx, query, MediaType.MANGA);
 
 
     private async Task GetMedia(InteractionContext ctx, string query, MediaType type)
@@ -61,7 +62,7 @@ public class AnilistCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("waifu", "Get information about a character from AniList")]
-    public async Task GetCharacter(InteractionContext ctx, [Option("query", "Name of the character to search for")] string query)
+    public async Task GetCharacter(InteractionContext ctx, [Option("character", "Name of the character to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query)
     {
         var character = await client.GetCharacterAsync(query);
 

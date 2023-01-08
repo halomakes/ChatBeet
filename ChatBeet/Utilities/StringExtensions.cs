@@ -47,7 +47,9 @@ namespace ChatBeet.Utilities
 
         public static string RemoveLastCharacter(this string @string) => @string.Remove(@string.Length - 1, 1);
 
-        public static string ToPossessive(this string name) => name.EndsWith('s') ? $"{name}'" : $"{name}'s";
+        public static string ToPossessive(this string name) => $"{name}{name.GetPossiveSuffix()}";
+
+        public static string GetPossiveSuffix(this string name) => name.EndsWith('s') ? "'" : "'s";
 
         public static bool EqualsIgnoreCase(this string @string, string comparison) => @string.Equals(comparison, StringComparison.OrdinalIgnoreCase);
 

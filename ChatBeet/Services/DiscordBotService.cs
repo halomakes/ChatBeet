@@ -55,6 +55,8 @@ namespace ChatBeet.Services
             commands.RegisterCommands<DoggoCommandModule>();
             commands.RegisterCommands<GoogleCommandModule>();
             commands.RegisterCommands<MemoryCellCommandModule>();
+            commands.RegisterCommands<SystemInfoCommandModule>();
+            commands.RegisterCommands<SuspicionCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
