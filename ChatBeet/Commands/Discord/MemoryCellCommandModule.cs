@@ -1,4 +1,5 @@
-﻿using ChatBeet.Data;
+﻿using ChatBeet.Commands.Discord.Autocomplete;
+using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
 using DSharpPlus;
@@ -24,7 +25,7 @@ public class MemoryCellCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("who-def", "Check who set a peasant definition.")]
-    public async Task GetAuthor(InteractionContext ctx, [Option("key", "Key of the entry to look up")] string key)
+    public async Task GetAuthor(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
         var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
@@ -37,13 +38,13 @@ public class MemoryCellCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("recall", "Get the value of a peasant definition.")]
-    public async Task GetCell(InteractionContext ctx, [Option("key", "Key of the entry to look up")] string key)
+    public async Task GetCell(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
         var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
 
         if (cell is not null)
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent($"{Formatter.Bold(cell.Key)}: {Formatter.Sanitize(cell.Value)}"));
+            .WithContent($"{Formatter.Bold(cell.Key)}: {cell.Value}"));
         else
             await NotFound(ctx, key);
     }
@@ -75,7 +76,7 @@ public class MemoryCellCommandModule : ApplicationCommandModule
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
             .WithContent(@$"Got it! 👍
-Previous value was {Formatter.Bold(Formatter.Sanitize(existingCell.Value))}, set by {existingCell.Author}."));
+Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.Author}."));
         }
 
         if (ctx.Channel.IsPrivate)
@@ -93,7 +94,7 @@ Previous value was {Formatter.Bold(Formatter.Sanitize(existingCell.Value))}, set
     }
 
     [SlashCommand("append", "Add something on to an existing definition.")]
-    public async Task AppendCell(InteractionContext ctx, [Option("key", "Key of the entry to set")] string key, [Option("value", "Value to append")] string value)
+    public async Task AppendCell(InteractionContext ctx, [Option("key", "Key of the entry to set")] string key, [Option("value", "Value to append"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string value)
     {
         var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
         if (cell is not null)

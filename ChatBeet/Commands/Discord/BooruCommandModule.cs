@@ -1,4 +1,5 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Commands.Discord.Autocomplete;
+using ChatBeet.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -18,10 +19,10 @@ public class BooruCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("booru", "Get a random image from gelbooru matching tags (safe only).")]
-    public async Task GetRandomSafePost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)")] string tagList) => await GetPost(ctx, true, tagList);
+    public async Task GetRandomSafePost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tagList) => await GetPost(ctx, true, tagList);
 
     [SlashCommand("booru-nsfw", "Get a random image from gelbooru matching tags (questionable and explicit only).")]
-    public async Task GetRandomPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)")] string tagList) => await GetPost(ctx, false, tagList);
+    public async Task GetRandomPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tagList) => await GetPost(ctx, false, tagList);
 
     private async Task GetPost(InteractionContext ctx, bool safeOnly, string tags)
     {

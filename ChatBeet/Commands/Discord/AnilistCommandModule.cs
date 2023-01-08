@@ -3,6 +3,7 @@ using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using Humanizer;
 using Miki.Anilist;
 using System;
 using System.Threading.Tasks;
@@ -33,15 +34,17 @@ public class AnilistCommandModule : ApplicationCommandModule
 
         if (media is not null)
         {
+            var description = media.Description.RemoveSpoilers().Truncate(1000);
+
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = media.CoverImage,
                 Url = media.Url,
-                Description = media.Description,
+                Description = description,
                 Title = media.EnglishTitle
             };
             var text = @$"{Formatter.Bold(media.EnglishTitle)} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {media.Score}%
-{media.Description.RemoveSpoilers()}
+{description}
 {Formatter.MaskedUrl("View on AniList", new Uri(media.Url))}";
 
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -64,6 +67,7 @@ public class AnilistCommandModule : ApplicationCommandModule
 
         if (character is not null)
         {
+            var description = character.Description.RemoveSpoilers().Truncate(1000);
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = character.LargeImageUrl,
@@ -72,7 +76,7 @@ public class AnilistCommandModule : ApplicationCommandModule
             };
             var fullName = Formatter.Bold($"{character.FirstName} {character.LastName}");
             var text = @$"{fullName} ({character.NativeName})
-{character.Description.RemoveSpoilers()}
+{description}
 {Formatter.MaskedUrl("View on AniList", new Uri(character.SiteUrl))}";
 
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()

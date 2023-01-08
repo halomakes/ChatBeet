@@ -13,7 +13,7 @@ namespace ChatBeet.Services
     {
         private readonly DiscordClient _client;
         private readonly ILogger<DiscordBotService> _logger;
-        private readonly IServiceProvider _services;
+        public readonly IServiceProvider _services;
 
         public DiscordBotService(DiscordClient client, ILogger<DiscordBotService> logger, IServiceProvider services)
         {
@@ -37,6 +37,11 @@ namespace ChatBeet.Services
             commands.SlashCommandErrored += (e, x) =>
             {
                 _logger.LogError(x.Exception, "Slash command failed");
+                return Task.CompletedTask;
+            };
+            commands.AutocompleteErrored += (e, x) =>
+            {
+                _logger.LogError(x.Exception, "Autocomplete failed");
                 return Task.CompletedTask;
             };
 

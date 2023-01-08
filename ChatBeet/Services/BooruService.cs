@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Services
@@ -22,14 +24,16 @@ namespace ChatBeet.Services
         private readonly ChatBeetConfiguration.BooruConfiguration booruConfig;
         private readonly BooruContext context;
         private readonly MessageQueueService messageQueue;
+        private readonly HttpClient httpClient;
 
-        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context, MessageQueueService messageQueue)
+        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context, MessageQueueService messageQueue, HttpClient httpClient)
         {
             this.cache = cache;
             this.gelbooru = gelbooru;
             booruConfig = options.Value.Booru;
             this.context = context;
             this.messageQueue = messageQueue;
+            this.httpClient = httpClient;
         }
 
         [Obsolete("Remove with IRC")]
@@ -124,6 +128,13 @@ namespace ChatBeet.Services
             ClearCache(nick);
         }
 
+        public async Task<IEnumerable<string>> GetTagsAsync(string query) => await cache.GetOrCreateAsync($"booru:tags:{query}", async entry =>
+        {
+            entry.SlidingExpiration = TimeSpan.FromHours(1);
+            var response = await httpClient.GetFromJsonAsync<TagResponse>($"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&limit=25&name_pattern={query}%");
+            return response.Tag.Select(t => t.Name);
+        });
+
         private void ClearCache(string nick) => cache.Remove(GetCacheEntry(nick));
 
         private static string GetCacheEntry(string nick) => $"boorublacklist:{nick}";
@@ -146,5 +157,10 @@ namespace ChatBeet.Services
         }
 
         public record struct MediaSearchResult(Uri ImageUrl, Uri PageUrl, Rating Rating, IEnumerable<string> Tags);
+
+        internal record TagResponseEntry(string Name);
+
+        internal record TagResponse(IEnumerable<TagResponseEntry> Tag);
     }
+
 }
