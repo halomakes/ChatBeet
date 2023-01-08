@@ -1,7 +1,9 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Commands.Discord.Autocomplete;
+using ChatBeet.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,14 +20,9 @@ public class BooruCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("booru", "Get a random image from gelbooru matching tags (safe only).")]
-    public async Task GetRandomSafePost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)")] string tagList) => await GetPost(ctx, true, tagList);
-
-    [SlashCommand("booru-nsfw", "Get a random image from gelbooru matching tags (questionable and explicit only).")]
-    public async Task GetRandomPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)")] string tagList) => await GetPost(ctx, false, tagList);
-
-    private async Task GetPost(InteractionContext ctx, bool safeOnly, string tags)
+    private async Task GetPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tags, [Option("safe-only", "Turn this off if you're horny")] bool safeOnly = true)
     {
-        var tagList = tags.Split(' ');
+        var tagList = tags.ToLower().Split(' ');
         if (tagList.Any())
         {
             var result = await booru.GetRandomPostAsync(safeOnly, ctx.User.Username, tagList);
@@ -42,14 +39,14 @@ public class BooruCommandModule : ApplicationCommandModule
                         Url = media.PageUrl.ToString()
                     };
                     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                    .WithContent(@$"{media.Rating} - {Formatter.Sanitize(string.Join(", ", media.Tags))}
+                    .WithContent(@$"{media.Rating} - {FormatTags(media.Tags, tagList)}
 {Formatter.EmbedlessUrl(media.PageUrl)}")
                     .AddEmbed(embed));
                 }
                 else
                 {
                     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                    .WithContent(@$"{media.Rating} - {Formatter.Sanitize(string.Join(", ", media.Tags))}
+                    .WithContent(@$"{media.Rating} - {FormatTags(media.Tags, tagList)}
 {Formatter.Spoiler(Formatter.EmbedlessUrl(media.PageUrl))}"));
                 }
             }
@@ -68,6 +65,9 @@ public class BooruCommandModule : ApplicationCommandModule
         }
     }
 
+    private string FormatTags(IEnumerable<string> tags, IEnumerable<string> queriedTags) => string.Join(", ", tags
+        .Select(t => queriedTags.Contains(t) ? Formatter.Bold(Formatter.Sanitize(t)) : Formatter.Sanitize(t)));
+
     [SlashCommand("astolfo", "Fill the void in your soul with an Astolfo picture.")]
-    public Task GetAstolfo(InteractionContext ctx) => GetPost(ctx, true, "astolfo_(fate)");
+    public Task GetAstolfo(InteractionContext ctx) => GetPost(ctx, "astolfo_(fate)", true);
 }

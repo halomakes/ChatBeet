@@ -8,6 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["ChatBeet/ChatBeet.csproj", "ChatBeet/"]
+COPY "README.md" "ChatBeet/wwwroot/README.md"
 COPY ["SentimentAnalysis/SentimentAnalysis.csproj", "SentimentAnalysis/"]
 RUN dotnet restore "ChatBeet/ChatBeet.csproj"
 COPY . .

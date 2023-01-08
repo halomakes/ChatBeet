@@ -1,8 +1,10 @@
-﻿using ChatBeet.Services;
+﻿using ChatBeet.Commands.Discord.Autocomplete;
+using ChatBeet.Services;
 using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using Humanizer;
 using Miki.Anilist;
 using System;
 using System.Threading.Tasks;
@@ -20,11 +22,11 @@ public class AnilistCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("anime", "Get information about an anime series from AniList")]
-    public Task GetAnime(InteractionContext ctx, [Option("query", "Anime to search for")] string query) => GetMedia(ctx, query, MediaType.ANIME);
+    public Task GetAnime(InteractionContext ctx, [Option("media", "Anime to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query) => GetMedia(ctx, query, MediaType.ANIME);
 
 
     [SlashCommand("manga", "Get information about a manga from AniList")]
-    public Task GetManga(InteractionContext ctx, [Option("query", "Manga to search for")] string query) => GetMedia(ctx, query, MediaType.MANGA);
+    public Task GetManga(InteractionContext ctx, [Option("media", "Manga to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query) => GetMedia(ctx, query, MediaType.MANGA);
 
 
     private async Task GetMedia(InteractionContext ctx, string query, MediaType type)
@@ -33,15 +35,17 @@ public class AnilistCommandModule : ApplicationCommandModule
 
         if (media is not null)
         {
+            var description = media.Description.RemoveSpoilers().Truncate(1000);
+
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = media.CoverImage,
                 Url = media.Url,
-                Description = media.Description,
+                Description = description,
                 Title = media.EnglishTitle
             };
             var text = @$"{Formatter.Bold(media.EnglishTitle)} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {media.Score}%
-{media.Description.RemoveSpoilers()}
+{description}
 {Formatter.MaskedUrl("View on AniList", new Uri(media.Url))}";
 
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -58,12 +62,13 @@ public class AnilistCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("waifu", "Get information about a character from AniList")]
-    public async Task GetCharacter(InteractionContext ctx, [Option("query", "Name of the character to search for")] string query)
+    public async Task GetCharacter(InteractionContext ctx, [Option("character", "Name of the character to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query)
     {
         var character = await client.GetCharacterAsync(query);
 
         if (character is not null)
         {
+            var description = character.Description.RemoveSpoilers().Truncate(1000);
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = character.LargeImageUrl,
@@ -72,7 +77,7 @@ public class AnilistCommandModule : ApplicationCommandModule
             };
             var fullName = Formatter.Bold($"{character.FirstName} {character.LastName}");
             var text = @$"{fullName} ({character.NativeName})
-{character.Description.RemoveSpoilers()}
+{description}
 {Formatter.MaskedUrl("View on AniList", new Uri(character.SiteUrl))}";
 
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -87,4 +92,8 @@ public class AnilistCommandModule : ApplicationCommandModule
                 );
         }
     }
+
+    [SlashCommand("husbando", "Get information about a character from AniList")]
+    public Task GetCharacterAlias(InteractionContext ctx, [Option("character", "Name of the character to search for"), Autocomplete(typeof(AnilistAutoCompleteProvider))] string query)
+        => GetCharacter(ctx, query);
 }

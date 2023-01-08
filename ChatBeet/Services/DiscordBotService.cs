@@ -13,7 +13,7 @@ namespace ChatBeet.Services
     {
         private readonly DiscordClient _client;
         private readonly ILogger<DiscordBotService> _logger;
-        private readonly IServiceProvider _services;
+        public readonly IServiceProvider _services;
 
         public DiscordBotService(DiscordClient client, ILogger<DiscordBotService> logger, IServiceProvider services)
         {
@@ -39,6 +39,11 @@ namespace ChatBeet.Services
                 _logger.LogError(x.Exception, "Slash command failed");
                 return Task.CompletedTask;
             };
+            commands.AutocompleteErrored += (e, x) =>
+            {
+                _logger.LogError(x.Exception, "Autocomplete failed");
+                return Task.CompletedTask;
+            };
 
             commands.RegisterCommands<AnilistCommandModule>();
             commands.RegisterCommands<BadBotCommandModule>();
@@ -50,6 +55,8 @@ namespace ChatBeet.Services
             commands.RegisterCommands<DoggoCommandModule>();
             commands.RegisterCommands<GoogleCommandModule>();
             commands.RegisterCommands<MemoryCellCommandModule>();
+            commands.RegisterCommands<SystemInfoCommandModule>();
+            commands.RegisterCommands<SuspicionCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
