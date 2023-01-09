@@ -28,6 +28,14 @@ namespace ChatBeet.Utilities
             return $"{bar}  {periodDescription} {percentage} complete.";
         }
 
+        public static string GetCompletionDescription(double ratio, string periodDescription)
+        {
+            var (percentage, _) = GetPercentAndBar(ratio);
+
+            return $"{periodDescription} {percentage} complete.";
+        }
+
+
         public static string FormatTemplate(DateTime now, DateTime start, DateTime end, string template)
         {
             var elapsed = ForcePositive(now - start);
@@ -61,7 +69,7 @@ namespace ChatBeet.Utilities
             return $"{bar}  {filledTemplate}";
         }
 
-        private static double GetRatio(DateTime now, DateTime start, DateTime end) => ForceRange((now - start) / (end - start), isUnit: true);
+        public static double GetRatio(DateTime now, DateTime start, DateTime end) => ForceRange((now - start) / (end - start), isUnit: true);
 
         private static (string percentage, string bar) GetPercentAndBar(double ratio)
         {
@@ -70,7 +78,7 @@ namespace ChatBeet.Utilities
 
             var filled = string.Concat(Enumerable.Repeat('█', segments));
             var empty = string.Concat(Enumerable.Repeat('░', barLength - segments));
-            var percentageDesc = $"{IrcValues.BOLD}{percentage:F}%".Colorize(Convert.ToInt32(percentage));
+            var percentageDesc = $"{percentage:F}%";
             var bar = $"{IrcValues.GREEN}{filled}{IrcValues.GREY}{empty}{IrcValues.RESET}";
 
             return (percentageDesc, bar);

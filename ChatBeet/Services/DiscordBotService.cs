@@ -1,6 +1,5 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
-using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -63,7 +62,8 @@ namespace ChatBeet.Services
             commands.RegisterCommands<MemoryCellCommandModule>();
             commands.RegisterCommands<SystemInfoCommandModule>();
             commands.RegisterCommands<SuspicionCommandModule>();
-            commands.RegisterCommands<MessageTransformCommandProcessor>();
+            commands.RegisterCommands<MessageTransformCommandModule>();
+            commands.RegisterCommands<ProgressCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }

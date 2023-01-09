@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 namespace ChatBeet.Commands.Discord;
 
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
-public partial class MessageTransformCommandProcessor : ApplicationCommandModule
+public partial class MessageTransformCommandModule : ApplicationCommandModule
 {
     private readonly NegativeResponseService negativeResponseService;
     private readonly DiscordClient client;
 
-    public MessageTransformCommandProcessor(NegativeResponseService negativeResponseService, DiscordClient client)
+    public MessageTransformCommandModule(NegativeResponseService negativeResponseService, DiscordClient client)
     {
         this.negativeResponseService = negativeResponseService;
         this.client = client;
