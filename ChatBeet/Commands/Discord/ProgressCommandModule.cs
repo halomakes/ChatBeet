@@ -1,4 +1,5 @@
 ﻿using ChatBeet.Attributes;
+using ChatBeet.Commands.Discord.Autocomplete;
 using ChatBeet.Configuration;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
@@ -38,7 +39,7 @@ public class ProgressCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("custom", "Gets progress over a period of time.")]
-    public async Task GetCustomTime(InteractionContext ctx, [Option("time-unit", "Unit of time")] string timeUnit)
+    public async Task GetCustomTime(InteractionContext ctx, [Option("time-unit", "Unit of time"), Autocomplete(typeof(TimeRangesAutocompleteProvider))] string timeUnit)
     {
         var unit = await dbContext.FixedTimeRanges.FirstOrDefaultAsync(r => r.Key.ToLower() == timeUnit.Trim().ToLower());
         if (unit is null)
