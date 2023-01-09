@@ -41,14 +41,14 @@ namespace ChatBeet.Commands.Irc
                 var now = DateTime.Now;
                 if (now < unit.StartDate)
                     content = string.IsNullOrWhiteSpace(unit.BeforeRangeMessage)
-                        ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
+                        ? Progress.FormatTemplateWithBar(now, unit.StartDate, unit.EndDate, unit.Template)
                         : unit.BeforeRangeMessage;
                 else if (now > unit.EndDate)
                     content = string.IsNullOrWhiteSpace(unit.AfterRangeMessage)
-                        ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
+                        ? Progress.FormatTemplateWithBar(now, unit.StartDate, unit.EndDate, unit.Template)
                         : unit.AfterRangeMessage;
                 else
-                    content = Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template);
+                    content = Progress.FormatTemplateWithBar(now, unit.StartDate, unit.EndDate, unit.Template);
             }
             return new PrivateMessage(IncomingMessage.GetResponseTarget(), content);
         }

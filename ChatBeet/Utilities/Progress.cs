@@ -36,6 +36,18 @@ namespace ChatBeet.Utilities
         }
 
 
+        public static string FormatTemplateWithBar(DateTime now, DateTime start, DateTime end, string template)
+        {
+            var elapsed = ForcePositive(now - start);
+            var remaining = ForcePositive(end - now);
+
+            return FormatTemplateWithBar(GetRatio(now, start, end), template, new Dictionary<string, string>
+            {
+                { "elapsed", elapsed.Humanize() },
+                { "remaining", remaining.Humanize() }
+            });
+        }
+
         public static string FormatTemplate(DateTime now, DateTime start, DateTime end, string template)
         {
             var elapsed = ForcePositive(now - start);
@@ -48,6 +60,7 @@ namespace ChatBeet.Utilities
             });
         }
 
+
         public static TimeSpan ForcePositive(TimeSpan ts) => ts < TimeSpan.Zero ? TimeSpan.Zero : ts;
 
         public static double ForceRange(double percentage, bool isUnit = false) => (percentage, isUnit) switch
@@ -59,6 +72,17 @@ namespace ChatBeet.Utilities
         };
 
         private static string FormatTemplate(double ratio, string template, Dictionary<string, string> templateValues = default)
+        {
+            var (percentage, bar) = GetPercentAndBar(ratio);
+            var filledTemplate = template.Replace(@"{percentage}", percentage);
+            if (templateValues is not null)
+                foreach (var (key, value) in templateValues)
+                    filledTemplate = filledTemplate.Replace(@$"{{{key}}}", value);
+
+            return filledTemplate;
+        }
+
+        private static string FormatTemplateWithBar(double ratio, string template, Dictionary<string, string> templateValues = default)
         {
             var (percentage, bar) = GetPercentAndBar(ratio);
             var filledTemplate = template.Replace(@"{percentage}", percentage);

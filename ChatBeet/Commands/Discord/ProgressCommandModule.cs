@@ -1,11 +1,14 @@
-﻿using ChatBeet.Configuration;
+﻿using ChatBeet.Attributes;
+using ChatBeet.Configuration;
 using ChatBeet.Data;
+using ChatBeet.Data.Entities;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Humanizer;
+using IF.Lastfm.Core.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -34,27 +37,24 @@ public class ProgressCommandModule : ApplicationCommandModule
         now = DateTime.Now;
     }
 
-    /*[SlashCommand("custom", "Gets progress over a period of time.")]
-    public async Task GetCustomTime(InteractionContext ctx, [Option] string timeUnit)
+    [SlashCommand("custom", "Gets progress over a period of time.")]
+    public async Task GetCustomTime(InteractionContext ctx, [Option("time-unit", "Unit of time")] string timeUnit)
     {
-        string content = "Enter a valid time unit.";
         var unit = await dbContext.FixedTimeRanges.FirstOrDefaultAsync(r => r.Key.ToLower() == timeUnit.Trim().ToLower());
-        if (unit != default)
+        if (unit is null)
         {
-            var now = DateTime.Now;
-            if (now < unit.StartDate)
-                content = string.IsNullOrWhiteSpace(unit.BeforeRangeMessage)
-                    ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
-                    : unit.BeforeRangeMessage;
-            else if (now > unit.EndDate)
-                content = string.IsNullOrWhiteSpace(unit.AfterRangeMessage)
-                    ? Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template)
-                    : unit.AfterRangeMessage;
-            else
-                content = Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template);
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Enter a valid time unit."));
+            return;
         }
-        return new PrivateMessage(IncomingMessage.GetResponseTarget(), content);
-    }*/
+
+        var now = DateTime.Now;
+        if (now < unit.StartDate && !string.IsNullOrWhiteSpace(unit.BeforeRangeMessage))
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(unit.BeforeRangeMessage));
+        else if (now > unit.EndDate && !string.IsNullOrWhiteSpace(unit.AfterRangeMessage))
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(unit.AfterRangeMessage));
+        else
+            await ProgressResult(ctx, unit.StartDate, unit.EndDate, Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template));
+    }
 
     [SlashCommand("year", "Get progress for the current year.")]
     public async Task GetYear(InteractionContext ctx)
@@ -182,7 +182,8 @@ public class ProgressCommandModule : ApplicationCommandModule
             .WithContent(message)
             .AddFile(path, ms));
 
-        static Color GetGradientColor(double ratio) {
+        static Color GetGradientColor(double ratio)
+        {
             byte[] startColor = { 245, 66, 66 };
             byte[] endColor = { 78, 173, 84 };
             return Color.FromRgb(Blend(0), Blend(1), Blend(2));
@@ -196,21 +197,21 @@ public class ProgressCommandModule : ApplicationCommandModule
         }
     }
 
-    /*[SlashCommand("workday", "Get progress for your current workday.")]
+    [SlashCommand("workday", "Get progress for your current workday.")]
     public async Task GetWorkday(InteractionContext ctx)
     {
-        var startPref = await preferences.Get(IncomingMessage.From, UserPreference.WorkHoursStart);
-        var endPref = await preferences.Get(IncomingMessage.From, UserPreference.WorkHoursEnd);
+        var startPref = await preferences.Get(ctx.User.DiscriminatedUsername(), UserPreference.WorkHoursStart);
+        var endPref = await preferences.Get(ctx.User.DiscriminatedUsername(), UserPreference.WorkHoursEnd);
 
         if (!IsValidDate(startPref))
         {
             var description = UserPreference.WorkHoursStart.GetAttribute<ParameterAttribute>().DisplayName;
-            return new NoticeMessage(IncomingMessage.From, $"No valid value set for preference {Formatter.Italic(description)}");
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"No valid value set for preference {Formatter.Italic(description)}"));
         }
         else if (!IsValidDate(endPref))
         {
             var description = UserPreference.WorkHoursEnd.GetAttribute<ParameterAttribute>().DisplayName;
-            return new NoticeMessage(IncomingMessage.From, $"No valid value set for preference {Formatter.Italic(description)}");
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"No valid value set for preference {Formatter.Italic(description)}"));
         }
         else
         {
@@ -233,12 +234,11 @@ public class ProgressCommandModule : ApplicationCommandModule
 
             if (start <= now && end >= now)
             {
-                var bar = Progress.GetDescription(now, start, end, $"Formatter.Bold("Your workday") is");
-                return new PrivateMessage(IncomingMessage.GetResponseTarget(), bar);
+                await ProgressResult(ctx, start, end, $"{Formatter.Bold("Your workday")} is");
             }
             else
             {
-                return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"You are outside of working hours.");
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You are outside of working hours."));
             }
         }
 
@@ -246,5 +246,5 @@ public class ProgressCommandModule : ApplicationCommandModule
 
         static DateTime NormalizeTime(DateTime date, DateTime baseline) =>
             new(baseline.Year, baseline.Month, baseline.Day, date.Hour, date.Minute, date.Second);
-    }*/
+    }
 }
