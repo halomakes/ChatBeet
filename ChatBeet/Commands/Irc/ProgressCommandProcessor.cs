@@ -73,7 +73,8 @@ namespace ChatBeet.Commands.Irc
         [RateLimit(5, TimeUnit.Minute)]
         public IClientMessage GetOffsetDay()
         {
-            var start = new DateTime(now.Year, now.Month, now.Day).AddHours(1);
+            var nowOffset = now.AddHours(1);
+            var start = new DateTime(nowOffset.Year, nowOffset.Month, nowOffset.Day);
             return ProgressResult(start, start.AddDays(1), $"(in the {IrcValues.ITALIC}objectively better{IrcValues.RESET} time zone) {IrcValues.BOLD}Today{IrcValues.RESET} is");
         }
 

@@ -13,6 +13,14 @@ namespace ChatBeet.Utilities
         public static string GetDescription(DateTime now, DateTime start, DateTime end, string periodDescription) =>
             GetDescription(GetRatio(now, start, end), periodDescription);
 
+        public static string GetCompletionDescription(DateTime now, DateTime start, DateTime end, string periodDescription)
+        {
+            var ratio = GetRatio(now, start, end);
+            var (percentage, _) = GetPercentAndBar(ratio);
+
+            return $"{periodDescription} {percentage} complete.";
+        }
+
         public static string GetDescription(double ratio, string periodDescription)
         {
             var (percentage, bar) = GetPercentAndBar(ratio);
