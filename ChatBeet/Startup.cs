@@ -225,7 +225,7 @@ namespace ChatBeet
                 c.TokenType = TokenType.Bot;
                 c.Intents = DiscordIntents.MessageContents | DiscordIntents.AllUnprivileged;
             });
-            services.AddTransient<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
+            services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
             services.AddHostedService<DiscordBotService>();
         }
 
