@@ -37,7 +37,7 @@ public partial class MessageTransformCommandModule : ApplicationCommandModule
         var message = ctx.TargetMessage.Content;
         var kerned = SpacingRegex().Replace(message, " $1").Replace("   ", "  ").Trim().ToUpperInvariant();
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent(kerned));
+            .WithContent($"{Formatter.Mention(ctx.TargetMessage.Author)}: {kerned}"));
     }
 
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Mock")]
@@ -54,7 +54,7 @@ public partial class MessageTransformCommandModule : ApplicationCommandModule
         var mocked = string.Concat(RandomizeCase(message));
 
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent(mocked));
+            .WithContent($"{Formatter.Mention(ctx.TargetMessage.Author)}: {mocked}"));
         await ctx.TargetMessage.CreateReactionAsync(DiscordEmoji.FromUnicode(@"🤣"));
 
         static IEnumerable<char> RandomizeCase(string s)

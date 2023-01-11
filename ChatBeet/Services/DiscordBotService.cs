@@ -63,6 +63,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<ProgressCommandModule>();
             commands.RegisterCommands<SentimentCommandModule>();
             commands.RegisterCommands<IrcCommandModule>();
+            commands.RegisterCommands<SauceCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
