@@ -1,6 +1,7 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
 using DSharpPlus.SlashCommands;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -34,19 +35,12 @@ namespace ChatBeet.Services
             {
                 Services = _services
             });
-            commands.SlashCommandErrored += (e, x) =>
+            commands.SlashCommandErrored += async (e, x) => await LogError("Slash command failed", x.Exception);
+            commands.AutocompleteErrored += async (e, x) => await LogError("Autocomplete failed", x.Exception);
+            commands.ContextMenuErrored += async (e, x) => await LogError("Context menu failed", x.Exception);
+            _client.ClientErrored += (e, x) =>
             {
-                _logger.LogError(x.Exception, "Slash command failed");
-                return Task.CompletedTask;
-            };
-            commands.AutocompleteErrored += (e, x) =>
-            {
-                _logger.LogError(x.Exception, "Autocomplete failed");
-                return Task.CompletedTask;
-            };
-            commands.ContextMenuErrored += (e, x) =>
-            {
-                _logger.LogError(x.Exception, "Context Menu failed");
+                _logger.LogError(x.Exception, "Discord client error"); 
                 return Task.CompletedTask;
             };
 
@@ -66,6 +60,12 @@ namespace ChatBeet.Services
             commands.RegisterCommands<ProgressCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
+        }
+
+        private async Task LogError(string v, Exception exception)
+        {
+            _logger.LogError(exception, v);
+            await _services.GetRequiredService<DiscordLogService>().LogError(v, exception);
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)

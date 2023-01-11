@@ -22,7 +22,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Miki.Anilist;
@@ -227,6 +226,8 @@ namespace ChatBeet
             });
             services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
             services.AddHostedService<DiscordBotService>();
+            services.Configure<DiscordBotConfiguration>(Configuration.GetSection("Discord"));
+            services.AddTransient<DiscordLogService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -234,14 +235,7 @@ namespace ChatBeet
         {
             app.UseForwardedHeaders();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-            }
+            app.UseExceptionHandler("/Error");
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
