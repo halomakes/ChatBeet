@@ -28,13 +28,15 @@ public class PreferencesCommandModule : ApplicationCommandModule
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DSharpPlus.Entities.DiscordInteractionResponseBuilder()
             .WithContent(string.IsNullOrWhiteSpace(value)
             ? $"No preference is set for {Formatter.Italic(preference.ToString())}."
-            : $"{Formatter.Italic(displayName)} is set to {Formatter.Bold(value)}"));
+            : $"{Formatter.Italic(displayName)} is set to {Formatter.Bold(value)}")
+            .AsEphemeral());
     }
 
     [SlashCommand("set", "Change the value one of your preferences.")]
     public async Task SetPreferenceValue(InteractionContext ctx, [Option("preference", "Preference to set")] UserPreference preference, [Option("value", "Value to set"), Autocomplete(typeof(PreferenceAutocompleteProvider))] string value) =>
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DSharpPlus.Entities.DiscordInteractionResponseBuilder()
-            .WithContent(await SetPreferenceSilent(ctx, preference, value)));
+            .WithContent(await SetPreferenceSilent(ctx, preference, value))
+            .AsEphemeral());
 
     private async Task<string> SetPreferenceSilent(InteractionContext ctx, UserPreference preference, string value)
     {
