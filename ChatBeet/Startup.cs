@@ -80,6 +80,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DessRule, PrivateMessage>();
                 pipeline.RegisterRule<AmazonSmileRule, PrivateMessage>();
+                pipeline.RegisterRule<IrcLinkRule, IrcLinkRequest>();
                 pipeline.AddCommandOrchestrator();
             });
 
@@ -158,6 +159,7 @@ namespace ChatBeet
             services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
             services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
             services.AddDbContext<ProgressContext>(opts => opts.UseSqlite("Data Source=db/progress.db"));
+            services.AddDbContext<IrcLinkContext>(opts => opts.UseSqlite("Data Source=db/ircmigration.db"));
             services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();
@@ -228,6 +230,7 @@ namespace ChatBeet
             services.AddHostedService<DiscordBotService>();
             services.Configure<DiscordBotConfiguration>(Configuration.GetSection("Discord"));
             services.AddTransient<DiscordLogService>();
+            services.AddScoped<IrcMigrationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

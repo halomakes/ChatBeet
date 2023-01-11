@@ -21,7 +21,8 @@ namespace ChatBeet.Services
             typeof(IdentityDbContext),
             typeof(ReplacementContext),
             typeof(SuspicionContext),
-            typeof(ProgressContext)
+            typeof(ProgressContext),
+            typeof(IrcLinkContext)
         };
 
         public ContextInitializer(IServiceProvider serviceProvider)

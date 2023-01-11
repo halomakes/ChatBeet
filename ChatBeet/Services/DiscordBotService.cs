@@ -1,5 +1,7 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
+using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,9 +42,10 @@ namespace ChatBeet.Services
             commands.ContextMenuErrored += async (e, x) => await LogError("Context menu failed", x.Exception);
             _client.ClientErrored += (e, x) =>
             {
-                _logger.LogError(x.Exception, "Discord client error"); 
+                _logger.LogError(x.Exception, "Discord client error");
                 return Task.CompletedTask;
             };
+            _client.ModalSubmitted += OnModalSubmitted;
 
             commands.RegisterCommands<AnilistCommandModule>();
             commands.RegisterCommands<BadBotCommandModule>();
@@ -59,8 +62,23 @@ namespace ChatBeet.Services
             commands.RegisterCommands<MessageTransformCommandModule>();
             commands.RegisterCommands<ProgressCommandModule>();
             commands.RegisterCommands<SentimentCommandModule>();
+            commands.RegisterCommands<IrcCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
+        }
+
+        private async Task OnModalSubmitted(DiscordClient sender, ModalSubmitEventArgs e)
+        {
+            switch (e.Interaction.Data.CustomId)
+            {
+                case IrcCommandModule.VerifyModalId:
+                    using (var scope = _services.CreateAsyncScope())
+                    {
+                        var service = scope.ServiceProvider.GetRequiredService<IrcMigrationService>();
+                        await service.ValidateTokenAsync(e.Interaction, e.Values["nick"], e.Values["token"]);
+                    }
+                    break;
+            }
         }
 
         private async Task LogError(string v, Exception exception)
