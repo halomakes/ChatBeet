@@ -66,6 +66,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<SauceCommandModule>();
             commands.RegisterCommands<PreferencesCommandModule>();
             commands.RegisterCommands<WhipCommandModule>();
+            commands.RegisterCommands<GameLookupCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
