@@ -22,7 +22,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Miki.Anilist;
@@ -65,7 +64,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<RememberRule, PrivateMessage>();
                 pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
-                pipeline.RegisterRule<DownloadCompleteRule, DownloadCompleteMessage>();
+                pipeline.RegisterAsyncRule<DownloadCompleteRule, DownloadCompleteMessage>();
                 pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
                 pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
@@ -81,6 +80,7 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
                 pipeline.RegisterAsyncRule<DessRule, PrivateMessage>();
                 pipeline.RegisterRule<AmazonSmileRule, PrivateMessage>();
+                pipeline.RegisterRule<IrcLinkRule, IrcLinkRequest>();
                 pipeline.AddCommandOrchestrator();
             });
 
@@ -159,6 +159,7 @@ namespace ChatBeet
             services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
             services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
             services.AddDbContext<ProgressContext>(opts => opts.UseSqlite("Data Source=db/progress.db"));
+            services.AddDbContext<IrcLinkContext>(opts => opts.UseSqlite("Data Source=db/ircmigration.db"));
             services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
             services.AddMemoryCache();
@@ -227,6 +228,9 @@ namespace ChatBeet
             });
             services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
             services.AddHostedService<DiscordBotService>();
+            services.Configure<DiscordBotConfiguration>(Configuration.GetSection("Discord"));
+            services.AddTransient<DiscordLogService>();
+            services.AddScoped<IrcMigrationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -234,14 +238,7 @@ namespace ChatBeet
         {
             app.UseForwardedHeaders();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-            }
+            app.UseExceptionHandler("/Error");
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

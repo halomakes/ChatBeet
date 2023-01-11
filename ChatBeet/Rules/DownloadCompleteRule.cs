@@ -1,31 +1,57 @@
-﻿using ChatBeet.Models;
+﻿using ChatBeet.Configuration;
+using ChatBeet.Models;
+using DSharpPlus;
+using DSharpPlus.Entities;
 using GravyBot;
 using GravyIrc.Messages;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Rules;
+
+public partial class DownloadCompleteRule : IAsyncMessageRule<DownloadCompleteMessage>
 {
-    public class DownloadCompleteRule : IMessageRule<DownloadCompleteMessage>
+    private readonly IrcBotConfiguration config;
+    private readonly DiscordClient discord;
+    private readonly DiscordBotConfiguration discordConfig;
+    private static DiscordChannel notifyChannel;
+
+    public DownloadCompleteRule(IOptions<IrcBotConfiguration> options, DiscordClient discord, IOptions<DiscordBotConfiguration> discordBotConfiguration)
     {
-        private readonly IrcBotConfiguration config;
+        config = options.Value;
+        this.discord = discord;
+        discordConfig = discordBotConfiguration.Value;
+    }
 
-        public DownloadCompleteRule(IOptions<IrcBotConfiguration> options)
+    public bool Matches(DownloadCompleteMessage incomingMessage) => true;
+
+    [GeneratedRegex(@"(@""(\[.*?\])"")")]
+    private partial Regex TagRgx();
+
+    [GeneratedRegex(@"(\.[A-z0-9]{3})$")]
+    private partial Regex ExtensionRgx();
+
+    public async IAsyncEnumerable<IClientMessage> RespondAsync(DownloadCompleteMessage incomingMessage)
+    {
+        if (incomingMessage.Source == "deluge" && !string.IsNullOrEmpty(incomingMessage.Name))
         {
-            config = options.Value;
-        }
+            await SendDiscordNotificationAsync(incomingMessage);
+            var downloadTitle = incomingMessage.Name;
+            downloadTitle = TagRgx().Replace(downloadTitle, $"{IrcValues.ORANGE}$1{IrcValues.RESET}");
+            downloadTitle = ExtensionRgx().Replace(downloadTitle, $"{IrcValues.GREY}$1{IrcValues.RESET}");
 
-        public IEnumerable<IClientMessage> Respond(DownloadCompleteMessage incomingMessage)
-        {
-            if (incomingMessage.Source == "deluge" && !string.IsNullOrEmpty(incomingMessage.Name))
-            {
-                var downloadTitle = incomingMessage.Name;
-                downloadTitle = new Regex(@"(\[.*?\])").Replace(downloadTitle, $"{IrcValues.ORANGE}$1{IrcValues.RESET}");
-                downloadTitle = new Regex(@"(\.[A-z0-9]{3})$").Replace(downloadTitle, $"{IrcValues.GREY}$1{IrcValues.RESET}");
-
-                yield return new PrivateMessage(config.NotifyChannel, $"{IrcValues.BOLD}{IrcValues.LIME}Download Complete{IrcValues.RESET}: {downloadTitle}");
-            }
+            yield return new PrivateMessage(config.NotifyChannel, $"{IrcValues.BOLD}{IrcValues.LIME}Download Complete{IrcValues.RESET}: {downloadTitle}");
         }
+    }
+
+    private async Task SendDiscordNotificationAsync(DownloadCompleteMessage incomingMessage)
+    {
+        notifyChannel ??= await discord.GetChannelAsync(discordConfig.Channels["Incoming"]);
+        var downloadTitle = incomingMessage.Name;
+        downloadTitle = TagRgx().Replace(downloadTitle, string.Empty);
+        downloadTitle = ExtensionRgx().Replace(downloadTitle, string.Empty);
+        await discord.SendMessageAsync(notifyChannel, $"{Formatter.Bold("Download complete")}: {downloadTitle}");
     }
 }
