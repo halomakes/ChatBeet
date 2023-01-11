@@ -34,7 +34,8 @@ public class IrcCommandModule : ApplicationCommandModule
                 ? ctx.User
                 : await _client.GetUserAsync(existingEntry.Id);
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{Formatter.Mention(discordUser)} is already linked to IRC user {Formatter.Bold(existingEntry.Nick)}"));
+                .WithContent($"{Formatter.Mention(discordUser)} is already linked to IRC user {Formatter.Bold(existingEntry.Nick)}")
+                .AsEphemeral());
             return;
         }
 
@@ -54,12 +55,14 @@ public class IrcCommandModule : ApplicationCommandModule
         if (existingEntry is not null)
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{Formatter.Mention(user)} used to be {Formatter.Bold(existingEntry.Nick)} on IRC."));
+                .WithContent($"{Formatter.Mention(user)} used to be {Formatter.Bold(existingEntry.Nick)} on IRC.")
+                .AsEphemeral());
         }
         else
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{Formatter.Mention(user)} either has no IRC nick or has not linked their accounts.  Use {Formatter.InlineCode("/irc link")} to link your account."));
+                .WithContent($"{Formatter.Mention(user)} either has no IRC nick or has not linked their accounts.  Use {Formatter.InlineCode("/irc link")} to link your account.")
+                .AsEphemeral());
         }
     }
 

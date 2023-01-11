@@ -54,7 +54,7 @@ public class ProgressCommandModule : ApplicationCommandModule
         else if (now > unit.EndDate && !string.IsNullOrWhiteSpace(unit.AfterRangeMessage))
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(unit.AfterRangeMessage));
         else
-            await ProgressResult(ctx, unit.StartDate, unit.EndDate, Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template));
+            await SendResult(ctx, Progress.GetRatio(now, unit.StartDate, unit.EndDate), Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template));
     }
 
     [SlashCommand("year", "Get progress for the current year.")]
