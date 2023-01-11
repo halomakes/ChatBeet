@@ -67,15 +67,14 @@ public class ProgressCommandModule : ApplicationCommandModule
     [SlashCommand("day", "Get progress for the current day.")]
     public async Task GetDay(InteractionContext ctx)
     {
-        var start = new DateTime(now.Year, now.Month, now.Day);
+        var start = DateTime.Today;
         await ProgressResult(ctx, start, start.AddDays(1), $"{Formatter.Bold("Today")} is");
     }
 
-    [SlashCommand("yatoday", "Get progress for the current day, but one hour in the past. It's objectively better. ")]
+    [SlashCommand("yato-day", "Get progress for the current day, but one hour in the past. It's objectively better. ")]
     public async Task GetOffsetDay(InteractionContext ctx)
     {
-        var nowOffset = now.AddHours(1);
-        var start = new DateTime(nowOffset.Year, nowOffset.Month, nowOffset.Day);
+        var start = DateTime.Today.AddHours(1);
         await ProgressResult(ctx, start, start.AddDays(1), $"(in the {Formatter.Italic("objectively better")} time zone) {Formatter.Bold("Today")} is");
     }
 
