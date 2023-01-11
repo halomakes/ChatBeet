@@ -1,8 +1,8 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using GravyBot;
 using SauceNET;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,14 +21,18 @@ public class SauceCommandModule : ApplicationCommandModule
     private async Task FindSauce(BaseContext ctx, string imageUrl)
     {
         var results = await sauceClient.GetSauceAsync(imageUrl);
-        var bestMatch = results?.Results?.OrderByDescending(r => double.TryParse(r.Similarity, out var p) ? p : 0).FirstOrDefault();
-        if (bestMatch != default)
+        var bestMatches = results?.Results?.OrderByDescending(r => double.TryParse(r.Similarity, out var p) ? p : 0).Take(3).ToList();
+        if (bestMatches?.Any() ?? false)
         {
-            var percentage = double.Parse(bestMatch.Similarity);
-            var percentageDesc = $"{IrcValues.BOLD}{percentage:F}%";
+            var content = bestMatches.Select(m =>
+            {
+                var percentage = double.Parse(m.Similarity);
+                var percentageDesc = Formatter.Bold($"{percentage:F}%");
+                return $"{percentageDesc} match on {Formatter.Bold(m.DatabaseName)}: {m.SourceURL}";
+            });
 
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{percentageDesc} match on {Formatter.Bold(bestMatch.DatabaseName)}: {bestMatch.SourceURL}"));
+                .WithContent(string.Join(Environment.NewLine, content)));
             return;
         }
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()

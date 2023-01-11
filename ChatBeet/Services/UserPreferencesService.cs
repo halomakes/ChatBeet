@@ -3,6 +3,9 @@ using ChatBeet.Configuration;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
+using ChatBeet.Utilities;
+using DSharpPlus;
+using DSharpPlus.Entities;
 using GravyBot;
 using IF.Lastfm.Core.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +22,28 @@ namespace ChatBeet.Services
 {
     public class UserPreferencesService
     {
-        private readonly PreferencesContext db;
-        private readonly ChatBeetConfiguration config;
+        private readonly PreferencesContext _db;
+        private readonly ChatBeetConfiguration _config;
+        private readonly IrcLinkContext _ircLink;
 
-        public UserPreferencesService(PreferencesContext db, IOptions<ChatBeetConfiguration> opts)
+        public UserPreferencesService(PreferencesContext db, IOptions<ChatBeetConfiguration> opts, IrcLinkContext ircLink)
         {
-            this.db = db;
-            config = opts.Value;
+            _db = db;
+            _config = opts.Value;
+            _ircLink = ircLink;
+        }
+
+        public async Task<string> Set(DiscordUser user, UserPreference preference, string value)
+        {
+            string userId = await GetInternalUsername(user);
+            return await Set(userId, preference, value);
+        }
+
+        private async Task<string> GetInternalUsername(DiscordUser user)
+        {
+            var ircUser = await _ircLink.Links.FirstOrDefaultAsync(l => l.Id == user.Id);
+            var userId = ircUser?.Nick ?? user.DiscriminatedUsername();
+            return userId;
         }
 
         public async Task<string> Set(string nick, UserPreference preference, string value)
@@ -33,12 +51,12 @@ namespace ChatBeet.Services
             var isDelete = string.IsNullOrEmpty(value);
             var normalized = isDelete ? default : Normalize(preference, value);
 
-            var existingPref = await db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
+            var existingPref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
             if (existingPref == default)
             {
                 if (!isDelete)
                 {
-                    db.PreferenceSettings.Add(new UserPreferenceSetting
+                    _db.PreferenceSettings.Add(new UserPreferenceSetting
                     {
                         Nick = nick,
                         Preference = preference,
@@ -50,7 +68,7 @@ namespace ChatBeet.Services
             {
                 if (isDelete)
                 {
-                    db.PreferenceSettings.Remove(existingPref);
+                    _db.PreferenceSettings.Remove(existingPref);
                 }
                 else
                 {
@@ -58,7 +76,7 @@ namespace ChatBeet.Services
                 }
             }
 
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
             return normalized;
         }
@@ -67,7 +85,14 @@ namespace ChatBeet.Services
 
         public async Task<string> Get(string nick, UserPreference preference)
         {
-            var pref = await db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
+            var pref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
+            return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
+        }
+
+        public async Task<string> Get(DiscordUser user, UserPreference preference)
+        {
+            var id = await GetInternalUsername(user);
+            var pref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == id && p.Preference == preference);
             return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
         }
 
@@ -84,9 +109,9 @@ namespace ChatBeet.Services
             return enumValue;
         }
 
-        public Task<List<UserPreferenceSetting>> Get(string nick) => db.PreferenceSettings.AsQueryable().Where(p => p.Nick == nick).ToListAsync();
+        public Task<List<UserPreferenceSetting>> Get(string nick) => _db.PreferenceSettings.AsQueryable().Where(p => p.Nick == nick).ToListAsync();
 
-        public Task<List<UserPreferenceSetting>> Get(IEnumerable<string> nicks, UserPreference preference) => db.PreferenceSettings.AsQueryable()
+        public Task<List<UserPreferenceSetting>> Get(IEnumerable<string> nicks, UserPreference preference) => _db.PreferenceSettings.AsQueryable()
             .Where(p => p.Preference == preference)
             .Where(p => nicks.Select(n => n.ToLower()).Contains(p.Nick.ToLower()))
             .ToListAsync();
@@ -96,10 +121,10 @@ namespace ChatBeet.Services
             var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
             return string.IsNullOrEmpty(value) ? default : preference switch
             {
-                UserPreference.SubjectPronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Subjects, displayName),
-                UserPreference.ObjectPronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Objects, displayName),
-                UserPreference.PossessivePronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Possessives, displayName),
-                UserPreference.ReflexivePronoun => GetCollectionValidation(value, config.Pronouns.Allowed.Reflexives, displayName),
+                UserPreference.SubjectPronoun => GetCollectionValidation(value, _config.Pronouns.Allowed.Subjects, displayName),
+                UserPreference.ObjectPronoun => GetCollectionValidation(value, _config.Pronouns.Allowed.Objects, displayName),
+                UserPreference.PossessivePronoun => GetCollectionValidation(value, _config.Pronouns.Allowed.Possessives, displayName),
+                UserPreference.ReflexivePronoun => GetCollectionValidation(value, _config.Pronouns.Allowed.Reflexives, displayName),
                 UserPreference.DateOfBirth => GetDateValidation(value),
                 UserPreference.WorkHoursEnd => GetDateValidation(value),
                 UserPreference.WorkHoursStart => GetDateValidation(value),
@@ -192,6 +217,14 @@ namespace ChatBeet.Services
             return string.IsNullOrEmpty(value)
                 ? $"Cleared value for {IrcValues.ITALIC}{displayName}{IrcValues.RESET}"
                 : $"Set {IrcValues.ITALIC}{displayName}{IrcValues.RESET} to {IrcValues.BOLD}{value}{IrcValues.RESET}";
+        }
+
+        public static string GetDiscordConfirmationMessage(UserPreference preference, string value)
+        {
+            var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
+            return string.IsNullOrEmpty(value)
+                ? $"Cleared value for {Formatter.Italic(displayName)}"
+                : $"Set {Formatter.Italic(displayName)} to {Formatter.Bold(value)}";
         }
     }
 }
