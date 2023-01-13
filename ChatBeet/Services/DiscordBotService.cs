@@ -71,6 +71,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<LastFmCommandModule>();
             commands.RegisterCommands<PreferenceLookupCommandModule>();
             commands.RegisterCommands<SpeedometerCommandModule>();
+            commands.RegisterCommands<WolframCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
