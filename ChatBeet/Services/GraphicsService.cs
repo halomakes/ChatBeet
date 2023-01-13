@@ -22,7 +22,7 @@ public class GraphicsService
         using var image = await Image.LoadAsync(Path.Join(WebRootPath, "img/high_ground.webp"));
         var fontCollection = new FontCollection();
         var fontFamily = fontCollection.Add(Path.Join(WebRootPath, "font/impact.woff2"));
-        var font = fontFamily.CreateFont(120);
+        var font = fontFamily.CreateFont(100);
         var fill = Brushes.Solid(Color.White);
         var outline = Pens.Solid(Color.Black, 3);
 
