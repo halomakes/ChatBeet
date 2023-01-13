@@ -29,7 +29,7 @@ public class WolframCommandModule : ApplicationCommandModule
         if (resultTask.IsCompleted)
         {
             var result = resultTask.Result;
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(@$"{Formatter.Bold(query)}:
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(@$"{Formatter.Bold(query)}:
 {result}"));
         }
         else
@@ -37,7 +37,7 @@ public class WolframCommandModule : ApplicationCommandModule
             // pinging page is taking too long, go ahead and give url then follow up with metadata later
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Still working on it, this is taking longer than usual..."));
             var result = await resultTask;
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(@$"{Formatter.Bold(query)}:
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(@$"{Formatter.Bold(query)}:
 {result}"));
         }
     }
