@@ -69,6 +69,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<HighGroundCommandModule>();
             commands.RegisterCommands<JokeCommandModule>();
             commands.RegisterCommands<LastFmCommandModule>();
+            commands.RegisterCommands<PreferenceLookupCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
