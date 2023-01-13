@@ -16,7 +16,7 @@ public class ComplimentCommandModule : ApplicationCommandModule
         this.service = service;
     }
 
-    [SlashCommand("compliment", "Pay someone a nice (or awkward) compliment.")]
+    [SlashCommand("compliment", "Pay someone a nice (or awkward) compliment")]
     public async Task Compliment(InteractionContext ctx, [Option("user", "hornyboi (or gal, etc)")] DiscordUser user)
     {
         var compliment = await service.GetComplimentAsync();

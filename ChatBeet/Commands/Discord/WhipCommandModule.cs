@@ -27,7 +27,7 @@ public class WhipCommandModule : ApplicationCommandModule
         _client = client;
     }
 
-    [SlashCommand("epeen", "Compare lengths to determine who wins an argument.")]
+    [SlashCommand("epeen", "Compare lengths to determine who wins an argument")]
     public async Task WhipOut(InteractionContext ctx)
     {
         if (IsPostValid(ctx.Channel.Id))

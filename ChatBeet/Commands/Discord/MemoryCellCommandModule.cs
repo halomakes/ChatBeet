@@ -24,7 +24,7 @@ public class MemoryCellCommandModule : ApplicationCommandModule
         this.queue = queue;
     }
 
-    [SlashCommand("who-def", "Check who set a peasant definition.")]
+    [SlashCommand("who-def", "Check who set a peasant definition")]
     public async Task GetAuthor(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
         var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
@@ -37,7 +37,7 @@ public class MemoryCellCommandModule : ApplicationCommandModule
             await NotFound(ctx, key);
     }
 
-    [SlashCommand("recall", "Get the value of a peasant definition.")]
+    [SlashCommand("recall", "Get the value of a peasant definition")]
     public async Task GetCell(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
         var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
@@ -49,7 +49,7 @@ public class MemoryCellCommandModule : ApplicationCommandModule
             await NotFound(ctx, key);
     }
 
-    [SlashCommand("remember", "Create or replace a peasant definition.")]
+    [SlashCommand("remember", "Create or replace a peasant definition")]
     public async Task SetCell(InteractionContext ctx, [Option("key", "Key of the entry to set")] string key, [Option("value", "Value to store")] string value)
     {
         var existingCell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
@@ -93,7 +93,7 @@ Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.Au
         }
     }
 
-    [SlashCommand("append", "Add something on to an existing definition.")]
+    [SlashCommand("append", "Add something on to an existing definition")]
     public async Task AppendCell(InteractionContext ctx, [Option("key", "Key of the entry to set")] string key, [Option("value", "Value to append"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string value)
     {
         var cell = await dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());

@@ -2,6 +2,7 @@
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using GravyBot.Commands;
 using SampleClassification.Model;
 using System;
 using System.Collections.Generic;

@@ -1,9 +1,11 @@
 ﻿using ChatBeet.Data;
 using ChatBeet.Models;
+using ChatBeet.Utilities;
 using DSharpPlus.Entities;
 using GravyBot;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using static ChatBeet.Services.LogonService;
 
@@ -70,5 +72,12 @@ public class IrcMigrationService
 
             return;
         }
+    }
+
+    public async Task<string> GetInternalUsername(DiscordUser user)
+    {
+        var ircUser = await _ctx.Links.FirstOrDefaultAsync(l => l.Id == user.Id);
+        var userId = ircUser?.Nick ?? user.DiscriminatedUsername();
+        return userId;
     }
 }

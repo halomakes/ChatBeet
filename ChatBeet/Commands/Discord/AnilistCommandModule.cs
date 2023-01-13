@@ -8,6 +8,7 @@ using Humanizer;
 using Miki.Anilist;
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Commands.Discord;
@@ -45,11 +46,21 @@ public class AnilistCommandModule : ApplicationCommandModule
                 Description = description,
                 Title = media.EnglishTitle
             };
-            var text = @$"{Formatter.Bold(media.EnglishTitle)} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Status} - {media.Score}%
-{Formatter.MaskedUrl("View on AniList", new Uri(media.Url))}";
+            var text = new StringBuilder(@$"{Formatter.Bold(media.EnglishTitle)} / {media.RomajiTitle} ({media.NativeTitle}) - {media.Score}%
+{media.Status}");
+            if (media.Episodes is not null)
+                text.Append($" - {media.Episodes} {(media.Episodes == 1 ? "episode" : "episodes")}");
+            if (media.Volumes is not null)
+                text.Append($" - {media.Volumes} {(media.Volumes == 1 ? "volume" : "volumes")}");
+            if (media.Chapters is not null)
+                text.Append($" - {media.Chapters} {(media.Chapters == 1 ? "chapter" : "chapters")}");
+            text.AppendLine();
+            if (media.Genres is not null && media.Genres.Any())
+                text.AppendLine(string.Join(", ", media.Genres.Take(7)));
+            text.AppendLine(Formatter.MaskedUrl("View on AniList", new Uri(media.Url)));
 
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent(text)
+                .WithContent(text.ToString())
                 .AddEmbed(embed)
                 );
         }

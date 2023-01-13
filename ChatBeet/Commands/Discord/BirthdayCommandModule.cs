@@ -24,7 +24,7 @@ public class BirthdayCommandModule : ApplicationCommandModule
         this.cache = cache;
     }
 
-    [SlashCommand("birthday", "Check when a user's special day is.")]
+    [SlashCommand("birthday", "Check when a user's special day is")]
     public async Task LookupBirthday(InteractionContext ctx, [Option("user", "User to look up the birthday for")] DiscordUser user)
     {
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -32,7 +32,7 @@ public class BirthdayCommandModule : ApplicationCommandModule
                 );
     }
 
-    [SlashCommand("upcoming-birthdays", "See a list of upcoming birthdays.")]
+    [SlashCommand("upcoming-birthdays", "See a list of upcoming birthdays")]
     public async Task GetUpcomingBirthdays(InteractionContext ctx)
     {
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()

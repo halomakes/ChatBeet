@@ -73,8 +73,11 @@ namespace ChatBeet.Commands.Irc
         [RateLimit(5, TimeUnit.Minute)]
         public IClientMessage GetOffsetDay()
         {
-            var start = DateTime.Today.AddHours(1);
-            return ProgressResult(start, start.AddDays(1), $"(in the {IrcValues.ITALIC}objectively better{IrcValues.RESET} time zone) {IrcValues.BOLD}Today{IrcValues.RESET} is");
+            var offset = TimeZoneInfo.Local.BaseUtcOffset - TimeSpan.FromHours(1);
+            var centralTimeZone = TimeZoneInfo.GetSystemTimeZones().First(tz => tz.BaseUtcOffset == offset);
+            var nowCentral = TimeZoneInfo.ConvertTime(DateTime.UtcNow, centralTimeZone);
+            var startOfDay = new DateTimeOffset(nowCentral.Year, nowCentral.Month, nowCentral.Day, 0, 0, 0, centralTimeZone.BaseUtcOffset);
+            return ProgressResult(startOfDay.DateTime, startOfDay.AddDays(1).DateTime, $"(in the {IrcValues.ITALIC}objectively better{IrcValues.RESET} time zone) {IrcValues.BOLD}Today{IrcValues.RESET} is");
         }
 
         [Command("progress hour", Description = "Get progress for the current hour.")]

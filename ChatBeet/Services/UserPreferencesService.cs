@@ -24,26 +24,19 @@ namespace ChatBeet.Services
     {
         private readonly PreferencesContext _db;
         private readonly ChatBeetConfiguration _config;
-        private readonly IrcLinkContext _ircLink;
+        private readonly IrcMigrationService _migration;
 
-        public UserPreferencesService(PreferencesContext db, IOptions<ChatBeetConfiguration> opts, IrcLinkContext ircLink)
+        public UserPreferencesService(PreferencesContext db, IOptions<ChatBeetConfiguration> opts, IrcMigrationService migration)
         {
             _db = db;
             _config = opts.Value;
-            _ircLink = ircLink;
+            _migration = migration;
         }
 
         public async Task<string> Set(DiscordUser user, UserPreference preference, string value)
         {
-            string userId = await GetInternalUsername(user);
+            string userId = await _migration.GetInternalUsername(user);
             return await Set(userId, preference, value);
-        }
-
-        private async Task<string> GetInternalUsername(DiscordUser user)
-        {
-            var ircUser = await _ircLink.Links.FirstOrDefaultAsync(l => l.Id == user.Id);
-            var userId = ircUser?.Nick ?? user.DiscriminatedUsername();
-            return userId;
         }
 
         public async Task<string> Set(string nick, UserPreference preference, string value)
@@ -91,7 +84,7 @@ namespace ChatBeet.Services
 
         public async Task<string> Get(DiscordUser user, UserPreference preference)
         {
-            var id = await GetInternalUsername(user);
+            var id = await _migration.GetInternalUsername(user);
             var pref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == id && p.Preference == preference);
             return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
         }

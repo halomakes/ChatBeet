@@ -1,8 +1,8 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
-using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
+using GravyBot;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -45,7 +45,8 @@ namespace ChatBeet.Services
                 _logger.LogError(x.Exception, "Discord client error");
                 return Task.CompletedTask;
             };
-            _client.ModalSubmitted += OnModalSubmitted;
+            _client.ModalSubmitted += SendToGravyBot;
+            _client.MessageCreated += SendToGravyBot;
 
             commands.RegisterCommands<AnilistCommandModule>();
             commands.RegisterCommands<BadBotCommandModule>();
@@ -67,22 +68,14 @@ namespace ChatBeet.Services
             commands.RegisterCommands<PreferencesCommandModule>();
             commands.RegisterCommands<WhipCommandModule>();
             commands.RegisterCommands<GameLookupCommandModule>();
+            commands.RegisterCommands<HighGroundCommandModule>();
+            commands.RegisterCommands<JokeCommandModule>();
+            commands.RegisterCommands<LastFmCommandModule>();
+            commands.RegisterCommands<PreferenceLookupCommandModule>();
+            commands.RegisterCommands<SpeedometerCommandModule>();
+            commands.RegisterCommands<WolframCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
-        }
-
-        private async Task OnModalSubmitted(DiscordClient sender, ModalSubmitEventArgs e)
-        {
-            switch (e.Interaction.Data.CustomId)
-            {
-                case IrcCommandModule.VerifyModalId:
-                    using (var scope = _services.CreateAsyncScope())
-                    {
-                        var service = scope.ServiceProvider.GetRequiredService<IrcMigrationService>();
-                        await service.ValidateTokenAsync(e.Interaction, e.Values["nick"], e.Values["token"]);
-                    }
-                    break;
-            }
         }
 
         private async Task LogError(string v, Exception exception)
@@ -101,6 +94,13 @@ namespace ChatBeet.Services
         {
             _client.Dispose();
             base.Dispose();
+        }
+
+        private async Task SendToGravyBot<TEvent>(DiscordClient sender, TEvent @event)
+        {
+            using var scope = _services.CreateAsyncScope();
+            var queue = scope.ServiceProvider.GetRequiredService<MessageQueueService>();
+            queue.Push(@event);
         }
     }
 }

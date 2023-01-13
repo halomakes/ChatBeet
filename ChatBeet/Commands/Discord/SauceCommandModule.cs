@@ -39,19 +39,27 @@ public class SauceCommandModule : ApplicationCommandModule
                 .WithContent($"Sorry, couldn't find anything for {imageUrl}, ya perv."));
     }
 
-    [SlashCommand("sauce", "Get sauce for an image based on its url.")]
+    [SlashCommand("sauce", "Get sauce for an image based on its url")]
     public Task DemandSauce(InteractionContext ctx, [Option("url", "URL of the image")] string imageUrl) => FindSauce(ctx, imageUrl);
 
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Find Sauce")]
     public async Task DemandSauce(ContextMenuContext ctx)
     {
         var embed = ctx.TargetMessage.Embeds.FirstOrDefault(e => e.Type == "image");
-        if (embed is null)
+        if (embed is not null)
         {
-            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"Didn't see any image embeds on that message."));
+            await FindSauce(ctx, embed.Image?.Url?.ToString() ?? embed.Url?.ToString());
             return;
         }
-        await FindSauce(ctx, embed.Image?.Url?.ToString() ?? embed.Url?.ToString());
+
+        var attachment = ctx.TargetMessage.Attachments.FirstOrDefault(a => a.MediaType.StartsWith("image", StringComparison.InvariantCultureIgnoreCase));
+        if (attachment is not null)
+        {
+            await FindSauce(ctx, attachment.Url);
+            return;
+        }
+
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent($"Didn't see any image embeds on that message."));
     }
 }

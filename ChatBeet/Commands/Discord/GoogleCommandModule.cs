@@ -16,7 +16,7 @@ public class GoogleCommandModule : ApplicationCommandModule
         this.searchService = searchService;
     }
 
-    [SlashCommand("google", "Find something on the interwebz.")]
+    [SlashCommand("google", "Find something on the interwebz")]
     public async Task Compliment(InteractionContext ctx, [Option("query", "Thing to search for")] string query)
     {
         var resultLink = await searchService.GetFeelingLuckyResultAsync(query);

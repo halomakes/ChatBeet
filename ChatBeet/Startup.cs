@@ -5,6 +5,7 @@ using ChatBeet.Models;
 using ChatBeet.Rules;
 using ChatBeet.Services;
 using DSharpPlus;
+using DSharpPlus.EventArgs;
 using Genbox.WolframAlpha;
 using GravyBot;
 using GravyBot.Commands;
@@ -81,6 +82,12 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<DessRule, PrivateMessage>();
                 pipeline.RegisterRule<AmazonSmileRule, PrivateMessage>();
                 pipeline.RegisterRule<IrcLinkRule, IrcLinkRequest>();
+                pipeline.RegisterAsyncRule<AmazonSmileRule, MessageCreateEventArgs>();
+                pipeline.RegisterAsyncRule<IrcLinkValidationRule, ModalSubmitEventArgs>();
+                pipeline.RegisterAsyncRule<DefUpdatedRule, DefinitionChange>();
+                pipeline.RegisterAsyncRule<DessRule, MessageCreateEventArgs>();
+                pipeline.RegisterAsyncRule<KarmaReactRule, MessageCreateEventArgs>();
+                pipeline.RegisterAsyncRule<SuspectRule, MessageCreateEventArgs>();
                 pipeline.AddCommandOrchestrator();
             });
 
@@ -231,6 +238,8 @@ namespace ChatBeet
             services.Configure<DiscordBotConfiguration>(Configuration.GetSection("Discord"));
             services.AddTransient<DiscordLogService>();
             services.AddScoped<IrcMigrationService>();
+
+            services.AddTransient<GraphicsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

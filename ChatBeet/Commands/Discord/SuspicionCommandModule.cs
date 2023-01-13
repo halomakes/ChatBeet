@@ -29,7 +29,7 @@ public class SuspicionCommandModule : ApplicationCommandModule
         this.client = client;
     }
 
-    [SlashCommand("report", "Report a user as being suspicious.")]
+    [SlashCommand("report", "Report a user as being suspicious")]
     public async Task IncreaseSuspicion(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
         if (suspect.Equals(client.CurrentUser))
@@ -40,8 +40,7 @@ public class SuspicionCommandModule : ApplicationCommandModule
         {
             if (await db.HasRecentlyReportedAsync(suspect.DiscriminatedUsername(), ctx.User.DiscriminatedUsername()))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.Modal, new DiscordInteractionResponseBuilder()
-                    .WithTitle("Slow down there, partner.")
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                     .WithContent("You must wait at least 2 minutes each time you raise suspicion against a user."));
             }
             else
@@ -56,7 +55,7 @@ public class SuspicionCommandModule : ApplicationCommandModule
         }
     }
 
-    [SlashCommand("check", "Check how suspicious a user is.")]
+    [SlashCommand("check", "Check how suspicious a user is")]
     public async Task GetSuspicionLevel(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
         var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.DiscriminatedUsername());

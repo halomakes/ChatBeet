@@ -23,7 +23,7 @@ public class GameLookupCommandModule : ApplicationCommandModule
         this.memoryCache = memoryCache;
     }
 
-    [SlashCommand("game", "Look up a title on IGDB.")]
+    [SlashCommand("game", "Look up a title on IGDB")]
     public async Task RespondAsync(InteractionContext ctx, [Option("name", "Name of game to search for")] string mediaName)
     {
         var game = await memoryCache.GetOrCreateAsync($"igdb:{mediaName}", async entry =>

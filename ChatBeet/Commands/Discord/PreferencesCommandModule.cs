@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ChatBeet.Commands.Discord;
 
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
-[SlashCommandGroup("preference", "Commands for managing user preferences.")]
+[SlashCommandGroup("preference", "Commands for managing user preferences")]
 public class PreferencesCommandModule : ApplicationCommandModule
 {
     private readonly UserPreferencesService _service;
@@ -20,7 +20,7 @@ public class PreferencesCommandModule : ApplicationCommandModule
         _service = service;
     }
 
-    [SlashCommand("get", "Check the value one of your preferences.")]
+    [SlashCommand("get", "Check the value one of your preferences")]
     public async Task GetPreferenceValue(InteractionContext ctx, [Option("preference", "Preference to check")] UserPreference preference)
     {
         var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
@@ -32,7 +32,7 @@ public class PreferencesCommandModule : ApplicationCommandModule
             .AsEphemeral());
     }
 
-    [SlashCommand("set", "Change the value one of your preferences.")]
+    [SlashCommand("set", "Change the value one of your preferences")]
     public async Task SetPreferenceValue(InteractionContext ctx, [Option("preference", "Preference to set")] UserPreference preference, [Option("value", "Value to set"), Autocomplete(typeof(PreferenceAutocompleteProvider))] string value) =>
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DSharpPlus.Entities.DiscordInteractionResponseBuilder()
             .WithContent(await SetPreferenceSilent(ctx, preference, value))

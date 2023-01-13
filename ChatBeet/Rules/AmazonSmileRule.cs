@@ -1,4 +1,5 @@
 ﻿using ChatBeet.Utilities;
+using DSharpPlus.EventArgs;
 using GravyBot;
 using GravyIrc.Messages;
 using System;
@@ -7,15 +8,16 @@ using System.Text.RegularExpressions;
 
 namespace ChatBeet.Rules
 {
-    public class AmazonSmileRule : IMessageRule<PrivateMessage>
+    public partial class AmazonSmileRule : IMessageRule<PrivateMessage>, IAsyncMessageRule<MessageCreateEventArgs>
     {
-        private readonly Regex rgx = new(@"((?:https?:\/\/)?(?:www.amazon\.com)\/\S+)");
+        [GeneratedRegex(@"((?:https?:\/\/)?(?:www.amazon\.com)\/\S+)")]
+        private static partial Regex rgx();
 
-        public bool Matches(PrivateMessage incomingMessage) => incomingMessage.IsChannelMessage && rgx.IsMatch(incomingMessage.Message);
+        public bool Matches(PrivateMessage incomingMessage) => incomingMessage.IsChannelMessage && rgx().IsMatch(incomingMessage.Message);
 
         public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
         {
-            var match = rgx.Match(incomingMessage.Message);
+            var match = rgx().Match(incomingMessage.Message);
             if (match.Success)
             {
                 var url = match.Groups[1].Value;
@@ -48,5 +50,23 @@ namespace ChatBeet.Rules
                 return default;
             }
         }
+
+        public async IAsyncEnumerable<IClientMessage> RespondAsync(MessageCreateEventArgs incomingMessage)
+        {
+            var match = rgx().Match(incomingMessage.Message.Content);
+            if (match.Success)
+            {
+                var url = match.Groups[1].Value;
+                if (!string.IsNullOrEmpty(url))
+                {
+                    var modified = ModifyUri(url);
+                    if (!string.IsNullOrEmpty(modified))
+                        await incomingMessage.Message.RespondAsync(modified);
+                }
+            }
+            yield break;
+        }
+
+        public bool Matches(MessageCreateEventArgs incomingMessage) => rgx().IsMatch(incomingMessage.Message.Content);
     }
 }

@@ -19,7 +19,7 @@ public class DoggoCommandModule : ApplicationCommandModule
         this.client = client;
     }
 
-    [SlashCommand("doggo", "Get a random dog picture. 🐕")]
+    [SlashCommand("doggo", "Get a random dog picture 🐕")]
     public async Task GetRandomDoggo(InteractionContext ctx)
     {
         try
