@@ -1,20 +1,27 @@
 ﻿using ChatBeet.Services;
+using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using Humanizer;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ChatBeet.Commands.Discord;
 
+[SlashCommandGroup("music", "Commands related to music")]
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
-public class LastFmCommandProcessor : ApplicationCommandModule
+public class LastFmCommandModule : ApplicationCommandModule
 {
     private readonly LastFmService lastFm;
 
-    public LastFmCommandProcessor(LastFmService lastFm)
+    public LastFmCommandModule(LastFmService lastFm)
     {
         this.lastFm = lastFm;
     }
 
-    /*[SlashCommand("artist", "Look up an artist on Last.fm")]
-    public async IAsyncEnumerable<IClientMessage> GetArtist([Option("name", "Name of musician to look up")] string name)
+    [SlashCommand("artist", "Look up an artist on Last.fm")]
+    public async Task GetArtist(InteractionContext ctx, [Option("name", "Name of musician to look up")] string name)
     {
         var artist = await lastFm.GetArtistInfo(name);
 
@@ -22,69 +29,56 @@ public class LastFmCommandProcessor : ApplicationCommandModule
         {
             // filter out empty bios
             bool hasBio = !string.IsNullOrEmpty(artist?.Bio?.Summary) && !artist.Bio.Summary.StartsWith("<a href");
-
-            if (hasBio)
-            {
-                yield return new PrivateMessage(
-                    IncomingMessage.GetResponseTarget(),
-                    $"{artist.Bio?.Summary}"
-                );
-            }
+            var content = new StringBuilder();
 
             if (artist?.Tags?.Any() == true)
-            {
-                yield return new PrivateMessage(
-                    IncomingMessage.GetResponseTarget(),
-                    $"{IrcValues.BOLD}Related tags{IrcValues.RESET}: {string.Join(", ", artist.Tags.Select(t => t.Name))}"
-                );
-            }
+                content.AppendLine($"{Formatter.Bold("Related tags")}: {string.Join(", ", artist.Tags.Select(t => t.Name))}");
 
-            if (!hasBio)
-            {
-                yield return new PrivateMessage(
-                    IncomingMessage.GetResponseTarget(),
-                    $"I found the artist but they don't have a biography.  Check here for more: {artist.Url}"
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle(artist.Name)
+                .WithUrl(artist.Url)
+                .WithDescription(artist.Bio?.Summary?.Truncate(250));
+
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent(content.ToString())
+                .AddEmbed(embed)
                 );
-            }
         }
         else
         {
-            yield return new PrivateMessage(
-                IncomingMessage.GetResponseTarget(),
-                "Sorry, couldn't find that artist."
-            );
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent($"Sorry, couldn't find that artist.")
+                );
         }
     }
 
-    [SlashCommand("track {trackName} by {artistName}", "Look up a track on Last.fm")]
-    public async Task<IClientMessage> GetTrack([Required] string trackName, [Required] string artistName)
+    [SlashCommand("song", "Look up a track on Last.fm")]
+    public async Task GetTrack(InteractionContext ctx, [Option("track", "Name of the track to search for")] string trackName, [Option("artist", "Name of artist who recorded the track")] string artistName)
     {
         var track = await lastFm.GetTrackInfo(trackName, artistName);
 
         if (track != null)
         {
-            var result = $"{IrcValues.BOLD}{track.Name}{IrcValues.RESET}";
+            var result = new StringBuilder(Formatter.Bold(track.Name));
             if (track.Duration.HasValue)
-            {
-                result += $" ({track.Duration})";
-            }
+                result.Append($" ({track.Duration})");
 
             if (!string.IsNullOrEmpty(track.AlbumName))
-            {
-                result += $" from {IrcValues.BOLD}{track.AlbumName}{IrcValues.RESET}";
-            }
+                result.Append($" from {Formatter.Bold(track.AlbumName)}");
 
             if (!string.IsNullOrEmpty(track.ArtistName))
-            {
-                result += $" by {IrcValues.BOLD}{track.ArtistName}{IrcValues.BOLD}";
-            }
+                result.Append($" by {Formatter.Bold(track.ArtistName)}");
 
-            result += $" | {track.Url}";
-            return new PrivateMessage(IncomingMessage.GetResponseTarget(), result);
+            result.Append($" | {track.Url}");
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent(result.ToString())
+                );
         }
         else
         {
-            return new PrivateMessage(IncomingMessage.GetResponseTarget(), "Sorry, couldn't find that track.");
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent($"Sorry, couldn't find that song.")
+                );
         }
-    }*/
+    }
 }

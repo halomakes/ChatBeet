@@ -39,7 +39,7 @@ public class SauceCommandModule : ApplicationCommandModule
                 .WithContent($"Sorry, couldn't find anything for {imageUrl}, ya perv."));
     }
 
-    [SlashCommand("sauce", "Get sauce for an image based on its url.")]
+    [SlashCommand("sauce", "Get sauce for an image based on its url")]
     public Task DemandSauce(InteractionContext ctx, [Option("url", "URL of the image")] string imageUrl) => FindSauce(ctx, imageUrl);
 
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Find Sauce")]

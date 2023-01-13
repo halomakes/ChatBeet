@@ -1,6 +1,5 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
-using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,6 +68,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<GameLookupCommandModule>();
             commands.RegisterCommands<HighGroundCommandModule>();
             commands.RegisterCommands<JokeCommandModule>();
+            commands.RegisterCommands<LastFmCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
