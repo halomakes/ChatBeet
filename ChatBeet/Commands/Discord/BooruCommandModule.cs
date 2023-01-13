@@ -1,5 +1,6 @@
 ﻿using ChatBeet.Commands.Discord.Autocomplete;
 using ChatBeet.Services;
+using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -22,14 +23,25 @@ public class BooruCommandModule : ApplicationCommandModule
     [SlashCommand("booru", "Get a random image from gelbooru matching tags")]
     private async Task GetPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tags, [Option("safe-only", "Turn this off if you're horny")] bool safeOnly = true)
     {
+        var (text, embed) = await GetResponseContent(tags, safeOnly, ctx.User.DiscriminatedUsername());
+        var response = new DiscordInteractionResponseBuilder()
+                    .WithContent(text);
+        if (embed is not null)
+            response = response.AddEmbed(embed);
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, response);
+    }
+
+    public async Task<(string Content, DiscordEmbed? Embed)> GetResponseContent(string tags, bool safeOnly, string username)
+    {
         var tagList = tags.ToLower().Split(' ');
         if (tagList.Any())
         {
-            var result = await booru.GetRandomPostAsync(safeOnly, ctx.User.Username, tagList);
+            var result = await booru.GetRandomPostAsync(safeOnly, username, tagList);
 
             if (result is BooruService.MediaSearchResult media)
             {
-                await booru.RecordTags(ctx.User.Username, tagList);
+                if (username is not null)
+                    await booru.RecordTags(username, tagList);
 
                 if (media != default && media is { Rating: < BooruSharp.Search.Post.Rating.Explicit })
                 {
@@ -38,30 +50,23 @@ public class BooruCommandModule : ApplicationCommandModule
                         ImageUrl = media.ImageUrl.ToString(),
                         Url = media.PageUrl.ToString()
                     };
-                    await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                    .WithContent(@$"{media.Rating} - {FormatTags(media.Tags, tagList)}
-{Formatter.EmbedlessUrl(media.PageUrl)}")
-                    .AddEmbed(embed));
+                    return (@$"{media.Rating} - {FormatTags(media.Tags, tagList)}
+{Formatter.EmbedlessUrl(media.PageUrl)}", embed);
                 }
                 else
                 {
-                    await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                    .WithContent(@$"{media.Rating} - {FormatTags(media.Tags, tagList)}
-{Formatter.Spoiler(Formatter.EmbedlessUrl(media.PageUrl))}"));
+                    return (@$"{media.Rating} - {FormatTags(media.Tags, tagList)}
+{Formatter.Spoiler(Formatter.EmbedlessUrl(media.PageUrl))}", null);
                 }
             }
             else
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                    .WithContent($"Sorry, couldn't find anything for {string.Join(", ", tagList)}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list")
-               );
+                return ($"Sorry, couldn't find anything for {string.Join(", ", tagList)}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list", null);
             }
         }
         else
         {
-            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"Please specify tag/tags. See available list here: https://gelbooru.com/index.php?page=tags&s=list")
-            );
+            return ($"Please specify tag/tags. See available list here: https://gelbooru.com/index.php?page=tags&s=list", null);
         }
     }
 
