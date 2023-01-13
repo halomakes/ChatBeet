@@ -46,12 +46,20 @@ public class SauceCommandModule : ApplicationCommandModule
     public async Task DemandSauce(ContextMenuContext ctx)
     {
         var embed = ctx.TargetMessage.Embeds.FirstOrDefault(e => e.Type == "image");
-        if (embed is null)
+        if (embed is not null)
         {
-            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"Didn't see any image embeds on that message."));
+            await FindSauce(ctx, embed.Image?.Url?.ToString() ?? embed.Url?.ToString());
             return;
         }
-        await FindSauce(ctx, embed.Image?.Url?.ToString() ?? embed.Url?.ToString());
+
+        var attachment = ctx.TargetMessage.Attachments.FirstOrDefault(a => a.MediaType.StartsWith("image", StringComparison.InvariantCultureIgnoreCase));
+        if (attachment is not null)
+        {
+            await FindSauce(ctx, attachment.Url);
+            return;
+        }
+
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent($"Didn't see any image embeds on that message."));
     }
 }
