@@ -15,7 +15,7 @@ public class JokeCommandModule : ApplicationCommandModule
         this.jokeService = jokeService;
     }
 
-    [SlashCommand("joke", "Get a random (bad) joke.")]
+    [SlashCommand("joke", "Get a random (bad) joke")]
     public async Task GetJoke(InteractionContext ctx)
     {
         var joke = await jokeService.GetDadJokeAsync();

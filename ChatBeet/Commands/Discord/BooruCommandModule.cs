@@ -19,7 +19,7 @@ public class BooruCommandModule : ApplicationCommandModule
         this.booru = booru;
     }
 
-    [SlashCommand("booru", "Get a random image from gelbooru matching tags (safe only).")]
+    [SlashCommand("booru", "Get a random image from gelbooru matching tags")]
     private async Task GetPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tags, [Option("safe-only", "Turn this off if you're horny")] bool safeOnly = true)
     {
         var tagList = tags.ToLower().Split(' ');
@@ -68,6 +68,6 @@ public class BooruCommandModule : ApplicationCommandModule
     private string FormatTags(IEnumerable<string> tags, IEnumerable<string> queriedTags) => string.Join(", ", tags
         .Select(t => queriedTags.Contains(t) ? Formatter.Bold(Formatter.Sanitize(t)) : Formatter.Sanitize(t)));
 
-    [SlashCommand("astolfo", "Fill the void in your soul with an Astolfo picture.")]
+    [SlashCommand("astolfo", "Fill the void in your soul with an Astolfo picture")]
     public Task GetAstolfo(InteractionContext ctx) => GetPost(ctx, "astolfo_(fate)", true);
 }

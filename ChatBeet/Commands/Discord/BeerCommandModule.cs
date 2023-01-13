@@ -21,7 +21,7 @@ public class BeerCommandModule : ApplicationCommandModule
         this.cache = cache;
     }
 
-    [SlashCommand("beer", "Get info about a beer on Untappd.")]
+    [SlashCommand("beer", "Get info about a beer on Untappd")]
     public async Task FindBeerAsync(InteractionContext ctx, [Option("beer-name", "Name of the beer to get info about")] string beerName)
     {
         var results = await cache.GetOrCreateAsync($"beer:{beerName}", entry =>

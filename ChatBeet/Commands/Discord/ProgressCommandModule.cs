@@ -18,6 +18,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using TimeZoneConverter;
 
@@ -38,7 +39,7 @@ public class ProgressCommandModule : ApplicationCommandModule
         now = DateTime.Now;
     }
 
-    [SlashCommand("custom", "Gets progress over a period of time.")]
+    [SlashCommand("custom", "Gets progress over a period of time")]
     public async Task GetCustomTime(InteractionContext ctx, [Option("time-unit", "Unit of time"), Autocomplete(typeof(TimeRangesAutocompleteProvider))] string timeUnit)
     {
         var unit = await dbContext.FixedTimeRanges.FirstOrDefaultAsync(r => r.Key.ToLower() == timeUnit.Trim().ToLower());
@@ -57,70 +58,73 @@ public class ProgressCommandModule : ApplicationCommandModule
             await SendResult(ctx, Progress.GetRatio(now, unit.StartDate, unit.EndDate), Progress.FormatTemplate(now, unit.StartDate, unit.EndDate, unit.Template));
     }
 
-    [SlashCommand("year", "Get progress for the current year.")]
+    [SlashCommand("year", "Get progress for the current year")]
     public async Task GetYear(InteractionContext ctx)
     {
         var start = new DateTime(now.Year, 1, 1, 0, 0, 0);
         await ProgressResult(ctx, start, start.AddYears(1), $"{Formatter.Bold(now.Year.ToString())} is");
     }
 
-    [SlashCommand("day", "Get progress for the current day.")]
+    [SlashCommand("day", "Get progress for the current day")]
     public async Task GetDay(InteractionContext ctx)
     {
         var start = DateTime.Today;
         await ProgressResult(ctx, start, start.AddDays(1), $"{Formatter.Bold("Today")} is");
     }
 
-    [SlashCommand("yato-day", "Get progress for the current day, but one hour in the past. It's objectively better. ")]
+    [SlashCommand("yato-day", "Get progress for the current day, but one hour in the past - it's objectively better")]
     public async Task GetOffsetDay(InteractionContext ctx)
     {
-        var start = DateTime.Today.AddHours(1);
-        await ProgressResult(ctx, start, start.AddDays(1), $"(in the {Formatter.Italic("objectively better")} time zone) {Formatter.Bold("Today")} is");
+        var offset = TimeZoneInfo.Local.BaseUtcOffset - TimeSpan.FromHours(1);
+        var centralTimeZone = TimeZoneInfo.GetSystemTimeZones().First(tz => tz.BaseUtcOffset == offset);
+        var nowCentral = TimeZoneInfo.ConvertTime(DateTime.UtcNow, centralTimeZone);
+        var startOfDay = new DateTimeOffset(nowCentral.Year, nowCentral.Month, nowCentral.Day, 0, 0, 0, centralTimeZone.BaseUtcOffset);
+        await ProgressResult(ctx, startOfDay.DateTime, startOfDay.AddDays(1).DateTime, $"(in the {Formatter.Italic("objectively better")} time zone) {Formatter.Bold("Today")} is");
     }
 
-    [SlashCommand("hour", "Get progress for the current hour.")]
+    [SlashCommand("hour", "Get progress for the current hour")]
     public async Task GetHour(InteractionContext ctx)
     {
         var start = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0);
         await ProgressResult(ctx, start, start.AddHours(1), $"{Formatter.Bold("This hour")} is");
     }
 
-    [SlashCommand("minute", "Get progress for the current minute.")]
+    [SlashCommand("minute", "Get progress for the current minute")]
     public async Task GetMinute(InteractionContext ctx)
     {
         var start = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0);
         await ProgressResult(ctx, start, start.AddMinutes(1), $"{Formatter.Bold("This minute")} is");
     }
 
-    [SlashCommand("month", "Get progress for the current month.")]
+    [SlashCommand("month", "Get progress for the current month")]
     public async Task GetMonth(InteractionContext ctx)
     {
         var start = new DateTime(now.Year, now.Month, 1);
         await ProgressResult(ctx, start, start.AddMonths(1), $"{Formatter.Bold($"{now:MMMM}")} is");
     }
 
-    [SlashCommand("decade", "Get progress for the current decade.")]
+    [SlashCommand("decade", "Get progress for the current decade")]
     public async Task GetDecade(InteractionContext ctx)
     {
         var start = new DateTime(now.Year - (now.Year % 10), 1, 1);
         await ProgressResult(ctx, start, start.AddYears(10), $"{Formatter.Bold($"The {start.Year}s")} are");
     }
 
-    [SlashCommand("yato-week", "Get progress for the current week starting on Monday, as the Japanese gods intended.")]
+    [SlashCommand("yato-week", "Get progress for the current week starting on Monday, as the Japanese gods intended")]
     public async Task GetOffsetWeek(InteractionContext ctx)
     {
         var start = now.StartOfWeek(DayOfWeek.Monday);
         await ProgressResult(ctx, start, start.AddDays(7), $"{Formatter.Bold("This week")} is");
     }
 
-    [SlashCommand("week", "Get progress for the current week.")]
+    [SlashCommand("week", "Get progress for the current week")]
     public async Task GetWeek(InteractionContext ctx)
     {
         var start = now.StartOfWeek(DayOfWeek.Sunday);
         await ProgressResult(ctx, start, start.AddDays(7), $"{Formatter.Bold("This week")} is");
     }
 
-    [SlashCommand("century", "Get progress for the current century.")]
+    [SlashCommand("century", "Get progress for the current century")]
     public async Task GetCentury(InteractionContext ctx)
     {
         var start = new DateTime(now.Year - (now.Year % 100), 1, 1);
@@ -128,20 +132,20 @@ public class ProgressCommandModule : ApplicationCommandModule
         await ProgressResult(ctx, start, start.AddYears(100), $"{Formatter.Bold($"The {century.Ordinalize(ChatBeetConfiguration.Culture)} century")} is");
     }
 
-    [SlashCommand("millennium", "Get progress for the current millennium.")]
+    [SlashCommand("millennium", "Get progress for the current millennium")]
     public async Task GetMillennium(InteractionContext ctx)
     {
         var start = new DateTime(now.Year - (now.Year % 1000), 1, 1);
         await ProgressResult(ctx, start, start.AddYears(1000), $"{Formatter.Bold("This millenium")} is");
     }
 
-    [SlashCommand("second", "Get progress for the current millennium.")]
+    [SlashCommand("second", "Get progress for the current millennium")]
     public async Task GetSecond(InteractionContext ctx)
     {
         await ProgressResult(ctx, (double)now.Millisecond / 1000, $"{Formatter.Bold("This second")} is");
     }
 
-    [SlashCommand("president", "Get progress for the current US presidential term.")]
+    [SlashCommand("president", "Get progress for the current US presidential term")]
     public async Task GetPresidentialTerm(InteractionContext ctx)
     {
         // inauguration is January 20 at noon eastern time every 4 years (year after leap year)
@@ -197,7 +201,7 @@ public class ProgressCommandModule : ApplicationCommandModule
         }
     }
 
-    [SlashCommand("workday", "Get progress for your current workday.")]
+    [SlashCommand("workday", "Get progress for your current workday")]
     public async Task GetWorkday(InteractionContext ctx)
     {
         var startPref = await preferences.Get(ctx.User.DiscriminatedUsername(), UserPreference.WorkHoursStart);

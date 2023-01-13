@@ -24,7 +24,7 @@ public class IrcCommandModule : ApplicationCommandModule
         _client = client;
     }
 
-    [SlashCommand("link", "Link your old IRC nick to your Discord account.")]
+    [SlashCommand("link", "Link your old IRC nick to your Discord account")]
     public async Task GetVerificationCode(InteractionContext ctx, [Option("irc-nick", "Your IRC nick on dtella.net")] string nick)
     {
         var existingEntry = await _db.Links.FirstOrDefaultAsync(l => l.Id == ctx.User.Id || l.Nick.ToLower() == nick.ToLower());
@@ -66,7 +66,7 @@ public class IrcCommandModule : ApplicationCommandModule
         }
     }
 
-    [SlashCommand("identify", "Check what a user's IRC nick was.")]
+    [SlashCommand("identify", "Check what a user's IRC nick was")]
     public async Task LookupUser(InteractionContext ctx, [Option("user", "User to look up")] DiscordUser user) => await LookupUser(ctx as BaseContext, user);
 
     [ContextMenu(ApplicationCommandType.UserContextMenu, "Check IRC Nick")]

@@ -13,7 +13,7 @@ public class HighGroundCommandModule : ApplicationCommandModule
     private static readonly Dictionary<DiscordUser, DateTime> InvocationHistory = new();
     private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(5);
 
-    [SlashCommand("jump", "Claim the high ground.")]
+    [SlashCommand("jump", "Claim the high ground")]
     public async Task Claim(InteractionContext ctx)
     {
         var server = ctx.Channel.Guild;
