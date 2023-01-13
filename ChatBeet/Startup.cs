@@ -231,6 +231,8 @@ namespace ChatBeet
             services.Configure<DiscordBotConfiguration>(Configuration.GetSection("Discord"));
             services.AddTransient<DiscordLogService>();
             services.AddScoped<IrcMigrationService>();
+
+            services.AddTransient<GraphicsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
