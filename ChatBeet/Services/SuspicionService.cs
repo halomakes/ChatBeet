@@ -24,14 +24,27 @@ public class SuspicionService
 
     public async Task<IEnumerable<Suspicion>> GetActiveSuspicionsAsync()
     {
-        var links = await _irc.GetLinksAsync();
         var suspicions = await ActiveSuspicions.ToListAsync();
+        await MergeIrcNicksAsync(suspicions);
+        return suspicions;
+    }
+
+    public async Task<IEnumerable<Suspicion>> GetSuspicionsAsync()
+    {
+        var suspicions = await _ctx.Suspicions.ToListAsync();
+        await MergeIrcNicksAsync(suspicions);
+        return suspicions;
+    }
+
+    async Task MergeIrcNicksAsync(List<Suspicion> suspicions)
+    {
+        var links = await _irc.GetLinksAsync();
+        
         foreach (var suspicion in suspicions)
         {
             suspicion.Reporter = GetInternalId(suspicion.Reporter);
             suspicion.Suspect = GetInternalId(suspicion.Suspect);
         }
-        return suspicions;
 
         string GetInternalId(string username)
         {
