@@ -17,12 +17,12 @@ namespace ChatBeet.Controllers
     public class SuspicionController : Controller
     {
         private readonly UserPreferencesService userPreferencesService;
-        private readonly SuspicionContext suspicionContext;
+        private readonly SuspicionService suspicionService;
 
-        public SuspicionController(UserPreferencesService userPreferencesService, SuspicionContext suspicionContext)
+        public SuspicionController(UserPreferencesService userPreferencesService, SuspicionService suspicionService)
         {
             this.userPreferencesService = userPreferencesService;
-            this.suspicionContext = suspicionContext;
+            this.suspicionService = suspicionService;
         }
 
         /// <summary>
@@ -31,17 +31,17 @@ namespace ChatBeet.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels()
         {
-            var mostSuspicious = await suspicionContext.Suspicions
+            var mostSuspicious = (await suspicionService.GetActiveSuspicionsAsync())
                 .AsQueryable()
                 .GroupBy(s => s.Suspect.ToLower())
                 .Select(g => new
                 {
                     Nick = g.Key,
-                    Active = g.Where(grp => grp.TimeReported >= suspicionContext.ActiveWindowStart).Count(),
+                    Active = g.Where(grp => grp.TimeReported >= suspicionService.ActiveWindowStart).Count(),
                     Total = g.Count()
                 })
                 .OrderByDescending(t => t.Active)
-                .ToListAsync();
+                .ToList();
 
             var colorPrefs = await userPreferencesService.Get(mostSuspicious.Select(s => s.Nick), UserPreference.GearColor);
 

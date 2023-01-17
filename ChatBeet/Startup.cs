@@ -242,6 +242,7 @@ namespace ChatBeet
             services.AddScoped<IrcMigrationService>();
 
             services.AddTransient<GraphicsService>();
+            services.AddScoped<SuspicionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

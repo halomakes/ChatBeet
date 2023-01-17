@@ -35,7 +35,7 @@ namespace ChatBeet.Services
 
         public async Task<string> Set(DiscordUser user, UserPreference preference, string value)
         {
-            string userId = await _migration.GetInternalUsername(user);
+            string userId = await _migration.GetInternalUsernameAsync(user);
             return await Set(userId, preference, value);
         }
 
@@ -84,7 +84,7 @@ namespace ChatBeet.Services
 
         public async Task<string> Get(DiscordUser user, UserPreference preference)
         {
-            var id = await _migration.GetInternalUsername(user);
+            var id = await _migration.GetInternalUsernameAsync(user);
             var pref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == id && p.Preference == preference);
             return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
         }

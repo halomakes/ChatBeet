@@ -20,14 +20,14 @@ namespace ChatBeet.Rules
     {
         private readonly DiscordClient _discord;
         private readonly NegativeResponseService _negativeResponseService;
-        private readonly SuspicionContext _db;
+        private readonly SuspicionService _service;
 
-        public SuspectRule(IOptions<IrcBotConfiguration> options, IServiceProvider serviceProvider, DiscordClient discord, NegativeResponseService negativeResponseService, SuspicionContext db) : base(options, serviceProvider)
+        public SuspectRule(IOptions<IrcBotConfiguration> options, IServiceProvider serviceProvider, DiscordClient discord, NegativeResponseService negativeResponseService, SuspicionService service) : base(options, serviceProvider)
         {
             Pattern = new Regex($@"(?:^({RegexUtils.Nick})(?: is)? sus$)");
             _discord = discord;
             _negativeResponseService = negativeResponseService;
-            _db = db;
+            _service = service;
         }
 
         public bool Matches(MessageCreateEventArgs incomingMessage) => discordRgx().IsMatch(incomingMessage.Message.Content);
@@ -41,15 +41,15 @@ namespace ChatBeet.Rules
             }
             else
             {
-                if (await _db.HasRecentlyReportedAsync(suspect.DiscriminatedUsername(), incomingMessage.Author.DiscriminatedUsername()))
+                if (await _service.HasRecentlyReportedAsync(suspect.DiscriminatedUsername(), incomingMessage.Author.DiscriminatedUsername()))
                 {
                     await incomingMessage.Message.RespondAsync("You must wait at least 2 minutes each time you raise suspicion against a user.");
                 }
                 else
                 {
-                    await _db.ReportSuspiciousActivityAsync(suspect.DiscriminatedUsername(), incomingMessage.Author.DiscriminatedUsername(), bypassDebounceCheck: true);
+                    await _service.ReportSuspiciousActivityAsync(suspect.DiscriminatedUsername(), incomingMessage.Author.DiscriminatedUsername(), bypassDebounceCheck: true);
 
-                    var suspicionLevel = await _db.GetSuspicionLevelAsync(suspect.DiscriminatedUsername());
+                    var suspicionLevel = await _service.GetSuspicionLevelAsync(suspect.DiscriminatedUsername());
 
                     await incomingMessage.Message.RespondAsync($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is now {suspicionLevel}.");
                 }

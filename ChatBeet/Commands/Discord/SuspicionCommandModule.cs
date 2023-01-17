@@ -16,12 +16,12 @@ namespace ChatBeet.Commands.Discord;
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
 public class SuspicionCommandModule : ApplicationCommandModule
 {
-    private readonly SuspicionContext db;
+    private readonly SuspicionService db;
     private readonly UserPreferencesService prefsService;
     private readonly DiscordClient client;
     private readonly NegativeResponseService negativeResponseService;
 
-    public SuspicionCommandModule(SuspicionContext db, UserPreferencesService prefsService, DiscordClient client, NegativeResponseService negativeResponseService)
+    public SuspicionCommandModule(SuspicionService db, UserPreferencesService prefsService, DiscordClient client, NegativeResponseService negativeResponseService)
     {
         this.db = db;
         this.prefsService = prefsService;
@@ -59,9 +59,9 @@ public class SuspicionCommandModule : ApplicationCommandModule
     public async Task GetSuspicionLevel(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
         var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.DiscriminatedUsername());
-        var maxLevel = await db.ActiveSuspicions.GroupBy(s => s.Suspect.ToLower())
+        var maxLevel = (await db.GetActiveSuspicionsAsync()).GroupBy(s => s.Suspect.ToLower())
             .Select(s => s.Count())
-            .MaxAsync();
+            .Max();
 
         var descriptor = GetSuspicionDescriptor(suspicionLevel, maxLevel);
 
