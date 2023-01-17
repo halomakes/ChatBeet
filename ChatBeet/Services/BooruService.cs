@@ -52,7 +52,7 @@ namespace ChatBeet.Services
 
         public async Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
         {
-            var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:sensitive" : "-rating:sensitive") : string.Empty;
+            var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:general" : "-rating:general") : string.Empty;
             var globalBlacklist = Negate(booruConfig.BlacklistedTags);
             var userBlacklist = string.IsNullOrEmpty(requestor)
                 ? new List<string>()
