@@ -31,7 +31,7 @@ namespace ChatBeet.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels()
         {
-            var mostSuspicious = (await suspicionService.GetActiveSuspicionsAsync())
+            var mostSuspicious = (await suspicionService.GetSuspicionsAsync())
                 .AsQueryable()
                 .GroupBy(s => s.Suspect.ToLower())
                 .Select(g => new
