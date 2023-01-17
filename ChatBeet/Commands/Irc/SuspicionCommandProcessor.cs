@@ -17,14 +17,14 @@ namespace ChatBeet.Commands.Irc
 {
     public class SuspicionCommandProcessor : CommandProcessor
     {
-        private readonly SuspicionContext db;
+        private readonly SuspicionService service;
         private readonly UserPreferencesService prefsService;
         private readonly IrcBotConfiguration config;
         private readonly NegativeResponseService negativeResponseService;
 
-        public SuspicionCommandProcessor(SuspicionContext db, UserPreferencesService prefsService, IOptions<IrcBotConfiguration> opts, NegativeResponseService negativeResponseService)
+        public SuspicionCommandProcessor(SuspicionService service, UserPreferencesService prefsService, IOptions<IrcBotConfiguration> opts, NegativeResponseService negativeResponseService)
         {
-            this.db = db;
+            this.service = service;
             this.prefsService = prefsService;
             this.negativeResponseService = negativeResponseService;
             config = opts.Value;
@@ -43,15 +43,15 @@ namespace ChatBeet.Commands.Irc
                     }
                     else
                     {
-                        if (await db.HasRecentlyReportedAsync(suspect, IncomingMessage.From))
+                        if (await service.HasRecentlyReportedAsync(suspect, IncomingMessage.From))
                         {
                             yield return new NoticeMessage(IncomingMessage.From, $"You must wait at least 2 minutes each time you raise suspicion against a user.");
                         }
                         else
                         {
-                            await db.ReportSuspiciousActivityAsync(suspect, IncomingMessage.From, bypassDebounceCheck: true);
+                            await service.ReportSuspiciousActivityAsync(suspect, IncomingMessage.From, bypassDebounceCheck: true);
 
-                            var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.Trim());
+                            var suspicionLevel = await service.GetSuspicionLevelAsync(suspect.Trim());
 
                             yield return new NoticeMessage(IncomingMessage.From, $"{suspect.ToPossessive()} suspicion level is now {suspicionLevel}.");
 
@@ -62,16 +62,10 @@ namespace ChatBeet.Commands.Irc
             }
             else
             {
-                if (!await db.HasRecentlyReportedAsync(IncomingMessage.From, config.Nick))
+                if (!await service.HasRecentlyReportedAsync(IncomingMessage.From, config.Nick))
                 {
-                    db.Suspicions.Add(new Suspicion
-                    {
-                        Reporter = config.Nick,
-                        Suspect = IncomingMessage.From,
-                        TimeReported = DateTime.Now
-                    });
-                    await db.SaveChangesAsync();
-                    var suspicionLevel = await db.GetSuspicionLevelAsync(IncomingMessage.From);
+                    await service.ReportSuspiciousActivityAsync(IncomingMessage.From, config.Nick, true);
+                    var suspicionLevel = await service.GetSuspicionLevelAsync(IncomingMessage.From);
                     yield return new PrivateMessage(IncomingMessage.From, $"Reporting someone in private messages is pretty sus. Your suspicion level just went up to {suspicionLevel}.");
                 }
                 else
@@ -86,10 +80,10 @@ namespace ChatBeet.Commands.Irc
         {
             if (!string.IsNullOrEmpty(suspect))
             {
-                var suspicionLevel = await db.GetSuspicionLevelAsync(suspect.Trim());
-                var maxLevel = await db.ActiveSuspicions.GroupBy(s => s.Suspect.ToLower())
+                var suspicionLevel = await service.GetSuspicionLevelAsync(suspect.Trim());
+                var maxLevel = (await service.GetActiveSuspicionsAsync()).GroupBy(s => s.Suspect.ToLower())
                     .Select(s => s.Count())
-                    .MaxAsync();
+                    .Max();
 
                 var descriptor = GetSuspicionDescriptor(suspicionLevel, maxLevel);
 

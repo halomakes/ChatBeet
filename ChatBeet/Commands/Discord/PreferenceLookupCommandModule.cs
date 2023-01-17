@@ -28,7 +28,7 @@ public class PreferenceLookupCommandModule : ApplicationCommandModule
         }
         else
         {
-            var internalId = await _migration.GetInternalUsername(user);
+            var internalId = await _migration.GetInternalUsernameAsync(user);
             var subject = (await _preferences.Get(internalId, UserPreference.SubjectPronoun))?.ToLower();
             var @object = (await _preferences.Get(internalId, UserPreference.ObjectPronoun))?.ToLower();
 
