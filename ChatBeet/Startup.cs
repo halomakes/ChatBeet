@@ -88,6 +88,8 @@ namespace ChatBeet
                 pipeline.RegisterAsyncRule<DessRule, MessageCreateEventArgs>();
                 pipeline.RegisterAsyncRule<KarmaReactRule, MessageCreateEventArgs>();
                 pipeline.RegisterAsyncRule<SuspectRule, MessageCreateEventArgs>();
+                pipeline.RegisterAsyncRule<BonkCensorRule, MessageReactionAddEventArgs>();
+                pipeline.RegisterAsyncRule<EightBallRule, MessageCreateEventArgs>();
                 pipeline.AddCommandOrchestrator();
             });
 

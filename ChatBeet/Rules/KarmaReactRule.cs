@@ -64,12 +64,12 @@ namespace ChatBeet.Rules
             yield break;
         }
 
-        public bool Matches(MessageCreateEventArgs incomingMessage) => filter.IsMatch(incomingMessage.Message.Content) || IsDiscordUpvode(incomingMessage.Message);
+        public bool Matches(MessageCreateEventArgs incomingMessage) => filter.IsMatch(incomingMessage.Message.Content) || IsDiscordUpvote(incomingMessage.Message);
 
         [GeneratedRegex(@"^\<@\d+\> ?\+\+$", RegexOptions.IgnoreCase)]
         private partial Regex discordRgx();
 
-        private bool IsDiscordUpvode(DiscordMessage message) =>
+        private bool IsDiscordUpvote(DiscordMessage message) =>
             (message.MessageType == MessageType.Default || message.MessageType == MessageType.Reply)
             && message.MentionedUsers.Count() == 1
             && message.MentionedUsers.Single() == _discord.CurrentUser
