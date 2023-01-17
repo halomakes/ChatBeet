@@ -47,6 +47,7 @@ namespace ChatBeet.Services
             };
             _client.ModalSubmitted += SendToGravyBot;
             _client.MessageCreated += SendToGravyBot;
+            _client.MessageReactionAdded += SendToGravyBot;
 
             commands.RegisterCommands<AnilistCommandModule>();
             commands.RegisterCommands<BadBotCommandModule>();
@@ -74,6 +75,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<PreferenceLookupCommandModule>();
             commands.RegisterCommands<SpeedometerCommandModule>();
             commands.RegisterCommands<WolframCommandModule>();
+            commands.RegisterCommands<EightBallCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
