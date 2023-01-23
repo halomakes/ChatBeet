@@ -76,6 +76,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<SpeedometerCommandModule>();
             commands.RegisterCommands<WolframCommandModule>();
             commands.RegisterCommands<EightBallCommandModule>();
+            commands.RegisterCommands<MiataCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
