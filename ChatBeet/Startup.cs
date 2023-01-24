@@ -243,6 +243,7 @@ namespace ChatBeet
 
             services.AddTransient<GraphicsService>();
             services.AddScoped<SuspicionService>();
+            services.AddScoped<MemeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
