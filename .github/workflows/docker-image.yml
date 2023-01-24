@@ -27,14 +27,3 @@ jobs:
           push: true
           tags: halomademeapc/chatbeet:latest
           labels: ${{ steps.meta.outputs.labels }}
-  deploy:
-    needs: publish
-    runs-on: ubuntu-latest
-    steps:
-      - name: Update Droplet
-        uses: appleboy/ssh-action@v0.1.4
-        with:
-          host: ${{ secrets.DROPLET_HOST }}
-          username: ${{ secrets.DROPLET_USERNAME }}
-          password: ${{ secrets.secrets.DROPLET_PASSWORD }}
-          script: ${{ secrets.DROPLET_SCRIPT }}
