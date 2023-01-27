@@ -19,6 +19,8 @@ FROM build AS publish
 RUN dotnet publish "ChatBeet.csproj" -c Release -o /app/publish
 
 FROM base AS final
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT false
+RUN apk add --no-cache icu-libs tzdata
 WORKDIR /app
 COPY --from=publish /app/publish .
 RUN mkdir -p db
