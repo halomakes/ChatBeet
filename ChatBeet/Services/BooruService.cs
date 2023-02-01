@@ -132,7 +132,7 @@ namespace ChatBeet.Services
         {
             entry.SlidingExpiration = TimeSpan.FromHours(1);
             var response = await httpClient.GetFromJsonAsync<TagResponse>($"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&limit=25&name_pattern={query}%");
-            return response.Tag.Select(t => t.Name);
+            return response.Tag.Select(t => t.Name).ToList();
         });
 
         private void ClearCache(string nick) => cache.Remove(GetCacheEntry(nick));
