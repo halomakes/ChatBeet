@@ -1,8 +1,9 @@
-﻿using DSharpPlus;
+﻿using ChatBeet.Services;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using System.Linq;
 using System.Threading.Tasks;
-using ChatBeet.Services;
 
 namespace ChatBeet.Commands.Discord;
 
@@ -24,6 +25,7 @@ public class BonkCommandModule : ApplicationCommandModule
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
             .WithContent($"🚨🚨 {Formatter.Mention(user)} has been reported as being horny 🚨🚨  {Formatter.Mention(_client.CurrentUser)} is now contacting the {Formatter.Bold("FBI")}, {Formatter.Bold("NSA")}, {Formatter.Bold("CIA")}, {Formatter.Bold("Navy SEALs")}, {Formatter.Bold("Secret Service")}, and {Formatter.Bold("ur mom")}. ")
         );
+        await BonkReactAsync(user, ctx.Channel);
         await EmbedImageAsync(await ctx.GetOriginalResponseAsync());
     }
 
@@ -33,6 +35,7 @@ public class BonkCommandModule : ApplicationCommandModule
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
             .WithContent($"🚨🚨 {Formatter.Mention(ctx.TargetUser)} has been reported as being horny 🚨🚨  {Formatter.Mention(_client.CurrentUser)} is now contacting the {Formatter.Bold("FBI")}, {Formatter.Bold("NSA")}, {Formatter.Bold("CIA")}, {Formatter.Bold("Navy SEALs")}, {Formatter.Bold("Secret Service")}, and {Formatter.Bold("ur mom")}. ")
         );
+        await BonkReactAsync(ctx.TargetUser, ctx.Channel);
         await EmbedImageAsync(await ctx.GetOriginalResponseAsync());
     }
 
@@ -43,5 +46,15 @@ public class BonkCommandModule : ApplicationCommandModule
             .WithContent(message.Content)
             .AddEmbed(new DiscordEmbedBuilder()
                 .WithImageUrl(image)));
+    }
+
+    private async Task BonkReactAsync(DiscordUser user, DiscordChannel channel)
+    {
+        var messages = await channel.GetMessagesAsync();
+        var message = messages
+            .OrderByDescending(m => m.Timestamp)
+            .FirstOrDefault(m => m.Author == user);
+        if (message is not null && DiscordEmoji.TryFromName(_client, ":bonk:", out var emoji))
+            await message.CreateReactionAsync(emoji);
     }
 }
