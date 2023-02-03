@@ -26,6 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Miki.Anilist;
+using Miki.UrbanDictionary;
 using SauceNET;
 using System;
 using System.IO;
@@ -34,6 +35,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Untappd.Client;
+using YoutubeExplode;
 using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
 
 namespace ChatBeet
@@ -244,6 +246,8 @@ namespace ChatBeet
             services.AddTransient<GraphicsService>();
             services.AddScoped<SuspicionService>();
             services.AddScoped<MemeService>();
+            services.AddScoped<UrbanDictionaryApi>();
+            services.AddScoped<YoutubeClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

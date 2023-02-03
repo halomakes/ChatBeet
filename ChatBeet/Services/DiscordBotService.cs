@@ -1,6 +1,8 @@
 ﻿using ChatBeet.Commands.Discord;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity;
 using DSharpPlus.SlashCommands;
 using GravyBot;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DSharpPlus.Interactivity.Extensions;
 
 namespace ChatBeet.Services
 {
@@ -33,6 +36,11 @@ namespace ChatBeet.Services
 
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
+            _client.UseInteractivity(new InteractivityConfiguration()
+            {
+                PollBehaviour = PollBehaviour.KeepEmojis,
+                Timeout = TimeSpan.FromSeconds(30)
+            });
             var commands = _client.UseSlashCommands(new SlashCommandsConfiguration
             {
                 Services = _services
@@ -77,6 +85,8 @@ namespace ChatBeet.Services
             commands.RegisterCommands<WolframCommandModule>();
             commands.RegisterCommands<EightBallCommandModule>();
             commands.RegisterCommands<MiataCommandModule>();
+            commands.RegisterCommands<UrbanDictionaryCommandModule>();
+            commands.RegisterCommands<YoutubeCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
