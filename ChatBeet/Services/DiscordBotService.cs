@@ -86,6 +86,7 @@ namespace ChatBeet.Services
             commands.RegisterCommands<EightBallCommandModule>();
             commands.RegisterCommands<MiataCommandModule>();
             commands.RegisterCommands<UrbanDictionaryCommandModule>();
+            commands.RegisterCommands<YoutubeCommandModule>();
             await _client.ConnectAsync();
             await base.StartAsync(cancellationToken);
         }
