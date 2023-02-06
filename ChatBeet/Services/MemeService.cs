@@ -36,10 +36,10 @@ public class MemeService
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
-        return content.Results.Select(r => $"{_client.BaseAddress}/{r.ThumbnailUrl}").ToList();
+        return content.Results.Select(r => $"{_client.BaseAddress}/{r.ContentUrl}").ToList();
     });
 
     internal record ResponseWrapper(List<Result> Results);
 
-    internal record Result(string ThumbnailUrl);
+    internal record Result(string ContentUrl);
 }
