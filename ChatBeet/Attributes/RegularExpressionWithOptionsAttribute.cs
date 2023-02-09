@@ -1,20 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace ChatBeet.Attributes
+namespace ChatBeet.Attributes;
+
+public class RegularExpressionWithOptionsAttribute : RegularExpressionAttribute
 {
-    public class RegularExpressionWithOptionsAttribute : RegularExpressionAttribute
+    public RegularExpressionWithOptionsAttribute(string pattern) : base(pattern) { }
+
+    public RegexOptions RegexOptions { get; set; }
+
+    public override bool IsValid(object value)
     {
-        public RegularExpressionWithOptionsAttribute(string pattern) : base(pattern) { }
+        if (string.IsNullOrEmpty(value as string))
+            return true;
 
-        public RegexOptions RegexOptions { get; set; }
-
-        public override bool IsValid(object value)
-        {
-            if (string.IsNullOrEmpty(value as string))
-                return true;
-
-            return Regex.IsMatch(value as string, "^" + Pattern + "$", RegexOptions);
-        }
+        return Regex.IsMatch(value as string, "^" + Pattern + "$", RegexOptions);
     }
 }

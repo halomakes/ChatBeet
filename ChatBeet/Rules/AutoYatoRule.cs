@@ -7,29 +7,28 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Rules;
+
+public class AutoYatoRule : IMessageRule<PrivateMessage>
 {
-    public class AutoYatoRule : IMessageRule<PrivateMessage>
+    private readonly IrcBotConfiguration config;
+    private readonly string autoYatoUrl;
+
+    public AutoYatoRule(IOptions<ChatBeetConfiguration> dtellaOptions, IOptions<IrcBotConfiguration> options)
     {
-        private readonly IrcBotConfiguration config;
-        private readonly string autoYatoUrl;
+        autoYatoUrl = dtellaOptions.Value.Urls["AutoYato"];
+        config = options.Value;
+    }
 
-        public AutoYatoRule(IOptions<ChatBeetConfiguration> dtellaOptions, IOptions<IrcBotConfiguration> options)
+    public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+    {
+        var rgx = new Regex($@"^{Regex.Escape(config.Nick)}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
+        if (rgx.IsMatch(incomingMessage.Message))
         {
-            autoYatoUrl = dtellaOptions.Value.Urls["AutoYato"];
-            config = options.Value;
-        }
+            var topic = rgx.Replace(incomingMessage.Message, @"$1");
+            var url = $"{autoYatoUrl}/{WebUtility.UrlEncode(topic)}";
 
-        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
-        {
-            var rgx = new Regex($@"^{Regex.Escape(config.Nick)}, what does yato think (?:about|of) ([^\?]*)\??", RegexOptions.IgnoreCase);
-            if (rgx.IsMatch(incomingMessage.Message))
-            {
-                var topic = rgx.Replace(incomingMessage.Message, @"$1");
-                var url = $"{autoYatoUrl}/{WebUtility.UrlEncode(topic)}";
-
-                yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Here's what yato thinks of {topic}: {url}");
-            }
+            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"Here's what yato thinks of {topic}: {url}");
         }
     }
 }

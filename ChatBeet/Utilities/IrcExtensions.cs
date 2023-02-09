@@ -1,9 +1,8 @@
 ﻿using GravyIrc.Messages;
 
-namespace ChatBeet.Utilities
+namespace ChatBeet.Utilities;
+
+public static class IrcExtensions
 {
-    public static class IrcExtensions
-    {
-        public static string GetResponseTarget(this PrivateMessage message) => message.IsChannelMessage ? message.To : message.From;
-    }
+    public static string GetResponseTarget(this PrivateMessage message) => message.IsChannelMessage ? message.To : message.From;
 }

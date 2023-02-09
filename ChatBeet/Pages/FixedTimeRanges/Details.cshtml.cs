@@ -5,33 +5,32 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages.FixedTimeRanges
+namespace ChatBeet.Pages.FixedTimeRanges;
+
+public class DetailsModel : PageModel
 {
-    public class DetailsModel : PageModel
+    private readonly Data.ProgressContext _context;
+
+    public DetailsModel(Data.ProgressContext context)
     {
-        private readonly Data.ProgressContext _context;
+        _context = context;
+    }
 
-        public DetailsModel(Data.ProgressContext context)
+    public FixedTimeRange FixedTimeRange { get; set; }
+
+    public async Task<IActionResult> OnGetAsync(string id)
+    {
+        if (id == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        public FixedTimeRange FixedTimeRange { get; set; }
+        FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        if (FixedTimeRange == null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
-
-            if (FixedTimeRange == null)
-            {
-                return NotFound();
-            }
-            return Page();
+            return NotFound();
         }
+        return Page();
     }
 }

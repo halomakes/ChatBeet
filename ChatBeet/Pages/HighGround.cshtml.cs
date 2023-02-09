@@ -5,30 +5,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Linq;
 
-namespace ChatBeet.Pages
+namespace ChatBeet.Pages;
+
+public class HighGroundModel : PageModel
 {
-    public class HighGroundModel : PageModel
+    private readonly MessageQueueService queueService;
+
+    public string Nick { get; set; }
+
+    [BindProperty]
+    public string Channel { get; set; }
+
+    public HighGroundModel(MessageQueueService queueService)
     {
-        private readonly MessageQueueService queueService;
+        this.queueService = queueService;
+    }
 
-        public string Nick { get; set; }
-
-        [BindProperty]
-        public string Channel { get; set; }
-
-        public HighGroundModel(MessageQueueService queueService)
+    public void OnGet()
+    {
+        if (HighGroundCommandProcessor.HighestNicks.AsEnumerable().Any())
         {
-            this.queueService = queueService;
-        }
-
-        public void OnGet()
-        {
-            if (HighGroundCommandProcessor.HighestNicks.AsEnumerable().Any())
-            {
-                var top = HighGroundCommandProcessor.HighestNicks.AsEnumerable().PickRandom();
-                Nick = top.Value;
-                Channel = top.Key;
-            }
+            var top = HighGroundCommandProcessor.HighestNicks.AsEnumerable().PickRandom();
+            Nick = top.Value;
+            Channel = top.Key;
         }
     }
 }

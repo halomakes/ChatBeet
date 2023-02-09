@@ -5,19 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Rules;
+
+public class StackTraceRule : IMessageRule<Exception>
 {
-    public class StackTraceRule : IMessageRule<Exception>
+    private readonly IrcBotConfiguration config;
+
+    public StackTraceRule(IOptions<IrcBotConfiguration> opts)
     {
-        private readonly IrcBotConfiguration config;
-
-        public StackTraceRule(IOptions<IrcBotConfiguration> opts)
-        {
-            config = opts.Value;
-        }
-
-        public IEnumerable<IClientMessage> Respond(Exception incomingMessage) => incomingMessage.StackTrace
-            .Replace("\r\n", "\n").Split("\n")
-            .Select(line => new PrivateMessage(config.LogChannel, $"{IrcValues.YELLOW}{line}{IrcValues.RESET}"));
+        config = opts.Value;
     }
+
+    public IEnumerable<IClientMessage> Respond(Exception incomingMessage) => incomingMessage.StackTrace
+        .Replace("\r\n", "\n").Split("\n")
+        .Select(line => new PrivateMessage(config.LogChannel, $"{IrcValues.YELLOW}{line}{IrcValues.RESET}"));
 }

@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace ChatBeet.Utilities
+namespace ChatBeet.Utilities;
+
+public static class DateExtensions
 {
-    public static class DateExtensions
+    public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
     {
-        public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
-        {
-            int diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
-            return dt.AddDays(-1 * diff).Date;
-        }
+        int diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
+        return dt.AddDays(-1 * diff).Date;
     }
 }

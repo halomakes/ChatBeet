@@ -1,15 +1,14 @@
-﻿namespace ChatBeet.Models
-{
-    public struct TagStat
-    {
-        public string Tag;
-        public int Total;
-        public StatMode Mode;
+﻿namespace ChatBeet.Models;
 
-        public enum StatMode
-        {
-            User,
-            Tag
-        }
+public struct TagStat
+{
+    public string Tag;
+    public int Total;
+    public StatMode Mode;
+
+    public enum StatMode
+    {
+        User,
+        Tag
     }
 }

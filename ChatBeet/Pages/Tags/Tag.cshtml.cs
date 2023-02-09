@@ -9,39 +9,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages.Tags
+namespace ChatBeet.Pages.Tags;
+
+[Authorize]
+public class TagModel : PageModel
 {
-    [Authorize]
-    public class TagModel : PageModel
+    private readonly BooruContext booru;
+    private readonly IMemoryCache cache;
+
+    public string TagName { get; private set; }
+    public IEnumerable<TagStat> Stats { get; private set; }
+
+    public TagModel(BooruContext booru, IMemoryCache cache)
     {
-        private readonly BooruContext booru;
-        private readonly IMemoryCache cache;
+        this.booru = booru;
+        this.cache = cache;
+    }
 
-        public string TagName { get; private set; }
-        public IEnumerable<TagStat> Stats { get; private set; }
-
-        public TagModel(BooruContext booru, IMemoryCache cache)
+    public async Task OnGet(string tagName)
+    {
+        TagName = tagName.Trim().ToLower();
+        var matchingTags = await cache.GetOrCreateAsync($"tags:tag:{tagName}", async entry =>
         {
-            this.booru = booru;
-            this.cache = cache;
-        }
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
-        public async Task OnGet(string tagName)
-        {
-            TagName = tagName.Trim().ToLower();
-            var matchingTags = await cache.GetOrCreateAsync($"tags:tag:{tagName}", async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-
-                return await booru.TagHistories
-                    .AsQueryable()
-                    .Where(th => th.Tag.ToLower() == tagName)
-                    .GroupBy(th => th.Nick)
-                    .OrderByDescending(g => g.Count())
-                    .Select(g => new TagStat { Tag = g.Key, Total = g.Count(), Mode = TagStat.StatMode.User })
-                    .ToListAsync();
-            });
-            Stats = matchingTags;
-        }
+            return await booru.TagHistories
+                .AsQueryable()
+                .Where(th => th.Tag.ToLower() == tagName)
+                .GroupBy(th => th.Nick)
+                .OrderByDescending(g => g.Count())
+                .Select(g => new TagStat { Tag = g.Key, Total = g.Count(), Mode = TagStat.StatMode.User })
+                .ToListAsync();
+        });
+        Stats = matchingTags;
     }
 }

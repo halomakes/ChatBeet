@@ -7,17 +7,21 @@ using DSharpPlus.SlashCommands;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Notifications;
+using MediatR;
 
 namespace ChatBeet.Commands.Discord;
 
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
 public class BooruCommandModule : ApplicationCommandModule
 {
-    private readonly BooruService booru;
+    private readonly BooruService _booru;
+    private readonly IMediator _mediator;
 
-    public BooruCommandModule(BooruService booru)
+    public BooruCommandModule(BooruService booru, IMediator mediator)
     {
-        this.booru = booru;
+        _booru = booru;
+        _mediator = mediator;
     }
 
     [SlashCommand("booru", "Get a random image from gelbooru matching tags")]
@@ -29,6 +33,8 @@ public class BooruCommandModule : ApplicationCommandModule
         if (embed is not null)
             response = response.AddEmbed(embed);
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, response);
+        var message = await ctx.GetOriginalResponseAsync();
+        await _mediator.Publish(new BonkableMessageNotification(message));
     }
 
     public async Task<(string Content, DiscordEmbed? Embed)> GetResponseContent(string tags, bool safeOnly, string username)
@@ -36,12 +42,12 @@ public class BooruCommandModule : ApplicationCommandModule
         var tagList = tags.ToLower().Split(' ');
         if (tagList.Any())
         {
-            var result = await booru.GetRandomPostAsync(safeOnly, username, tagList);
+            var result = await _booru.GetRandomPostAsync(safeOnly, username, tagList);
 
-            if (result is BooruService.MediaSearchResult media)
+            if (result is { } media)
             {
                 if (username is not null)
-                    await booru.RecordTags(username, tagList);
+                    await _booru.RecordTags(username, tagList);
 
                 if (media != default && media is { Rating: < BooruSharp.Search.Post.Rating.Explicit })
                 {

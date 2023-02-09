@@ -33,6 +33,8 @@ public class SauceCommandModule : ApplicationCommandModule
 
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(string.Join(Environment.NewLine, content)));
+            var response = await ctx.GetOriginalResponseAsync();
+            await response.ModifyEmbedSuppressionAsync(true);
             return;
         }
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()

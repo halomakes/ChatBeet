@@ -10,54 +10,53 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Commands.Irc
+namespace ChatBeet.Commands.Irc;
+
+public class LinkPreviewCommandProcessor : CommandProcessor
 {
-    public class LinkPreviewCommandProcessor : CommandProcessor
+    private readonly MessageQueueService messageQueue;
+    private readonly LinkPreviewService previewService;
+
+    public LinkPreviewCommandProcessor(MessageQueueService messageQueue, LinkPreviewService previewService)
     {
-        private readonly MessageQueueService messageQueue;
-        private readonly LinkPreviewService previewService;
+        this.messageQueue = messageQueue;
+        this.previewService = previewService;
+    }
 
-        public LinkPreviewCommandProcessor(MessageQueueService messageQueue, LinkPreviewService previewService)
+    [Command("preview {uri}", Description = "Parse a link preview from a URI."), ChannelOnly]
+    public async Task<IClientMessage> PreviewLink([Uri, TypeConverter(typeof(UrlTypeConverter))] Uri uri)
+    {
+        if (uri is null)
         {
-            this.messageQueue = messageQueue;
-            this.previewService = previewService;
+            var rgx = new Regex(RegexUtils.Uri, RegexOptions.IgnoreCase);
+            var lookupMessage = messageQueue.GetLatestMessage(IncomingMessage.To, rgx);
+            if (lookupMessage == default)
+                return new NoticeMessage(IncomingMessage.From, $"Couldn't find a URI to preview.");
+            var match = rgx.Match(lookupMessage.Message);
+            if (Uri.TryCreate(match.Value, UriKind.Absolute, out var historic) || Uri.TryCreate($"https://{match.Value}", UriKind.Absolute, out historic))
+                uri = historic;
         }
 
-        [Command("preview {uri}", Description = "Parse a link preview from a URI."), ChannelOnly]
-        public async Task<IClientMessage> PreviewLink([Uri, TypeConverter(typeof(UrlTypeConverter))] Uri uri)
+        if (uri is not null)
         {
-            if (uri is null)
+            try
             {
-                var rgx = new Regex(RegexUtils.Uri, RegexOptions.IgnoreCase);
-                var lookupMessage = messageQueue.GetLatestMessage(IncomingMessage.To, rgx);
-                if (lookupMessage == default)
-                    return new NoticeMessage(IncomingMessage.From, $"Couldn't find a URI to preview.");
-                var match = rgx.Match(lookupMessage.Message);
-                if (Uri.TryCreate(match.Value, UriKind.Absolute, out var historic) || Uri.TryCreate($"https://{match.Value}", UriKind.Absolute, out historic))
-                    uri = historic;
+                var meta = await previewService.GetDocumentAsync(uri);
+                if (meta != default)
+                {
+                    var summary = meta.ToIrcSummary(maxDescriptionLength: 400);
+                    if (!string.IsNullOrEmpty(summary))
+                        return new PrivateMessage(IncomingMessage.GetResponseTarget(), summary);
+                }
+                return new NoticeMessage(IncomingMessage.From, $"Sorry, I couldn't parse details from that page.");
             }
-
-            if (uri is not null)
+            catch (Exception e)
             {
-                try
-                {
-                    var meta = await previewService.GetDocumentAsync(uri);
-                    if (meta != default)
-                    {
-                        var summary = meta.ToIrcSummary(maxDescriptionLength: 400);
-                        if (!string.IsNullOrEmpty(summary))
-                            return new PrivateMessage(IncomingMessage.GetResponseTarget(), summary);
-                    }
-                    return new NoticeMessage(IncomingMessage.From, $"Sorry, I couldn't parse details from that page.");
-                }
-                catch (Exception e)
-                {
-                    messageQueue.Push(e);
-                    return new NoticeMessage(IncomingMessage.From, $"Couldn't fetch {IrcValues.ITALIC}{uri}{IrcValues.RESET}.  Make sure it's absolute and publicly accessible.");
-                }
+                messageQueue.Push(e);
+                return new NoticeMessage(IncomingMessage.From, $"Couldn't fetch {IrcValues.ITALIC}{uri}{IrcValues.RESET}.  Make sure it's absolute and publicly accessible.");
             }
-
-            return new NoticeMessage(IncomingMessage.From, $"Couldn't parse that URI.  Make sure it's absolute and publicly accessible.");
         }
+
+        return new NoticeMessage(IncomingMessage.From, $"Couldn't parse that URI.  Make sure it's absolute and publicly accessible.");
     }
 }

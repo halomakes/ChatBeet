@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace ChatBeet.Models
+namespace ChatBeet.Models;
+
+public class LoginCompleteNotification
 {
-    public class LoginCompleteNotification
-    {
-        public string Nick { get; set; }
-        public DateTime Time { get; private set; } = DateTime.Now;
-    }
+    public string Nick { get; set; }
+    public DateTime Time { get; private set; } = DateTime.Now;
 }

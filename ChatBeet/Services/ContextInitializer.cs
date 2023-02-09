@@ -8,38 +8,37 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Services
+namespace ChatBeet.Services;
+
+public class ContextInitializer : IHostedService
 {
-    public class ContextInitializer : IHostedService
+    private readonly IServiceProvider serviceProvider;
+    private static readonly IEnumerable<Type> contextTypes = new List<Type> {
+        typeof(MemoryCellContext),
+        typeof(BooruContext),
+        typeof(PreferencesContext),
+        typeof(KeywordContext),
+        typeof(IdentityDbContext),
+        typeof(ReplacementContext),
+        typeof(SuspicionContext),
+        typeof(ProgressContext),
+        typeof(IrcLinkContext)
+    };
+
+    public ContextInitializer(IServiceProvider serviceProvider)
     {
-        private readonly IServiceProvider serviceProvider;
-        private static readonly IEnumerable<Type> contextTypes = new List<Type> {
-            typeof(MemoryCellContext),
-            typeof(BooruContext),
-            typeof(PreferencesContext),
-            typeof(KeywordContext),
-            typeof(IdentityDbContext),
-            typeof(ReplacementContext),
-            typeof(SuspicionContext),
-            typeof(ProgressContext),
-            typeof(IrcLinkContext)
-        };
-
-        public ContextInitializer(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
-
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            using var scope = serviceProvider.CreateScope();
-            foreach (var ctxType in contextTypes)
-            {
-                var ctx = scope.ServiceProvider.GetRequiredService(ctxType) as DbContext;
-                await ctx.Database.EnsureCreatedAsync();
-            }
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        this.serviceProvider = serviceProvider;
     }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using var scope = serviceProvider.CreateScope();
+        foreach (var ctxType in contextTypes)
+        {
+            var ctx = scope.ServiceProvider.GetRequiredService(ctxType) as DbContext;
+            await ctx.Database.EnsureCreatedAsync();
+        }
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

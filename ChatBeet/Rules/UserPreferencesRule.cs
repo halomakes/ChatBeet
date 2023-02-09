@@ -4,13 +4,12 @@ using GravyBot;
 using GravyIrc.Messages;
 using System.Collections.Generic;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Rules;
+
+public class UserPreferencesRule : IMessageRule<PreferenceChange>
 {
-    public class UserPreferencesRule : IMessageRule<PreferenceChange>
+    public IEnumerable<IClientMessage> Respond(PreferenceChange incomingMessage)
     {
-        public IEnumerable<IClientMessage> Respond(PreferenceChange incomingMessage)
-        {
-            yield return new PrivateMessage(incomingMessage.Nick, $"{UserPreferencesService.GetConfirmationMessage(incomingMessage.Preference.Value, incomingMessage.Value)} via WebUI");
-        }
+        yield return new PrivateMessage(incomingMessage.Nick, $"{UserPreferencesService.GetConfirmationMessage(incomingMessage.Preference.Value, incomingMessage.Value)} via WebUI");
     }
 }

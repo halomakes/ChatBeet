@@ -1,8 +1,7 @@
-﻿namespace ChatBeet.Models
+﻿namespace ChatBeet.Models;
+
+public struct Stat<TItem>
 {
-    public struct Stat<TItem>
-    {
-        public TItem Item { get; set; }
-        public int Count { get; set; }
-    }
+    public TItem Item { get; set; }
+    public int Count { get; set; }
 }

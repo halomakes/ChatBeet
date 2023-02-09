@@ -1,17 +1,16 @@
 ﻿using System;
 
-namespace ChatBeet.Attributes
+namespace ChatBeet.Attributes;
+
+public class ParameterAttribute : Attribute
 {
-    public class ParameterAttribute : Attribute
+    public ParameterAttribute(string InlineName, string DisplayName = default)
     {
-        public ParameterAttribute(string InlineName, string DisplayName = default)
-        {
-            this.InlineName = InlineName;
-            this.DisplayName = DisplayName;
-        }
-
-        public string DisplayName { get; set; }
-
-        public string InlineName { get; set; }
+        this.InlineName = InlineName;
+        this.DisplayName = DisplayName;
     }
+
+    public string DisplayName { get; set; }
+
+    public string InlineName { get; set; }
 }

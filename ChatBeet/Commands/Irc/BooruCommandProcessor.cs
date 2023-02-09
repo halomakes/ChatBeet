@@ -11,89 +11,88 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Commands.Irc
+namespace ChatBeet.Commands.Irc;
+
+public class BooruCommandProcessor : CommandProcessor
 {
-    public class BooruCommandProcessor : CommandProcessor
+    private readonly IrcBotConfiguration config;
+    private readonly BooruService booru;
+
+    public BooruCommandProcessor(IOptions<IrcBotConfiguration> options, BooruService booru)
     {
-        private readonly IrcBotConfiguration config;
-        private readonly BooruService booru;
+        config = options.Value;
+        this.booru = booru;
+    }
 
-        public BooruCommandProcessor(IOptions<IrcBotConfiguration> options, BooruService booru)
+    [Command("booru {tagList}", Description = "Get a random image from gelbooru matching tags (safe only).")]
+    [RateLimit(30, TimeUnit.Second)]
+    public async Task<IClientMessage> GetRandomSafePost([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] params string[] tagList) => await GetPost(true, tagList);
+
+    [Command("nsfwbooru {tagList}", Description = "Get a random image from gelbooru matching tags (questionable and explicit only).")]
+    [ChannelPolicy("NoMain")]
+    public async Task<IClientMessage> GetRandomPost([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] params string[] tagList) => await GetPost(false, tagList);
+
+    private async Task<IClientMessage> GetPost(bool safeOnly, [TypeConverter(typeof(SpaceSeparatedListConverter))] string[] tags)
+    {
+        if (tags.Any())
         {
-            config = options.Value;
-            this.booru = booru;
-        }
+            var text = await booru.GetRandomPostFormattedAsync(safeOnly, IncomingMessage.From, tags);
 
-        [Command("booru {tagList}", Description = "Get a random image from gelbooru matching tags (safe only).")]
-        [RateLimit(30, TimeUnit.Second)]
-        public async Task<IClientMessage> GetRandomSafePost([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] params string[] tagList) => await GetPost(true, tagList);
-
-        [Command("nsfwbooru {tagList}", Description = "Get a random image from gelbooru matching tags (questionable and explicit only).")]
-        [ChannelPolicy("NoMain")]
-        public async Task<IClientMessage> GetRandomPost([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] params string[] tagList) => await GetPost(false, tagList);
-
-        private async Task<IClientMessage> GetPost(bool safeOnly, [TypeConverter(typeof(SpaceSeparatedListConverter))] string[] tags)
-        {
-            if (tags.Any())
+            if (text is not null)
             {
-                var text = await booru.GetRandomPostFormattedAsync(safeOnly, IncomingMessage.From, tags);
-
-                if (text is not null)
-                {
-                    await booru.RecordTags(IncomingMessage.From, tags);
-                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), text);
-                }
-                else
-                {
-                    return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {string.Join(", ", tags)}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
-                }
+                await booru.RecordTags(IncomingMessage.From, tags);
+                return new PrivateMessage(IncomingMessage.GetResponseTarget(), text);
             }
             else
             {
-                return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Please specify tag/tags. See available list here: https://gelbooru.com/index.php?page=tags&s=list");
+                return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Sorry, couldn't find anything for {string.Join(", ", tags)}, ya perv. See available tags here: https://gelbooru.com/index.php?page=tags&s=list");
             }
         }
-
-        [Command("booru whitelist {tagList}", Description = "Remove tag(s) from your blacklist.")]
-        [Command("booru blacklist {tagList}", Description = "Add tag(s) to your blacklist.")]
-        public IAsyncEnumerable<IClientMessage> HandleBlacklistCommand([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] string[] tags)
+        else
         {
-            if (tags == default || !tags.Any())
-                return ListTags();
-            return TriggeringCommandName switch
-            {
-                "booru whitelist" => WhitelistTags(tags),
-                "booru blacklist" => BlacklistTags(tags),
-                _ => AsyncEnumerable.Empty<IClientMessage>()
-            };
+            return new PrivateMessage(IncomingMessage.GetResponseTarget(), $"Please specify tag/tags. See available list here: https://gelbooru.com/index.php?page=tags&s=list");
         }
+    }
 
-        [Command("astolfo", Description = "Fill the void in your soul with an Astolfo picture."), RateLimit(30, TimeUnit.Second)]
-        public async Task<IClientMessage> GetAstolfo()
+    [Command("booru whitelist {tagList}", Description = "Remove tag(s) from your blacklist.")]
+    [Command("booru blacklist {tagList}", Description = "Add tag(s) to your blacklist.")]
+    public IAsyncEnumerable<IClientMessage> HandleBlacklistCommand([Required, TypeConverter(typeof(SpaceSeparatedListConverter))] string[] tags)
+    {
+        if (tags == default || !tags.Any())
+            return ListTags();
+        return TriggeringCommandName switch
         {
-            var text = await booru.GetRandomPostFormattedAsync(true, IncomingMessage.From, "astolfo_(fate)");
-            return new PrivateMessage(IncomingMessage.GetResponseTarget(), text ?? "Sorry, couldn't find locate those succulent thighs.");
-        }
+            "booru whitelist" => WhitelistTags(tags),
+            "booru blacklist" => BlacklistTags(tags),
+            _ => AsyncEnumerable.Empty<IClientMessage>()
+        };
+    }
 
-        private async IAsyncEnumerable<IClientMessage> ListTags()
-        {
-            var global = booru.GetGlobalBlacklistedTags();
-            yield return new PrivateMessage(IncomingMessage.From, $"{IrcValues.BOLD}Global blacklist{IrcValues.RESET}: [{string.Join(", ", global)}]");
-            var user = await booru.GetBlacklistedTags(IncomingMessage.From);
-            yield return new PrivateMessage(IncomingMessage.From, $"{IrcValues.BOLD}User blacklist{IrcValues.RESET}: [{string.Join(", ", user)}]");
-            yield return new PrivateMessage(IncomingMessage.From, $"Use {IrcValues.ITALIC}{config.CommandPrefix}booru blacklist/whitelist [tags]{IrcValues.RESET} to manage your personal blacklist.");
-        }
+    [Command("astolfo", Description = "Fill the void in your soul with an Astolfo picture."), RateLimit(30, TimeUnit.Second)]
+    public async Task<IClientMessage> GetAstolfo()
+    {
+        var text = await booru.GetRandomPostFormattedAsync(true, IncomingMessage.From, "astolfo_(fate)");
+        return new PrivateMessage(IncomingMessage.GetResponseTarget(), text ?? "Sorry, couldn't find locate those succulent thighs.");
+    }
 
-        private async IAsyncEnumerable<IClientMessage> WhitelistTags(IEnumerable<string> tags)
-        {
-            await booru.WhitelistTags(IncomingMessage.From, tags);
-            yield return new PrivateMessage(IncomingMessage.From, $"[{string.Join(", ", tags)}] removed from your blacklist.");
-        }
+    private async IAsyncEnumerable<IClientMessage> ListTags()
+    {
+        var global = booru.GetGlobalBlacklistedTags();
+        yield return new PrivateMessage(IncomingMessage.From, $"{IrcValues.BOLD}Global blacklist{IrcValues.RESET}: [{string.Join(", ", global)}]");
+        var user = await booru.GetBlacklistedTags(IncomingMessage.From);
+        yield return new PrivateMessage(IncomingMessage.From, $"{IrcValues.BOLD}User blacklist{IrcValues.RESET}: [{string.Join(", ", user)}]");
+        yield return new PrivateMessage(IncomingMessage.From, $"Use {IrcValues.ITALIC}{config.CommandPrefix}booru blacklist/whitelist [tags]{IrcValues.RESET} to manage your personal blacklist.");
+    }
 
-        private async IAsyncEnumerable<IClientMessage> BlacklistTags(IEnumerable<string> tags)
-        {
-            await booru.BlacklistTags(IncomingMessage.From, tags);
-            yield return new PrivateMessage(IncomingMessage.From, $"[{string.Join(", ", tags)}] added to your blacklist.");
-        }
+    private async IAsyncEnumerable<IClientMessage> WhitelistTags(IEnumerable<string> tags)
+    {
+        await booru.WhitelistTags(IncomingMessage.From, tags);
+        yield return new PrivateMessage(IncomingMessage.From, $"[{string.Join(", ", tags)}] removed from your blacklist.");
+    }
+
+    private async IAsyncEnumerable<IClientMessage> BlacklistTags(IEnumerable<string> tags)
+    {
+        await booru.BlacklistTags(IncomingMessage.From, tags);
+        yield return new PrivateMessage(IncomingMessage.From, $"[{string.Join(", ", tags)}] added to your blacklist.");
     }
 }

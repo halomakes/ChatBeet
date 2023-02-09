@@ -34,6 +34,7 @@
     <PackageReference Include="LigerShark.WebOptimizer.Sass" Version="3.0.91" />
     <PackageReference Include="linqtotwitter" Version="5.1.3" />
     <PackageReference Include="Markdig" Version="0.30.4" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Meowtrix.PixivApi" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.2" />

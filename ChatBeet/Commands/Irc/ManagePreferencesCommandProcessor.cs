@@ -11,63 +11,62 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Commands.Irc
+namespace ChatBeet.Commands.Irc;
+
+public class ManagePreferencesCommandProcessor : CommandProcessor
 {
-    public class ManagePreferencesCommandProcessor : CommandProcessor
+    private readonly UserPreferencesService service;
+    private static readonly Dictionary<string, UserPreference> preferenceMappings;
+
+    static ManagePreferencesCommandProcessor()
     {
-        private readonly UserPreferencesService service;
-        private static readonly Dictionary<string, UserPreference> preferenceMappings;
+        preferenceMappings = Enum.GetValues(typeof(UserPreference))
+            .Cast<UserPreference>()
+            .ToDictionary(p => p.GetAttribute<ParameterAttribute>().InlineName, p => p);
+    }
 
-        static ManagePreferencesCommandProcessor()
-        {
-            preferenceMappings = Enum.GetValues(typeof(UserPreference))
-                .Cast<UserPreference>()
-                .ToDictionary(p => p.GetAttribute<ParameterAttribute>().InlineName, p => p);
-        }
+    public ManagePreferencesCommandProcessor(UserPreferencesService service)
+    {
+        this.service = service;
+    }
 
-        public ManagePreferencesCommandProcessor(UserPreferencesService service)
+    [Command("preference set {preferenceId}={value}", Description = "Set a user preference.")]
+    public async Task<IClientMessage> SetPreference([Required] string preferenceId, [Required] string value)
+    {
+        if (preferenceMappings.ContainsKey(preferenceId))
         {
-            this.service = service;
-        }
+            var preference = preferenceMappings[preferenceId];
+            var validationMessage = service.GetValidation(preference, value);
 
-        [Command("preference set {preferenceId}={value}", Description = "Set a user preference.")]
-        public async Task<IClientMessage> SetPreference([Required] string preferenceId, [Required] string value)
-        {
-            if (preferenceMappings.ContainsKey(preferenceId))
+            if (!string.IsNullOrEmpty(validationMessage))
             {
-                var preference = preferenceMappings[preferenceId];
-                var validationMessage = service.GetValidation(preference, value);
-
-                if (!string.IsNullOrEmpty(validationMessage))
-                {
-                    return new PrivateMessage(IncomingMessage.From, validationMessage);
-                }
-                else
-                {
-                    var normalized = await service.Set(IncomingMessage.From, preference, value);
-                    return new PrivateMessage(IncomingMessage.From, UserPreferencesService.GetConfirmationMessage(preference, normalized));
-                }
+                return new PrivateMessage(IncomingMessage.From, validationMessage);
             }
             else
             {
-                return new PrivateMessage(IncomingMessage.From, $"No preference {IrcValues.ITALIC}{preferenceId}{IrcValues.RESET} exists.");
+                var normalized = await service.Set(IncomingMessage.From, preference, value);
+                return new PrivateMessage(IncomingMessage.From, UserPreferencesService.GetConfirmationMessage(preference, normalized));
             }
         }
-
-        [Command("preference get {preferenceId}", Description = "Get a user preference.")]
-        public async Task<IClientMessage> GetPreference([Required] string preferenceId)
+        else
         {
-            if (preferenceMappings.ContainsKey(preferenceId))
-            {
-                var preference = preferenceMappings[preferenceId];
-                var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
-                var value = await service.Get(IncomingMessage.From, preference);
-                return new PrivateMessage(IncomingMessage.From, $"{IrcValues.ITALIC}{displayName}{IrcValues.RESET} is set to {IrcValues.BOLD}{value}{IrcValues.RESET}");
-            }
-            else
-            {
-                return new PrivateMessage(IncomingMessage.From, $"No preference {IrcValues.ITALIC}{preferenceId}{IrcValues.RESET} exists.");
-            }
+            return new PrivateMessage(IncomingMessage.From, $"No preference {IrcValues.ITALIC}{preferenceId}{IrcValues.RESET} exists.");
+        }
+    }
+
+    [Command("preference get {preferenceId}", Description = "Get a user preference.")]
+    public async Task<IClientMessage> GetPreference([Required] string preferenceId)
+    {
+        if (preferenceMappings.ContainsKey(preferenceId))
+        {
+            var preference = preferenceMappings[preferenceId];
+            var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
+            var value = await service.Get(IncomingMessage.From, preference);
+            return new PrivateMessage(IncomingMessage.From, $"{IrcValues.ITALIC}{displayName}{IrcValues.RESET} is set to {IrcValues.BOLD}{value}{IrcValues.RESET}");
+        }
+        else
+        {
+            return new PrivateMessage(IncomingMessage.From, $"No preference {IrcValues.ITALIC}{preferenceId}{IrcValues.RESET} exists.");
         }
     }
 }

@@ -7,50 +7,49 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Services
+namespace ChatBeet.Services;
+
+public class DadJokeService
 {
-    public class DadJokeService
+    private readonly HttpClient client;
+    private readonly IMemoryCache cache;
+
+    public DadJokeService(IHttpClientFactory clientFactory, IMemoryCache cache)
     {
-        private readonly HttpClient client;
-        private readonly IMemoryCache cache;
+        client = clientFactory.CreateClient();
+        this.cache = cache;
+    }
 
-        public DadJokeService(IHttpClientFactory clientFactory, IMemoryCache cache)
+    public async Task<string> GetDadJokeAsync()
+    {
+        var request = new HttpRequestMessage
         {
-            client = clientFactory.CreateClient();
-            this.cache = cache;
+            Method = HttpMethod.Get,
+            RequestUri = new Uri("https://icanhazdadjoke.com/")
+        };
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        if (response.IsSuccessStatusCode)
+        {
+            using var contentStream = await response.Content.ReadAsStreamAsync();
+            return DeserializeJsonFromStream<DadJoke>(contentStream)?.Joke;
         }
 
-        public async Task<string> GetDadJokeAsync()
+        return null;
+    }
+
+    private static T DeserializeJsonFromStream<T>(Stream stream)
+    {
+        if (stream == null || stream.CanRead == false)
+            return default(T);
+
+        using (var sr = new StreamReader(stream))
+        using (var jtr = new JsonTextReader(sr))
         {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("https://icanhazdadjoke.com/")
-            };
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            if (response.IsSuccessStatusCode)
-            {
-                using var contentStream = await response.Content.ReadAsStreamAsync();
-                return DeserializeJsonFromStream<DadJoke>(contentStream)?.Joke;
-            }
-
-            return null;
-        }
-
-        private static T DeserializeJsonFromStream<T>(Stream stream)
-        {
-            if (stream == null || stream.CanRead == false)
-                return default(T);
-
-            using (var sr = new StreamReader(stream))
-            using (var jtr = new JsonTextReader(sr))
-            {
-                var js = new JsonSerializer();
-                var searchResult = js.Deserialize<T>(jtr);
-                return searchResult;
-            }
+            var js = new JsonSerializer();
+            var searchResult = js.Deserialize<T>(jtr);
+            return searchResult;
         }
     }
 }

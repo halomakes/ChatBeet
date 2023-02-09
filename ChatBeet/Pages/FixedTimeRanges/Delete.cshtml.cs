@@ -7,53 +7,52 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages.FixedTimeRanges
+namespace ChatBeet.Pages.FixedTimeRanges;
+
+[Authorize]
+public class DeleteModel : PageModel
 {
-    [Authorize]
-    public class DeleteModel : PageModel
+    private readonly ProgressContext _context;
+
+    public DeleteModel(ProgressContext context)
     {
-        private readonly ProgressContext _context;
+        _context = context;
+    }
 
-        public DeleteModel(ProgressContext context)
+    [BindProperty]
+    public FixedTimeRange FixedTimeRange { get; set; }
+
+    public async Task<IActionResult> OnGetAsync(string id)
+    {
+        if (id == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        [BindProperty]
-        public FixedTimeRange FixedTimeRange { get; set; }
+        FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        if (FixedTimeRange == null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
+        return Page();
+    }
 
-            FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
-
-            if (FixedTimeRange == null)
-            {
-                return NotFound();
-            }
-            return Page();
+    public async Task<IActionResult> OnPostAsync(string id)
+    {
+        if (id == null)
+        {
+            return NotFound();
         }
 
-        public async Task<IActionResult> OnPostAsync(string id)
+        FixedTimeRange = await _context.FixedTimeRanges.FindAsync(id);
+
+        if (FixedTimeRange != null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            FixedTimeRange = await _context.FixedTimeRanges.FindAsync(id);
-
-            if (FixedTimeRange != null)
-            {
-                _context.FixedTimeRanges.Remove(FixedTimeRange);
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToPage("./Index");
+            _context.FixedTimeRanges.Remove(FixedTimeRange);
+            await _context.SaveChangesAsync();
         }
+
+        return RedirectToPage("./Index");
     }
 }

@@ -13,75 +13,74 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Rules
+namespace ChatBeet.Rules;
+
+public class ReplacementSetRule : IMessageRule<PrivateMessage>
 {
-    public class ReplacementSetRule : IMessageRule<PrivateMessage>
+    private readonly ReplacementContext db;
+    private readonly MessageQueueService messageQueue;
+    private readonly IrcBotConfiguration config;
+    private readonly NegativeResponseService negativeResponseService;
+    private readonly Regex rgx;
+    private static IEnumerable<ReplacementSet> ReplacementSets;
+    private static DateTime LastRefreshed;
+
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(1);
+
+    public ReplacementSetRule(ReplacementContext db, MessageQueueService messageQueue, IOptions<IrcBotConfiguration> opts, NegativeResponseService nrService)
     {
-        private readonly ReplacementContext db;
-        private readonly MessageQueueService messageQueue;
-        private readonly IrcBotConfiguration config;
-        private readonly NegativeResponseService negativeResponseService;
-        private readonly Regex rgx;
-        private static IEnumerable<ReplacementSet> ReplacementSets;
-        private static DateTime LastRefreshed;
+        this.db = db;
+        this.messageQueue = messageQueue;
+        config = opts.Value;
+        negativeResponseService = nrService;
+        rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}([^\ ]+)\ ([^\ ]+)", RegexOptions.IgnoreCase);
+        Initialize();
+    }
 
-        private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(1);
+    private async void Initialize()
+    {
+        await RefreshMappings();
+    }
 
-        public ReplacementSetRule(ReplacementContext db, MessageQueueService messageQueue, IOptions<IrcBotConfiguration> opts, NegativeResponseService nrService)
+    public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
+    {
+        var match = rgx.Match(incomingMessage.Message);
+        if (match.Success && ReplacementSets != default && ReplacementSets.Any())
         {
-            this.db = db;
-            this.messageQueue = messageQueue;
-            config = opts.Value;
-            negativeResponseService = nrService;
-            rgx = new Regex($@"^{Regex.Escape(config.CommandPrefix)}([^\ ]+)\ ([^\ ]+)", RegexOptions.IgnoreCase);
-            Initialize();
-        }
-
-        private async void Initialize()
-        {
-            await RefreshMappings();
-        }
-
-        public IEnumerable<IClientMessage> Respond(PrivateMessage incomingMessage)
-        {
-            var match = rgx.Match(incomingMessage.Message);
-            if (match.Success && ReplacementSets != default && ReplacementSets.Any())
+            var setName = match.Groups[1].Value.ToLower();
+            var nick = match.Groups[2].Value;
+            if (!string.IsNullOrEmpty(setName))
             {
-                var setName = match.Groups[1].Value.ToLower();
-                var nick = match.Groups[2].Value;
-                if (!string.IsNullOrEmpty(setName))
+                var set = ReplacementSets.FirstOrDefault(s => s.Command.ToLower() == setName);
+                if (set != default)
                 {
-                    var set = ReplacementSets.FirstOrDefault(s => s.Command.ToLower() == setName);
-                    if (set != default)
+                    var lookupMessage = messageQueue.GetLatestMessage(nick, incomingMessage.To, incomingMessage);
+                    if (lookupMessage != default)
                     {
-                        var lookupMessage = messageQueue.GetLatestMessage(nick, incomingMessage.To, incomingMessage);
-                        if (lookupMessage != default)
+                        var content = lookupMessage.Message;
+                        foreach (var map in set.Mappings.OrderByDescending(m => m.Input.Length))
                         {
-                            var content = lookupMessage.Message;
-                            foreach (var map in set.Mappings.OrderByDescending(m => m.Input.Length))
-                            {
-                                content = content.Replace(map.Input, map.Replacement, true, ChatBeetConfiguration.Culture);
-                            }
-                            yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {content}");
+                            content = content.Replace(map.Input, map.Replacement, true, ChatBeetConfiguration.Culture);
                         }
-                        else if (nick == config.Nick)
-                        {
-                            yield return negativeResponseService.GetResponse(incomingMessage);
-                        }
+                        yield return new PrivateMessage(incomingMessage.GetResponseTarget(), $"<{lookupMessage.From}> {content}");
+                    }
+                    else if (nick == config.Nick)
+                    {
+                        yield return negativeResponseService.GetResponse(incomingMessage);
                     }
                 }
             }
         }
+    }
 
-        public async Task RefreshMappings()
+    public async Task RefreshMappings()
+    {
+        if (ReplacementSets == default || (DateTime.Now - LastRefreshed > RefreshInterval))
         {
-            if (ReplacementSets == default || (DateTime.Now - LastRefreshed > RefreshInterval))
-            {
-                ReplacementSets = await db.Sets
-                    .Include(s => s.Mappings)
-                    .ToListAsync();
-                LastRefreshed = DateTime.Now;
-            }
+            ReplacementSets = await db.Sets
+                .Include(s => s.Mappings)
+                .ToListAsync();
+            LastRefreshed = DateTime.Now;
         }
     }
 }

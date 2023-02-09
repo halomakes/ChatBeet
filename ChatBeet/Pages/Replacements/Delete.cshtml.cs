@@ -6,27 +6,26 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages.Replacements
+namespace ChatBeet.Pages.Replacements;
+
+[Authorize]
+public class DeleteModel : PageModel
 {
-    [Authorize]
-    public class DeleteModel : PageModel
+    private readonly ReplacementContext db;
+
+    public DeleteModel(ReplacementContext db)
     {
-        private readonly ReplacementContext db;
+        this.db = db;
+    }
 
-        public DeleteModel(ReplacementContext db)
+    public async Task<IActionResult> OnGet([FromRoute] int id, [FromRoute] string input)
+    {
+        var map = await db.Mappings.AsQueryable().FirstOrDefaultAsync(m => m.SetId == id && m.Input == input);
+        if (map != default)
         {
-            this.db = db;
+            db.Mappings.Remove(map);
+            await db.SaveChangesAsync();
         }
-
-        public async Task<IActionResult> OnGet([FromRoute] int id, [FromRoute] string input)
-        {
-            var map = await db.Mappings.AsQueryable().FirstOrDefaultAsync(m => m.SetId == id && m.Input == input);
-            if (map != default)
-            {
-                db.Mappings.Remove(map);
-                await db.SaveChangesAsync();
-            }
-            return RedirectToPage("Index", new { id, input });
-        }
+        return RedirectToPage("Index", new { id, input });
     }
 }

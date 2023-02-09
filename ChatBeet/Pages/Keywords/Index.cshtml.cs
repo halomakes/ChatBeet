@@ -5,24 +5,23 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages.Keywords
+namespace ChatBeet.Pages.Keywords;
+
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    private readonly KeywordService service;
+
+    public IEnumerable<KeywordStat> Stats { get; private set; }
+    public DateTime LastUpdated { get; private set; }
+
+    public IndexModel(KeywordService service)
     {
-        private readonly KeywordService service;
+        this.service = service;
+    }
 
-        public IEnumerable<KeywordStat> Stats { get; private set; }
-        public DateTime LastUpdated { get; private set; }
-
-        public IndexModel(KeywordService service)
-        {
-            this.service = service;
-        }
-
-        public async Task OnGet()
-        {
-            Stats = await service.GetKeywordStatsAsync();
-            LastUpdated = KeywordService.StatsLastUpdated;
-        }
+    public async Task OnGet()
+    {
+        Stats = await service.GetKeywordStatsAsync();
+        LastUpdated = KeywordService.StatsLastUpdated;
     }
 }

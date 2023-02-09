@@ -7,70 +7,69 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Pages.FixedTimeRanges
-{
-    [Authorize]
-    public class EditModel : PageModel
-    {
-        private readonly ProgressContext _context;
+namespace ChatBeet.Pages.FixedTimeRanges;
 
-        public EditModel(ProgressContext context)
+[Authorize]
+public class EditModel : PageModel
+{
+    private readonly ProgressContext _context;
+
+    public EditModel(ProgressContext context)
+    {
+        _context = context;
+    }
+
+    [BindProperty]
+    public FixedTimeRange FixedTimeRange { get; set; }
+
+    public async Task<IActionResult> OnGetAsync(string id)
+    {
+        if (id == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        [BindProperty]
-        public FixedTimeRange FixedTimeRange { get; set; }
+        FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        if (FixedTimeRange == null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
+        return Page();
+    }
 
-            FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
-
-            if (FixedTimeRange == null)
-            {
-                return NotFound();
-            }
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
+        {
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        _context.Attach(FixedTimeRange).State = EntityState.Modified;
+
+        try
         {
-            if (!ModelState.IsValid)
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!FixedTimeRangeExists(FixedTimeRange.Key))
             {
-                return Page();
+                return NotFound();
             }
-
-            _context.Attach(FixedTimeRange).State = EntityState.Modified;
-
-            try
+            else
             {
-                await _context.SaveChangesAsync();
+                throw;
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FixedTimeRangeExists(FixedTimeRange.Key))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return RedirectToPage("./Index");
         }
 
-        private bool FixedTimeRangeExists(string id)
-        {
-            return _context.FixedTimeRanges.Any(e => e.Key == id);
-        }
+        return RedirectToPage("./Index");
+    }
+
+    private bool FixedTimeRangeExists(string id)
+    {
+        return _context.FixedTimeRanges.Any(e => e.Key == id);
     }
 }
