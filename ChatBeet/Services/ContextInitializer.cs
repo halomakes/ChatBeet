@@ -18,7 +18,6 @@ public class ContextInitializer : IHostedService
         typeof(BooruContext),
         typeof(PreferencesContext),
         typeof(KeywordContext),
-        typeof(IdentityDbContext),
         typeof(ReplacementContext),
         typeof(SuspicionContext),
         typeof(ProgressContext),

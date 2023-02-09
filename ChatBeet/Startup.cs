@@ -18,8 +18,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,12 +27,15 @@ using Miki.Anilist;
 using Miki.UrbanDictionary;
 using SauceNET;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using AspNet.Security.OAuth.Discord;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Untappd.Client;
 using YoutubeExplode;
 using OpenWeatherMapClient = OpenWeatherMap.Standard.Current;
@@ -132,7 +133,6 @@ public class Startup
         services.AddScoped<UserPreferencesService>();
         services.AddScoped<KeywordService>();
         services.AddHttpContextAccessor();
-        services.AddScoped<LogonService>();
         services.AddScoped<NegativeResponseService>();
         services.AddScoped(provider => new OpenWeatherMapClient(Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
         services.AddScoped<GoogleSearchService>();
@@ -166,46 +166,30 @@ public class Startup
         services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
         services.AddDbContext<ProgressContext>(opts => opts.UseSqlite("Data Source=db/progress.db"));
         services.AddDbContext<IrcLinkContext>(opts => opts.UseSqlite("Data Source=db/ircmigration.db"));
-        services.AddDbContext<IdentityDbContext>(opts => opts.UseSqlite("Data Source=db/identity.db"));
 
         services.AddMemoryCache();
-        services.AddIdentity<IdentityUser, IdentityRole>()
-            .AddEntityFrameworkStores<IdentityDbContext>()
-            .AddDefaultTokenProviders();
-
-        services.Configure<IdentityOptions>(opts =>
-        {
-            opts.User.AllowedUserNameCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+[]|1^{}\";
-        });
 
         services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = LogonService.Scheme;
-            options.DefaultChallengeScheme = LogonService.Scheme;
-            options.DefaultScheme = LogonService.Scheme;
-        }).AddCookie(LogonService.Scheme, options =>
-        {
-            options.Events = new CookieAuthenticationEvents
             {
-                OnRedirectToLogin = context =>
-                {
-                    if (context.Request.Path.StartsWithSegments("/api"))
-                    {
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    }
-                    else
-                    {
-                        context.Response.Redirect(context.RedirectUri);
-                    }
-
-                    return Task.FromResult(0);
-                }
-            };
-        });
-        services.Configure<ForwardedHeadersOptions>(options =>
-        {
-            options.ForwardedHeaders = ForwardedHeaders.All;
-        });
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+            })
+            .AddDiscord(options =>
+            {
+                options.ClientSecret = Configuration.GetValue<string>("Discord:ClientSecret");
+                options.ClientId = Configuration.GetValue<string>("Discord:ClientId");
+                options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "https://cdn.discordapp.com/avatars/{0}/{1}.{2}",
+                        user.GetString("id"),
+                        user.GetString("avatar"),
+                        user.GetString("avatar").StartsWith("a_") ? "gif" : "png"));
+            });
+        services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.All; });
 
         services.AddSwaggerGen(c =>
         {
@@ -220,10 +204,7 @@ public class Startup
             c.IncludeXmlComments(xmlPath);
         });
 
-        services.AddWebOptimizer(pipeline =>
-        {
-            pipeline.CompileScssFiles();
-        });
+        services.AddWebOptimizer(pipeline => { pipeline.CompileScssFiles(); });
 
         // discord stuff
         services.Configure<DiscordConfiguration>(c =>
@@ -253,14 +234,11 @@ public class Startup
         app.UseExceptionHandler("/Error");
 
         app.UseSwagger();
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatBeet");
-        });
+        app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatBeet"); });
 
         var cookieOptions = new CookiePolicyOptions
         {
-            MinimumSameSitePolicy = SameSiteMode.Strict
+            MinimumSameSitePolicy = SameSiteMode.Lax
         };
         app.UseCookiePolicy(cookieOptions);
 

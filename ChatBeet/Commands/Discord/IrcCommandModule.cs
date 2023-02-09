@@ -24,31 +24,6 @@ public class IrcCommandModule : ApplicationCommandModule
         _client = client;
     }
 
-    [SlashCommand("link", "Link your old IRC nick to your Discord account")]
-    public async Task GetVerificationCode(InteractionContext ctx, [Option("irc-nick", "Your IRC nick on dtella.net")] string nick)
-    {
-        var existingEntry = await _db.Links.FirstOrDefaultAsync(l => l.Id == ctx.User.Id || l.Nick.ToLower() == nick.ToLower());
-        if (existingEntry is not null)
-        {
-            var discordUser = ctx.User.Id == existingEntry.Id
-                ? ctx.User
-                : await _client.GetUserAsync(existingEntry.Id);
-            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{Formatter.Mention(discordUser)} is already linked to IRC user {Formatter.Bold(existingEntry.Nick)}")
-                .AsEphemeral());
-            return;
-        }
-
-        await _service.SendVerificationCodeAsync(ctx.Member, nick);
-        await ctx.CreateResponseAsync(InteractionResponseType.Modal, new DiscordInteractionResponseBuilder()
-            .WithTitle("Verify Your Account")
-            .WithCustomId("irc-verify")
-            .AddComponents(new TextInputComponent("Token", "token", style: TextInputStyle.Paragraph, required: true))
-            .AddComponents(new TextInputComponent("Nick", "nick", placeholder: nick, value: nick, required: true))
-            .WithContent($"You should receive a verification code from ChatBeet in IRC.  Enter that code here to verify your account. ")
-            );
-    }
-
     private async Task LookupUser(BaseContext ctx, DiscordUser user)
     {
         var existingEntry = await _db.Links.FirstOrDefaultAsync(l => l.Id == user.Id);

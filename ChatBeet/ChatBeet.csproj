@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Discord" Version="7.0.0" />
     <PackageReference Include="BooruSharp" Version="3.5.5" />
     <PackageReference Include="DogApi" Version="0.1.0" />
     <PackageReference Include="DSharpPlus.CommandsNext" Version="4.3.0" />

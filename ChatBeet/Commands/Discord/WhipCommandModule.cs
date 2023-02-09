@@ -68,7 +68,7 @@ public class WhipCommandModule : ApplicationCommandModule
     private async Task StartComparison(InteractionContext ctx)
     {
         LastPosts[ctx.Channel.Id] = await _client.SendMessageAsync(ctx.Channel, @$"A size comparison has been started! Use {Formatter.InlineCode("/epeen")} to show them what you got.
-This comparison will expire {Formatter.Timestamp(DateTime.Now + ComparisonWindow)}.
+This comparison expires {Formatter.Timestamp(DateTime.Now + ComparisonWindow)}.
 
 {GetRow(ctx.User)}");
     }
