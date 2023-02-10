@@ -2,7 +2,7 @@
 
 public class TopTag
 {
-    public string Nick { get; set; }
+    public Guid UserId { get; set; }
     public string Tag { get; set; }
     public int Total { get; set; }
 }

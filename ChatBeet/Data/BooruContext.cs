@@ -19,7 +19,7 @@ public partial class CbDbContext : IBooruRepository
     public virtual DbSet<TopTag> TopTags { get; set; } = null!;
 
     public Task<List<TopTag>> GetTopTags() => TopTags
-        .FromSqlRaw(@"select Tag, Nick, Total from (select t.Id, t.Tag, t.Nick, count(*) as Total from TagHistories t group by t.Tag, t.Nick order by Total desc) i group by i.Nick order by i.Total desc limit 10")
+        .FromSqlRaw(@"select Tag, UserId, Total from (select t.Id, t.Tag, t.UserId, count(*) as Total from booru.tag_history t group by t.Tag, t.UserId order by Total desc) i group by i.UserId order by i.Total desc limit 10")
         .ToListAsync();
 
     private void ConfigureBooru(ModelBuilder modelBuilder)

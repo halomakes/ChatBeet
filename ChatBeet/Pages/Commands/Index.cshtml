@@ -15,7 +15,7 @@
 
 <cache>
     <div id="accordion">
-        @foreach (var binding in commands.RegisteredCommands.First().Value.OrderBy(c => c.Name))
+        @foreach (var binding in commands.RegisteredCommands.First().Value.Where(c => c.Type == ApplicationCommandType.SlashCommand).OrderBy(c => c.Name))
         {
             var id = TagBuilder.CreateSanitizedId(binding.Name, "_");
             <div class="card" id="@id">
@@ -38,14 +38,17 @@
                             <h5>Example Usage</h5>
                             <code>
                                 <span class="text-white-50">/@binding.Name</span>
-                                @foreach (var opt in binding.Options)
+                                @if (binding?.Options?.Any() ?? false)
                                 {
-                                    <span class="text-white">&lt;@opt.Name&gt;</span>
+                                    foreach (var opt in binding.Options)
+                                    {
+                                        <span class="text-white">&lt;@opt.Name&gt;</span>
+                                    }
                                 }
                             </code>
                         </div>
 
-                        @if (binding.Options.Any())
+                        @if (binding?.Options?.Any() ?? false)
                         {
                             <div class="mb-4">
                                 <h5>Parameters</h5>
@@ -60,7 +63,7 @@
                                                 <li>
                                                     @(opt.Required == true ? "Required" : "Optional").
                                                 </li>
-                                                @if (opt.Choices.Any())
+                                                @if (opt.Choices is not null && opt.Choices.Any())
                                                 {
                                                     <li>
                                                         Available Choices:

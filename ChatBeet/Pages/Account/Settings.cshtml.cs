@@ -44,6 +44,7 @@ public class SettingsModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
+        ModelState.Remove("Preference.User");
         if (ModelState.IsValid)
         {
             var valMsg = _userPreferences.GetValidation(Preference.Preference.Value, Preference.Value);

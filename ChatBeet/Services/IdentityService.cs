@@ -4,6 +4,7 @@ using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using DSharpPlus;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Services;
 
@@ -27,7 +28,8 @@ public class WebIdentityService
             return null;
 
         var id = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var existingUser = await _usersRepository.Users.FindAsync(id);
+        var discordId = ulong.Parse(id);
+        var existingUser = await _usersRepository.Users.FirstOrDefaultAsync(u => u.Discord!.Id == discordId);
         return existingUser ?? await CreateCurrentUserAsync(user);
     }
 

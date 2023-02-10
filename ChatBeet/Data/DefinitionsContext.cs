@@ -5,10 +5,10 @@ namespace ChatBeet.Data;
 
 public interface IDefinitionsRepository : IApplicationRepository
 {
-    DbSet<Definition> Definitions { get;  }
+    DbSet<Definition> Definitions { get; }
 }
 
-public partial  class CbDbContext : IDefinitionsRepository
+public partial class CbDbContext : IDefinitionsRepository
 {
     public virtual DbSet<Definition> Definitions { get; set; } = null!;
 
@@ -32,6 +32,10 @@ public partial  class CbDbContext : IDefinitionsRepository
                 .WithMany()
                 .HasForeignKey(b => b.CreatedBy)
                 .HasPrincipalKey(b => b.Id);
+            builder.Property(b => b.CreatedAt)
+                .HasDefaultValueSql("current_timestamp");
+            builder.Property(b => b.UpdatedAt)
+                .HasDefaultValueSql("current_timestamp");
         });
     }
 }

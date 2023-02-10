@@ -105,6 +105,7 @@ public class Startup
         services.AddScoped<IProgressRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
         services.AddScoped<IHighGroundRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
         services.AddScoped<IKarmaRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+        services.AddScoped<ISuspicionRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     }
 
     private void AddAuthentication(IServiceCollection services)
@@ -205,6 +206,7 @@ public class Startup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         app.UseForwardedHeaders();
 
         app.UseExceptionHandler("/Error");

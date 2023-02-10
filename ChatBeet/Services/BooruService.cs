@@ -11,7 +11,6 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using ChatBeet.Data;
 using ChatBeet.Notifications;
-using LinqToTwitter;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -77,11 +76,11 @@ public class BooruService
 
     public IEnumerable<string> GetGlobalBlacklistedTags() => _booruConfig.BlacklistedTags;
 
-    public async Task<IEnumerable<string>> GetBlacklistedTags(Guid userId) => await _cache.GetOrCreateAsync(GetCacheEntry(userId), entry =>
+    public async Task<List<string>> GetBlacklistedTags(Guid userId) => await _cache.GetOrCreateAsync(GetCacheEntry(userId), entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromMinutes(15);
 
-        return _context.BlacklistedTags.AsNoTracking()
+        return _context?.BlacklistedTags?.AsNoTracking()
             .Where(b => b.UserId == userId)
             .Select(b => b.Tag)
             .ToListAsync();

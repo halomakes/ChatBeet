@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using System.Threading;
 using System.Threading.Tasks;
 using ChatBeet.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Services;
 
@@ -19,7 +20,7 @@ public class ContextInitializer : IHostedService
     {
         using var scope = _serviceProvider.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<CbDbContext>();
-        await ctx.Database.EnsureCreatedAsync(cancellationToken);
+        await ctx.Database.MigrateAsync(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
