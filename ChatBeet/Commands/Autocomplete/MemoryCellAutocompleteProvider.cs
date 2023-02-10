@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
@@ -17,10 +16,11 @@ public class MemoryCellAutocompleteProvider : IAutocompleteProvider
     public async Task<IEnumerable<DiscordAutoCompleteChoice>> Provider(AutocompleteContext ctx)
     {
         await using var scope = ctx.Services.CreateAsyncScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<MemoryCellContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IDefinitionsRepository>();
         if (ctx.FocusedOption.Value is null || (ctx.FocusedOption.Value is string emptyValue && string.IsNullOrWhiteSpace(emptyValue)))
         {
-            var cells = await dbContext.MemoryCells
+            var cells = await dbContext.Definitions
+                .Where(r => r.GuildId == ctx.Guild.Id)
                 .Where(r => r.Key != null)
                 .OrderBy(r => r.Key)
                 .Take(MaxResults)
@@ -30,22 +30,23 @@ public class MemoryCellAutocompleteProvider : IAutocompleteProvider
         else if (ctx.FocusedOption.Value is string currentValue)
         {
             var asLower = currentValue.ToLower();
-            var cells = await dbContext.MemoryCells
-                    .Where(r => r.Key != null)
-                    .Select(c => new
-                    {
-                        Item = c,
-                        Rating = (c.Key.ToLower().StartsWith(asLower) ? 5 : 0)
-                            + (c.Key.ToLower().Contains(asLower) ? 4 : 0)
-                            + (c.Value.ToLower().StartsWith(asLower) ? 2 : 0)
-                            + (c.Value.ToLower().Contains(asLower) ? 1 : 0)
-                    })
-                    .Where(r => r.Rating > 0)
-                    .OrderByDescending(r => r.Rating)
-                    .ThenBy(r => r.Item.Key)
-                    .Select(r => r.Item)
-                    .Take(MaxResults)
-                    .ToListAsync();
+            var cells = await dbContext.Definitions
+                .Where(r => r.GuildId == ctx.Guild.Id)
+                .Where(r => r.Key != null)
+                .Select(c => new
+                {
+                    Item = c,
+                    Rating = (c.Key.ToLower().StartsWith(asLower) ? 5 : 0)
+                             + (c.Key.ToLower().Contains(asLower) ? 4 : 0)
+                             + (c.Value.ToLower().StartsWith(asLower) ? 2 : 0)
+                             + (c.Value.ToLower().Contains(asLower) ? 1 : 0)
+                })
+                .Where(r => r.Rating > 0)
+                .OrderByDescending(r => r.Rating)
+                .ThenBy(r => r.Item.Key)
+                .Select(r => r.Item)
+                .Take(MaxResults)
+                .ToListAsync();
             return cells.Select(BuildChoice);
         }
         else
@@ -54,5 +55,5 @@ public class MemoryCellAutocompleteProvider : IAutocompleteProvider
         }
     }
 
-    private DiscordAutoCompleteChoice BuildChoice(MemoryCell cell) => new(cell.Key, cell.Key);
+    private DiscordAutoCompleteChoice BuildChoice(Definition cell) => new(cell.Key, cell.Key);
 }

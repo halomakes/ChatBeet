@@ -11,5 +11,5 @@ public class PreferenceChange : INotification
 
     public string Value { get; set; }
 
-    public string Nick { get; set; }
+    public User User { get; set; }
 }

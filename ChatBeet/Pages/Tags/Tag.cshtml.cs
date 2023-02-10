@@ -1,26 +1,24 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Models;
+﻿using ChatBeet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Pages.Tags;
 
 [Authorize]
 public class TagModel : PageModel
 {
-    private readonly BooruContext _booru;
+    private readonly IBooruRepository _booru;
     private readonly IMemoryCache _cache;
 
     public string TagName { get; private set; }
     public IEnumerable<TagStat> Stats { get; private set; }
 
-    public TagModel(BooruContext booru, IMemoryCache cache)
+    public TagModel(IBooruRepository booru, IMemoryCache cache)
     {
         _booru = booru;
         _cache = cache;
@@ -33,13 +31,14 @@ public class TagModel : PageModel
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
-            return await _booru.TagHistories
+            var entries = await _booru.TagHistories
+                .Include(h => h.User)
                 .AsQueryable()
                 .Where(th => th.Tag.ToLower() == tagName)
-                .GroupBy(th => th.Nick)
+                .GroupBy(th => th.User)
                 .OrderByDescending(g => g.Count())
-                .Select(g => new TagStat { Tag = g.Key, Total = g.Count(), Mode = TagStat.StatMode.User })
                 .ToListAsync();
+            return entries.Select(g => new TagStat { Tag = g.Key.DisplayName(), Total = g.Count(), Mode = TagStat.StatMode.User });
         });
         Stats = matchingTags;
     }

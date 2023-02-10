@@ -6,7 +6,7 @@
     ViewBag.Title = "Settings";
 }
 
-<h1>Preferences for <span class="text-secondary">@Model.Nick</span></h1>
+<h1>Preferences for <span class="text-secondary">@Model.User.DisplayName()</span></h1>
 <h2>Personalizations</h2>
 @if (Model.Settings.Any())
 {

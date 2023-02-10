@@ -1,5 +1,4 @@
 ﻿using OpenWeatherMap.Standard.Models;
-using System;
 using UnitsNet;
 
 namespace ChatBeet.Utilities;

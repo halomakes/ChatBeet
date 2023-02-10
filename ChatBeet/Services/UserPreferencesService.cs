@@ -1,18 +1,16 @@
 ﻿using ChatBeet.Attributes;
 using ChatBeet.Configuration;
-using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using IF.Lastfm.Core.Api.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using Microsoft.EntityFrameworkCore;
 using UnitsNet;
 using UnitsNet.Units;
 
@@ -20,36 +18,34 @@ namespace ChatBeet.Services;
 
 public class UserPreferencesService
 {
-    private readonly PreferencesContext _db;
+    private readonly IUsersRepository _db;
     private readonly ChatBeetConfiguration _config;
-    private readonly IrcMigrationService _migration;
 
-    public UserPreferencesService(PreferencesContext db, IOptions<ChatBeetConfiguration> opts, IrcMigrationService migration)
+    public UserPreferencesService(IUsersRepository db, IOptions<ChatBeetConfiguration> opts)
     {
         _db = db;
         _config = opts.Value;
-        _migration = migration;
     }
 
     public async Task<string> Set(DiscordUser user, UserPreference preference, string value)
     {
-        string userId = await _migration.GetInternalUsernameAsync(user);
+        var userId = (await _db.GetUserAsync(user)).Id;
         return await Set(userId, preference, value);
     }
 
-    public async Task<string> Set(string nick, UserPreference preference, string value)
+    public async Task<string> Set(Guid userId, UserPreference preference, string value)
     {
         var isDelete = string.IsNullOrEmpty(value);
         var normalized = isDelete ? default : Normalize(preference, value);
 
-        var existingPref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
+        var existingPref = await _db.UserPreferences.AsQueryable().FirstOrDefaultAsync(p => p.UserId == userId && p.Preference == preference);
         if (existingPref == default)
         {
             if (!isDelete)
             {
-                _db.PreferenceSettings.Add(new UserPreferenceSetting
+                _db.UserPreferences.Add(new UserPreferenceSetting
                 {
-                    Nick = nick,
+                    UserId = userId,
                     Preference = preference,
                     Value = normalized
                 });
@@ -59,7 +55,7 @@ public class UserPreferencesService
         {
             if (isDelete)
             {
-                _db.PreferenceSettings.Remove(existingPref);
+                _db.UserPreferences.Remove(existingPref);
             }
             else
             {
@@ -72,39 +68,39 @@ public class UserPreferencesService
         return normalized;
     }
 
-    public Task<string> Set(PreferenceChange change) => Set(change.Nick, change.Preference.Value, change.Value);
+    public Task<string> Set(PreferenceChange change) => Set(change.User.Id, change.Preference.Value, change.Value);
 
-    public async Task<string> Get(string nick, UserPreference preference)
+    public async Task<string> Get(Guid userId, UserPreference preference)
     {
-        var pref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == nick && p.Preference == preference);
+        var pref = await _db.UserPreferences.AsQueryable().FirstOrDefaultAsync(p => p.UserId == userId && p.Preference == preference);
         return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
     }
 
     public async Task<string> Get(DiscordUser user, UserPreference preference)
     {
-        var id = await _migration.GetInternalUsernameAsync(user);
-        var pref = await _db.PreferenceSettings.AsQueryable().FirstOrDefaultAsync(p => p.Nick == id && p.Preference == preference);
+        var id = (await _db.GetUserAsync(user)).Id;
+        var pref = await _db.UserPreferences.AsQueryable().FirstOrDefaultAsync(p => p.UserId == id && p.Preference == preference);
         return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
     }
 
-    public async Task<TEnum> Get<TEnum>(string nick, UserPreference preference) where TEnum : struct, Enum => Enum.Parse<TEnum>(await Get(nick, preference));
+    public async Task<TEnum> Get<TEnum>(Guid userId, UserPreference preference) where TEnum : struct, Enum => Enum.Parse<TEnum>(await Get(userId, preference));
 
-    public async Task<TEnum> Get<TEnum>(string nick, UserPreference preference, TEnum @default, TEnum? ignore = null) where TEnum : struct, Enum
+    public async Task<TEnum> Get<TEnum>(Guid userId, UserPreference preference, TEnum @default, TEnum? ignore = null) where TEnum : struct, Enum
     {
-        var prefValue = await Get(nick, preference);
+        var prefValue = await Get(userId, preference);
         if (prefValue == default)
             return @default;
-        var enumValue = Enum.Parse<TEnum>(await Get(nick, preference));
+        var enumValue = Enum.Parse<TEnum>(await Get(userId, preference));
         if (ignore.HasValue && ignore.Value.Equals(enumValue))
             return @default;
         return enumValue;
     }
 
-    public Task<List<UserPreferenceSetting>> Get(string nick) => _db.PreferenceSettings.AsQueryable().Where(p => p.Nick == nick).ToListAsync();
+    public Task<List<UserPreferenceSetting>> Get(Guid userId) => _db.UserPreferences.AsQueryable().Where(p => p.UserId == userId).ToListAsync();
 
-    public Task<List<UserPreferenceSetting>> Get(IEnumerable<string> nicks, UserPreference preference) => _db.PreferenceSettings.AsQueryable()
+    public Task<List<UserPreferenceSetting>> Get(IEnumerable<Guid> userIds, UserPreference preference) => _db.UserPreferences.AsQueryable()
         .Where(p => p.Preference == preference)
-        .Where(p => nicks.Select(n => n.ToLower()).Contains(p.Nick.ToLower()))
+        .Where(p => userIds.Contains(p.UserId))
         .ToListAsync();
 
     public string GetValidation(UserPreference preference, string value)

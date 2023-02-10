@@ -1,7 +1,6 @@
 ﻿using ChatBeet.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;

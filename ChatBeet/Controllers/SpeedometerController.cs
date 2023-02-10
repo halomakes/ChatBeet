@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using ChatBeet.Services;
 
 namespace ChatBeet.Controllers;

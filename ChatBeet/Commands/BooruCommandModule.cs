@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ChatBeet.Commands.Autocomplete;
+using ChatBeet.Data;
 using ChatBeet.Notifications;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
@@ -17,19 +17,21 @@ public class BooruCommandModule : ApplicationCommandModule
 {
     private readonly BooruService _booru;
     private readonly IMediator _mediator;
+    private readonly IUsersRepository _users;
 
-    public BooruCommandModule(BooruService booru, IMediator mediator)
+    public BooruCommandModule(BooruService booru, IMediator mediator, IUsersRepository users)
     {
         _booru = booru;
         _mediator = mediator;
+        _users = users;
     }
 
     [SlashCommand("booru", "Get a random image from gelbooru matching tags")]
     private async Task GetPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tags, [Option("safe-only", "Turn this off if you're horny")] bool safeOnly = true)
     {
-        var (text, embed) = await GetResponseContent(tags, safeOnly, ctx.User.DiscriminatedUsername());
+        var (text, embed) = await GetResponseContent(tags, safeOnly, (await _users.GetUserAsync(ctx.User)).Id);
         var response = new DiscordInteractionResponseBuilder()
-                    .WithContent(text);
+            .WithContent(text);
         if (embed is not null)
             response = response.AddEmbed(embed);
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, response);
@@ -37,17 +39,16 @@ public class BooruCommandModule : ApplicationCommandModule
         await _mediator.Publish(new BonkableMessageNotification(message));
     }
 
-    public async Task<(string Content, DiscordEmbed? Embed)> GetResponseContent(string tags, bool safeOnly, string username)
+    public async Task<(string Content, DiscordEmbed? Embed)> GetResponseContent(string tags, bool safeOnly, Guid id)
     {
         var tagList = tags.ToLower().Split(' ');
         if (tagList.Any())
         {
-            var result = await _booru.GetRandomPostAsync(safeOnly, username, tagList);
+            var result = await _booru.GetRandomPostAsync(safeOnly, id, tagList);
 
             if (result is { } media)
             {
-                if (username is not null)
-                    await _booru.RecordTags(username, tagList);
+                await _booru.RecordTags(id, tagList);
 
                 if (media != default && media is { Rating: < BooruSharp.Search.Post.Rating.Explicit })
                 {

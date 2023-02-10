@@ -14,24 +14,28 @@ namespace ChatBeet.Commands;
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
 public class MemoryCellCommandModule : ApplicationCommandModule
 {
-    private readonly MemoryCellContext _dbContext;
+    private readonly IDefinitionsRepository _dbContext;
+    private readonly IUsersRepository _users;
     private readonly IMediator _queue;
 
-    public MemoryCellCommandModule(MemoryCellContext dbContext, IMediator queue)
+    public MemoryCellCommandModule(IDefinitionsRepository dbContext, IMediator queue, IUsersRepository users)
     {
         _dbContext = dbContext;
         _queue = queue;
+        _users = users;
     }
 
     [SlashCommand("who-def", "Check who set a peasant definition")]
     public async Task GetAuthor(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
-        var cell = await _dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
+        var cell = await _dbContext.Definitions
+            .Include(d => d.Author)
+            .FirstOrDefaultAsync(c => c.GuildId == ctx.Guild.Id && c.Key.ToLower() == key.ToLower());
 
         if (cell is not null)
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent($"{Formatter.Bold(cell.Key)} was set by {Formatter.Bold(cell.Author)}.")
-        );
+                .WithContent($"{Formatter.Bold(cell.Key)} was set by {Formatter.Bold(cell.Author?.Mention())}.")
+            );
         else
             await NotFound(ctx, key);
     }
@@ -39,11 +43,11 @@ public class MemoryCellCommandModule : ApplicationCommandModule
     [SlashCommand("recall", "Get the value of a peasant definition")]
     public async Task GetCell(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
-        var cell = await _dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
+        var cell = await _dbContext.Definitions.FirstOrDefaultAsync(c => c.GuildId == ctx.Guild.Id && c.Key.ToLower() == key.ToLower());
 
         if (cell is not null)
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent($"{Formatter.Bold(cell.Key)}: {cell.Value}"));
+                .WithContent($"{Formatter.Bold(cell.Key)}: {cell.Value}"));
         else
             await NotFound(ctx, key);
     }
@@ -51,16 +55,19 @@ public class MemoryCellCommandModule : ApplicationCommandModule
     [SlashCommand("remember", "Create or replace a peasant definition")]
     public async Task SetCell(InteractionContext ctx, [Option("key", "Key of the entry to set")] string key, [Option("value", "Value to store")] string value)
     {
-        var existingCell = await _dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
+        var existingCell = await _dbContext.Definitions
+            .Include(d => d.Author)
+            .FirstOrDefaultAsync(c => c.GuildId == ctx.Guild.Id && c.Key.ToLower() == key.ToLower());
         if (existingCell != null)
         {
-            _dbContext.MemoryCells.Remove(existingCell);
+            _dbContext.Definitions.Remove(existingCell);
             await _dbContext.SaveChangesAsync();
         }
 
-        _dbContext.MemoryCells.Add(new MemoryCell
+        var user = await _users.GetUserAsync(ctx.User);
+        _dbContext.Definitions.Add(new Definition
         {
-            Author = ctx.User.Username,
+            CreatedBy = user.Id,
             Key = key,
             Value = value
         });
@@ -74,8 +81,8 @@ public class MemoryCellCommandModule : ApplicationCommandModule
         else
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent(@$"Got it! 👍
-Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.Author}."));
+                .WithContent(@$"Got it! 👍
+Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.CreatedBy}."));
         }
 
         if (ctx.Channel.IsPrivate)
@@ -83,19 +90,19 @@ Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.Au
             await _queue.Publish(new DefinitionChange
             {
                 Key = key,
-                NewNick = ctx.User.Username,
+                NewUser = user,
                 NewValue = value,
-                OldNick = existingCell?.Author,
-                OldValue = existingCell?.Value
+                OldUser = existingCell?.Author,
+                OldValue = existingCell?.Value,
+                GuildId = ctx.Guild.Id
             });
-
         }
     }
 
     [SlashCommand("append", "Add something on to an existing definition")]
     public async Task AppendCell(InteractionContext ctx, [Option("key", "Key of the entry to set")] string key, [Option("value", "Value to append"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string value)
     {
-        var cell = await _dbContext.MemoryCells.FirstOrDefaultAsync(c => c.Key.ToLower() == key.ToLower());
+        var cell = await _dbContext.Definitions.FirstOrDefaultAsync(c => c.GuildId == ctx.Guild.Id && c.Key.ToLower() == key.ToLower());
         if (cell is not null)
             await SetCell(ctx, key, $"{cell.Value} | {value.Trim()}");
         else
@@ -105,5 +112,5 @@ Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.Au
     private Task NotFound(InteractionContext ctx, string key) =>
         ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
             .WithContent($"I don't have anything for {Formatter.Bold(key)}.")
-    );
+        );
 }

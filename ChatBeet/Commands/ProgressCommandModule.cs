@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
 using ChatBeet.Attributes;
 using ChatBeet.Commands.Autocomplete;
@@ -29,20 +27,22 @@ namespace ChatBeet.Commands;
 public class ProgressCommandModule : ApplicationCommandModule
 {
     private readonly UserPreferencesService _preferences;
-    private readonly ProgressContext _dbContext;
+    private readonly IProgressRepository _dbContext;
+    private readonly IUsersRepository _users;
     private readonly DateTime _now;
 
-    public ProgressCommandModule(UserPreferencesService preferences, ProgressContext dbContext)
+    public ProgressCommandModule(UserPreferencesService preferences, IProgressRepository dbContext, IUsersRepository users)
     {
         _preferences = preferences;
         _dbContext = dbContext;
+        _users = users;
         _now = DateTime.Now;
     }
 
     [SlashCommand("custom", "Gets progress over a period of time")]
     public async Task GetCustomTime(InteractionContext ctx, [Option("time-unit", "Unit of time"), Autocomplete(typeof(TimeRangesAutocompleteProvider))] string timeUnit)
     {
-        var unit = await _dbContext.FixedTimeRanges.FirstOrDefaultAsync(r => r.Key.ToLower() == timeUnit.Trim().ToLower());
+        var unit = await _dbContext.Spans.FirstOrDefaultAsync(r => r.GuildId == ctx.Guild.Id && r.Key.ToLower() == timeUnit.Trim().ToLower());
         if (unit is null)
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Enter a valid time unit."));
@@ -204,8 +204,9 @@ public class ProgressCommandModule : ApplicationCommandModule
     [SlashCommand("workday", "Get progress for your current workday")]
     public async Task GetWorkday(InteractionContext ctx)
     {
-        var startPref = await _preferences.Get(ctx.User.DiscriminatedUsername(), UserPreference.WorkHoursStart);
-        var endPref = await _preferences.Get(ctx.User.DiscriminatedUsername(), UserPreference.WorkHoursEnd);
+        var user = await _users.GetUserAsync(ctx.User);
+        var startPref = await _preferences.Get(user.Id, UserPreference.WorkHoursStart);
+        var endPref = await _preferences.Get(user.Id, UserPreference.WorkHoursEnd);
 
         if (!IsValidDate(startPref))
         {

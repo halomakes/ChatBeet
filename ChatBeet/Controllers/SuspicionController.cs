@@ -1,10 +1,7 @@
-﻿using ChatBeet.Data.Entities;
-using ChatBeet.Models;
+﻿using ChatBeet.Models;
 using ChatBeet.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Controllers;
@@ -14,12 +11,10 @@ namespace ChatBeet.Controllers;
 [ResponseCache(Duration = 300)]
 public class SuspicionController : Controller
 {
-    private readonly UserPreferencesService _userPreferencesService;
     private readonly SuspicionService _suspicionService;
 
-    public SuspicionController(UserPreferencesService userPreferencesService, SuspicionService suspicionService)
+    public SuspicionController(SuspicionService suspicionService)
     {
-        _userPreferencesService = userPreferencesService;
         _suspicionService = suspicionService;
     }
 
@@ -27,34 +22,5 @@ public class SuspicionController : Controller
     /// Get current suspicion levels
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels()
-    {
-        var mostSuspicious = (await _suspicionService.GetSuspicionsAsync())
-            .AsQueryable()
-            .GroupBy(s => s.Suspect.ToLower())
-            .Select(g => new
-            {
-                Nick = g.Key,
-                Active = g.Where(grp => grp.TimeReported >= _suspicionService.ActiveWindowStart).Count(),
-                Total = g.Count()
-            })
-            .OrderByDescending(t => t.Active)
-            .ToList();
-
-        var colorPrefs = await _userPreferencesService.Get(mostSuspicious.Select(s => s.Nick), UserPreference.GearColor);
-
-        var result = mostSuspicious.Select(s =>
-        {
-            var pref = colorPrefs.FirstOrDefault(p => p.Nick.Equals(s.Nick, StringComparison.OrdinalIgnoreCase));
-            return new SuspicionRank
-            {
-                Nick = pref?.Nick ?? s.Nick,
-                Level = s.Active,
-                LifetimeLevel = s.Total,
-                Color = pref?.Value
-            };
-        }).ToList();
-
-        return Ok(result);
-    }
+    public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels() => Ok(await _suspicionService.GetSuspicionLevels());
 }

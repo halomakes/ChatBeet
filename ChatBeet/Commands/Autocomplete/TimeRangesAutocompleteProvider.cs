@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
@@ -17,10 +16,11 @@ public class TimeRangesAutocompleteProvider : IAutocompleteProvider
     public async Task<IEnumerable<DiscordAutoCompleteChoice>> Provider(AutocompleteContext ctx)
     {
         await using var scope = ctx.Services.CreateAsyncScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ProgressContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IProgressRepository>();
         if (ctx.FocusedOption.Value is null || (ctx.FocusedOption.Value is string emptyValue && string.IsNullOrWhiteSpace(emptyValue)))
         {
-            var cells = await dbContext.FixedTimeRanges
+            var cells = await dbContext.Spans
+                .Where(r => r.GuildId == ctx.Guild.Id)
                 .Where(r => r.Key != null)
                 .OrderBy(r => r.Key)
                 .Take(MaxResults)
@@ -30,20 +30,21 @@ public class TimeRangesAutocompleteProvider : IAutocompleteProvider
         else if (ctx.FocusedOption.Value is string currentValue)
         {
             var asLower = currentValue.ToLower();
-            var cells = await dbContext.FixedTimeRanges
-                    .Where(r => r.Key != null)
-                    .Select(c => new
-                    {
-                        Item = c,
-                        Rating = (c.Key.ToLower().StartsWith(asLower) ? 5 : 0)
-                            + (c.Key.ToLower().Contains(asLower) ? 4 : 0)
-                    })
-                    .Where(r => r.Rating > 0)
-                    .OrderByDescending(r => r.Rating)
-                    .ThenBy(r => r.Item.Key)
-                    .Select(r => r.Item)
-                    .Take(MaxResults)
-                    .ToListAsync();
+            var cells = await dbContext.Spans
+                .Where(r => r.GuildId == ctx.Guild.Id)
+                .Where(r => r.Key != null)
+                .Select(c => new
+                {
+                    Item = c,
+                    Rating = (c.Key.ToLower().StartsWith(asLower) ? 5 : 0)
+                             + (c.Key.ToLower().Contains(asLower) ? 4 : 0)
+                })
+                .Where(r => r.Rating > 0)
+                .OrderByDescending(r => r.Rating)
+                .ThenBy(r => r.Item.Key)
+                .Select(r => r.Item)
+                .Take(MaxResults)
+                .ToListAsync();
             return cells.Select(BuildChoice);
         }
         else
@@ -52,5 +53,5 @@ public class TimeRangesAutocompleteProvider : IAutocompleteProvider
         }
     }
 
-    private DiscordAutoCompleteChoice BuildChoice(FixedTimeRange range) => new(range.Key, range.Key);
+    private DiscordAutoCompleteChoice BuildChoice(ProgressSpan range) => new(range.Key, range.Key);
 }

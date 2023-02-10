@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using ChatBeet.Data;
-using ChatBeet.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -12,31 +11,26 @@ namespace ChatBeet.Commands;
 [SlashCommandGroup("irc", "Commands about legacy IRC integration")]
 public class IrcCommandModule : ApplicationCommandModule
 {
-    private readonly IrcMigrationService _service;
-    private readonly IrcLinkContext _db;
-    private readonly DiscordClient _client;
-    public const string VerifyModalId = "irc-verify";
+    private readonly IUsersRepository _db;
 
-    public IrcCommandModule(IrcMigrationService service, IrcLinkContext db, DiscordClient client)
+    public IrcCommandModule(IUsersRepository db)
     {
-        _service = service;
         _db = db;
-        _client = client;
     }
 
     private async Task LookupUser(BaseContext ctx, DiscordUser user)
     {
-        var existingEntry = await _db.Links.FirstOrDefaultAsync(l => l.Id == user.Id);
-        if (existingEntry is not null)
+        var existingEntry = await _db.Users.FirstOrDefaultAsync(l => l.Discord!.Id == user.Id);
+        if (existingEntry?.Irc?.Nick is not null)
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{Formatter.Mention(user)} used to be {Formatter.Bold(existingEntry.Nick)} on IRC.")
+                .WithContent($"{Formatter.Mention(user)} used to be {Formatter.Bold(existingEntry.Irc!.Nick)} on IRC.")
                 .AsEphemeral());
         }
         else
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{Formatter.Mention(user)} either has no IRC nick or has not linked their accounts.  Use {Formatter.InlineCode("/irc link")} to link your account.")
+                .WithContent($"{Formatter.Mention(user)} either has no IRC nick or has not linked their accounts. ")
                 .AsEphemeral());
         }
     }

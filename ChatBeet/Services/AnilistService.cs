@@ -1,7 +1,5 @@
 ﻿using Miki.Anilist;
 using Miki.Anilist.Objects;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Services;

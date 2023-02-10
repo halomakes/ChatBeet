@@ -29,5 +29,5 @@ public class KeywordsController : ControllerBase
     /// </summary>
     /// <param name="id">ID of the keyword</param>
     [HttpGet("{id}")]
-    public Task<KeywordStat> GetStat([FromRoute] int id) => _service.GetKeywordStatAsync(id);
+    public Task<KeywordStat> GetStat([FromRoute] Guid id) => _service.GetKeywordStatAsync(id);
 }

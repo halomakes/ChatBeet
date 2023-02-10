@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ChatBeet.Notifications;
 using DSharpPlus.EventArgs;
 using MediatR;
-using System;
 using System.Text.RegularExpressions;
 
 namespace ChatBeet.Handlers;

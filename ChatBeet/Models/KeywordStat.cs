@@ -26,7 +26,7 @@ public class KeywordStat
         /// <summary>
         /// Nick of user
         /// </summary>
-        public string Nick { get; set; }
+        public User User { get; set; }
 
         /// <summary>
         /// Number of times user has used keyword

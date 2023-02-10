@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Utilities;
@@ -15,10 +13,10 @@ namespace ChatBeet.Commands;
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
 public class BirthdayCommandModule : ApplicationCommandModule
 {
-    private readonly PreferencesContext _db;
+    private readonly IUsersRepository _db;
     private readonly IMemoryCache _cache;
 
-    public BirthdayCommandModule(PreferencesContext db, IMemoryCache cache)
+    public BirthdayCommandModule(IUsersRepository db, IMemoryCache cache)
     {
         _db = db;
         _cache = cache;
@@ -28,31 +26,31 @@ public class BirthdayCommandModule : ApplicationCommandModule
     public async Task LookupBirthday(InteractionContext ctx, [Option("user", "User to look up the birthday for")] DiscordUser user)
     {
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent(await GetUserBirthday(user.Username))
-                );
+            .WithContent(await GetUserBirthday(user))
+        );
     }
 
     [SlashCommand("upcoming-birthdays", "See a list of upcoming birthdays")]
     public async Task GetUpcomingBirthdays(InteractionContext ctx)
     {
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent(await GetUpcomingBirthdays())
-                );
+            .WithContent(await GetUpcomingBirthdays())
+        );
     }
 
-    private async Task<string> GetUserBirthday(string nick)
+    private async Task<string> GetUserBirthday(DiscordUser discordUser)
     {
-        var prefs = _db.PreferenceSettings
-            .AsQueryable()
-            .Where(s => s.Nick.ToLower() == nick.ToLower());
-        var birthdayPref = await prefs
+        var user = await _db.Users
+            .Include(u => u.Preferences)
+            .FirstAsync(u => u.Discord!.Id == discordUser.Id);
+        var birthdayPref = user.Preferences!
             .Where(s => s.Preference == UserPreference.DateOfBirth)
             .Select(s => s.Value)
-            .FirstOrDefaultAsync();
-        var pronounPref = await prefs
+            .FirstOrDefault();
+        var pronounPref = user.Preferences!
             .Where(s => s.Preference == UserPreference.PossessivePronoun)
             .Select(s => s.Value)
-            .FirstOrDefaultAsync();
+            .FirstOrDefault();
 
         if (!string.IsNullOrEmpty(birthdayPref) && DateTime.TryParse(birthdayPref, out var d))
         {
@@ -61,7 +59,7 @@ public class BirthdayCommandModule : ApplicationCommandModule
         }
         else
         {
-            return $"I don't know the birthday for {nick}";
+            return $"I don't know the birthday for {Formatter.Mention(discordUser)}";
         }
     }
 
@@ -71,20 +69,21 @@ public class BirthdayCommandModule : ApplicationCommandModule
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
-            return await _db.PreferenceSettings
-                .AsQueryable()
+            return await _db.UserPreferences
+                .Include(p => p.User)
                 .Where(s => s.Preference == UserPreference.DateOfBirth)
                 .ToListAsync();
-        });
+        })!;
 
         var today = GetNormalized(DateTime.Now);
         var dateMappings = allPrefs
             .Where(p => p.Preference == UserPreference.DateOfBirth)
-            .Where(p => DateTime.TryParse(p.Value, out var d))
-            .Select(p => (Date: GetNormalized(DateTime.Parse(p.Value)), p.Nick));
-        var doubleYear = dateMappings.Union(dateMappings.Select(m => (Date: m.Date.AddYears(1), m.Nick)));
-        var upcoming = doubleYear.Where(m => m.Date >= today).OrderBy(m => m.Date).Take(5).DistinctBy(m => m.Nick);
-        var upcomingString = string.Join(Environment.NewLine, upcoming.Select(u => $"{u.Nick} on {Formatter.Bold($"{u.Date}:MMMM d")}"));
+            .Where(p => DateTime.TryParse(p.Value, out _))
+            .Select(p => (Date: GetNormalized(DateTime.Parse(p.Value)), p.User))
+            .ToList();
+        var doubleYear = dateMappings.Union(dateMappings.Select(m => (Date: m.Date.AddYears(1), m.User)));
+        var upcoming = doubleYear.Where(m => m.Date >= today).OrderBy(m => m.Date).Take(5).DistinctBy(m => m.User?.Id);
+        var upcomingString = string.Join(Environment.NewLine, upcoming.Select(u => $"{u.User?.Mention()} on {Formatter.Bold($"{u.Date}:MMMM d")}"));
         return $"Upcoming birthdays: {upcomingString}";
     }
 

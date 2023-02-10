@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace ChatBeet.Utilities;
+﻿namespace ChatBeet.Utilities;
 
 public static class EnumerationExtensions
 {

@@ -14,24 +14,28 @@ namespace ChatBeet.Controllers;
 public class PreferencesController : Controller
 {
     private readonly UserPreferencesService _prefsService;
+    private readonly WebIdentityService _webIdentity;
 
-    public PreferencesController(UserPreferencesService prefsService)
+    public PreferencesController(UserPreferencesService prefsService, WebIdentityService webIdentity)
     {
         _prefsService = prefsService;
+        _webIdentity = webIdentity;
     }
+
+    private async Task<User> GetCurrentUserAsync() => await _webIdentity.GetCurrentUserAsync();
 
     /// <summary>
     /// Get all set preferences
     /// </summary>
     [HttpGet, Authorize]
-    public async Task<IEnumerable<UserPreferenceSetting>> GetPreferences() => await _prefsService.Get(User?.Identity?.Name);
+    public async Task<IEnumerable<UserPreferenceSetting>> GetPreferences() => await _prefsService.Get((await GetCurrentUserAsync()).Id);
 
     /// <summary>
     /// Get an individual preference
     /// </summary>
     /// <param name="preference">Preference to get</param>
     [HttpGet("{preference}"), Authorize]
-    public async Task<string> GetPreference([FromRoute] UserPreference preference) => await _prefsService.Get(User?.Identity?.Name, preference);
+    public async Task<string> GetPreference([FromRoute] UserPreference preference) => await _prefsService.Get((await GetCurrentUserAsync()).Id, preference);
 
     /// <summary>
     /// Set a preference
@@ -40,12 +44,8 @@ public class PreferencesController : Controller
     [HttpPut, Authorize]
     public async Task<ActionResult<string>> SetPreference([FromBody] PreferenceChange change)
     {
-        change.Nick = User?.Identity?.Name;
-        if (string.IsNullOrEmpty(change.Nick))
-            return Unauthorized("You do not have access to user preferences.");
-
+        change.User = await GetCurrentUserAsync();
         var normalized = await _prefsService.Set(change);
-
         return Ok(normalized);
     }
 }

@@ -2,7 +2,6 @@ using ChatBeet.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using System;
 using ChatBeet.Services;
 
 namespace ChatBeet.Pages;

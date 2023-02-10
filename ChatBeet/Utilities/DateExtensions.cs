@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChatBeet.Utilities;
+﻿namespace ChatBeet.Utilities;
 
 public static class DateExtensions
 {

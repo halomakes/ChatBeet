@@ -1,8 +1,6 @@
 ﻿using ChatBeet.Utilities;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.ServiceModel.Syndication;
 using System.Threading.Tasks;

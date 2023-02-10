@@ -1,26 +1,25 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Data.Entities;
+﻿using ChatBeet.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Data;
 
 namespace ChatBeet.Pages.FixedTimeRanges;
 
 [Authorize]
 public class EditModel : PageModel
 {
-    private readonly ProgressContext _context;
+    private readonly IProgressRepository _context;
 
-    public EditModel(ProgressContext context)
+    public EditModel(IProgressRepository context)
     {
         _context = context;
     }
 
     [BindProperty]
-    public FixedTimeRange FixedTimeRange { get; set; }
+    public ProgressSpan ProgressSpan { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string id)
     {
@@ -29,9 +28,9 @@ public class EditModel : PageModel
             return NotFound();
         }
 
-        FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
+        ProgressSpan = await _context.Spans.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
 
-        if (FixedTimeRange == null)
+        if (ProgressSpan == null)
         {
             return NotFound();
         }
@@ -47,7 +46,7 @@ public class EditModel : PageModel
             return Page();
         }
 
-        _context.Attach(FixedTimeRange).State = EntityState.Modified;
+        _context.Attach(ProgressSpan).State = EntityState.Modified;
 
         try
         {
@@ -55,7 +54,7 @@ public class EditModel : PageModel
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!FixedTimeRangeExists(FixedTimeRange.Key))
+            if (!FixedTimeRangeExists(ProgressSpan.Key))
             {
                 return NotFound();
             }
@@ -70,6 +69,6 @@ public class EditModel : PageModel
 
     private bool FixedTimeRangeExists(string id)
     {
-        return _context.FixedTimeRanges.Any(e => e.Key == id);
+        return _context.Spans.Any(e => e.Key == id);
     }
 }

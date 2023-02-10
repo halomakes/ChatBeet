@@ -19,7 +19,6 @@ using Microsoft.OpenApi.Models;
 using Miki.Anilist;
 using Miki.UrbanDictionary;
 using SauceNET;
-using System;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -95,16 +94,17 @@ public class Startup
         });
     }
 
-    private static void ConfigureDatabases(IServiceCollection services)
+    private void ConfigureDatabases(IServiceCollection services)
     {
-        services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
-        services.AddDbContext<BooruContext>(opts => opts.UseSqlite("Data Source=db/booru.db"));
-        services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"));
-        services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"));
-        services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
-        services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
-        services.AddDbContext<ProgressContext>(opts => opts.UseSqlite("Data Source=db/progress.db"));
-        services.AddDbContext<IrcLinkContext>(opts => opts.UseSqlite("Data Source=db/ircmigration.db"));
+        services.AddDbContext<CbDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("ChatBeet")));
+
+        services.AddScoped<IUsersRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+        services.AddScoped<IBooruRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+        services.AddScoped<IKeywordsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+        services.AddScoped<IDefinitionsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+        services.AddScoped<IProgressRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+        services.AddScoped<IHighGroundRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+        services.AddScoped<IKarmaRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     }
 
     private void AddAuthentication(IServiceCollection services)
@@ -116,8 +116,8 @@ public class Startup
             })
             .AddDiscord(options =>
             {
-                options.ClientSecret = Configuration.GetValue<string>("Discord:ClientSecret");
-                options.ClientId = Configuration.GetValue<string>("Discord:ClientId");
+                options.ClientSecret = Configuration.GetValue<string>("Discord:ClientSecret")!;
+                options.ClientId = Configuration.GetValue<string>("Discord:ClientId")!;
                 options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
                     string.Format(
                         CultureInfo.InvariantCulture,
@@ -137,9 +137,9 @@ public class Startup
         services.AddScoped<LinkPreviewService>();
         services.AddScoped<SpeedometerService>();
         services.AddHostedService<ContextInitializer>();
-        services.AddScoped<IrcMigrationService>();
         services.AddTransient<GraphicsService>();
         services.AddScoped<SuspicionService>();
+        services.AddScoped<WebIdentityService>();
     }
 
     private static void AddHttpClients(IServiceCollection services)
@@ -168,7 +168,7 @@ public class Startup
         services.AddScoped<Gelbooru>();
         services.AddScoped(provider =>
         {
-            var config = provider.GetService<IOptions<ChatBeetConfiguration>>().Value.LastFm;
+            var config = provider.GetService<IOptions<ChatBeetConfiguration>>()!.Value.LastFm;
             return new LastfmClient(config.ClientId, config.ClientSecret);
         });
         services.AddScoped<LastFmService>();
@@ -184,14 +184,14 @@ public class Startup
         services.AddScoped(provider =>
         {
             var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
-            var opts = Options.Create(config.Value.Untappd);
+            var opts = Options.Create(config!.Value.Untappd);
             var clientFactory = provider.GetService<IHttpClientFactory>();
-            return new UntappdClient(clientFactory.CreateClient(), opts);
+            return new UntappdClient(clientFactory!.CreateClient(), opts);
         });
         services.AddScoped(provider =>
         {
             var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
-            return new SauceNETClient(config.Value.Sauce);
+            return new SauceNETClient(config!.Value.Sauce);
         });
         services.AddScoped(_ => new OpenWeatherMapClient(Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
         services.AddSingleton(_ => new WolframAlphaClient(Configuration.GetValue<string>("Rules:Wolfram:AppId")));

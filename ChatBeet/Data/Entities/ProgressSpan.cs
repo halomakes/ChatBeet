@@ -1,16 +1,17 @@
 ﻿using ChatBeet.Attributes;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChatBeet.Data.Entities;
 
-public class FixedTimeRange
+public class ProgressSpan
 {
+    public ulong GuildId { get; set; }
+    
     /// <summary>
     /// Key of time range
     /// </summary>
     /// <remarks>Can be alphanumeric with hyphens in the middle</remarks>
-    [Key, Required, RegularExpression(@"^[\w\d]+(?:-[\w\d]+)?$", ErrorMessage = "Key must contain only letters, digits, and hyphens and cannot begin or end with a hyphen."), MaxLength(30)]
+    [Required, RegularExpression(@"^[\w\d]+(?:-[\w\d]+)?$", ErrorMessage = "Key must contain only letters, digits, and hyphens and cannot begin or end with a hyphen."), MaxLength(30)]
     public string Key { get; set; }
 
     /// <summary>

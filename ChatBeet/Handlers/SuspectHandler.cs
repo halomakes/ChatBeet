@@ -1,7 +1,7 @@
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using ChatBeet.Data;
 using ChatBeet.Notifications;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
@@ -34,6 +34,7 @@ public partial class SuspectHandler : INotificationHandler<DiscordNotification<M
         var discord = scope.ServiceProvider.GetRequiredService<DiscordClient>();
         var negativeResponseService = scope.ServiceProvider.GetRequiredService<NegativeResponseService>();
         var service = scope.ServiceProvider.GetRequiredService<SuspicionService>();
+        var usersRepo = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
         
         var suspect = notification.Event.MentionedUsers.Single();
         if (suspect.Equals(discord.CurrentUser))
@@ -42,15 +43,17 @@ public partial class SuspectHandler : INotificationHandler<DiscordNotification<M
         }
         else
         {
-            if (await service.HasRecentlyReportedAsync(suspect.DiscriminatedUsername(), notification.Event.Author.DiscriminatedUsername()))
+            var internalSuspect = await usersRepo.GetUserAsync(suspect);
+            var internalReporter = await usersRepo.GetUserAsync(notification.Event.Author);
+            if (await service.HasRecentlyReportedAsync(internalSuspect.Id, internalReporter.Id))
             {
                 await notification.Event.Message.RespondAsync("You must wait at least 2 minutes each time you raise suspicion against a user.");
             }
             else
             {
-                await service.ReportSuspiciousActivityAsync(suspect.DiscriminatedUsername(), notification.Event.Author.DiscriminatedUsername(), bypassDebounceCheck: true);
+                await service.ReportSuspiciousActivityAsync(internalSuspect.Id, internalReporter.Id, bypassDebounceCheck: true);
 
-                var suspicionLevel = await service.GetSuspicionLevelAsync(suspect.DiscriminatedUsername());
+                var suspicionLevel = await service.GetSuspicionLevelAsync(internalSuspect.Id);
 
                 await notification.Event.Message.RespondAsync($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is now {suspicionLevel}.");
             }

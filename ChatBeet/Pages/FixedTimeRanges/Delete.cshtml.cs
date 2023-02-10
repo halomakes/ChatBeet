@@ -1,25 +1,25 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Data.Entities;
+﻿using ChatBeet.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Pages.FixedTimeRanges;
 
 [Authorize]
 public class DeleteModel : PageModel
 {
-    private readonly ProgressContext _context;
+    private readonly IProgressRepository _context;
 
-    public DeleteModel(ProgressContext context)
+    public DeleteModel(IProgressRepository context)
     {
         _context = context;
     }
 
     [BindProperty]
-    public FixedTimeRange FixedTimeRange { get; set; }
+    public ProgressSpan ProgressSpan { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string id)
     {
@@ -28,9 +28,9 @@ public class DeleteModel : PageModel
             return NotFound();
         }
 
-        FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
+        ProgressSpan = await _context.Spans.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
 
-        if (FixedTimeRange == null)
+        if (ProgressSpan == null)
         {
             return NotFound();
         }
@@ -44,11 +44,11 @@ public class DeleteModel : PageModel
             return NotFound();
         }
 
-        FixedTimeRange = await _context.FixedTimeRanges.FindAsync(id);
+        ProgressSpan = await _context.Spans.FirstOrDefaultAsync(s => s.Key == id);
 
-        if (FixedTimeRange != null)
+        if (ProgressSpan != null)
         {
-            _context.FixedTimeRanges.Remove(FixedTimeRange);
+            _context.Spans.Remove(ProgressSpan);
             await _context.SaveChangesAsync();
         }
 

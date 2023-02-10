@@ -1,50 +1,47 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Models;
+﻿using ChatBeet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using ChatBeet.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Pages.Tags;
 
 [Authorize]
 public class UserModel : PageModel
 {
-    private readonly BooruContext _booru;
+    private readonly IBooruRepository _booru;
     private readonly IMemoryCache _cache;
+    private readonly IUsersRepository _users;
 
-    public string Nick { get; private set; }
+    public User User { get; private set; }
     public IEnumerable<TagStat> Stats { get; private set; }
 
-    public UserModel(BooruContext booru, IMemoryCache cache)
+    public UserModel(IBooruRepository booru, IMemoryCache cache, IUsersRepository users)
     {
         _booru = booru;
         _cache = cache;
+        _users = users;
     }
 
-    public async Task OnGet(string nick)
+    public async Task OnGet(Guid userId)
     {
-        Nick = nick.Trim().ToLower();
-        var matchingTags = await _cache.GetOrCreateAsync($"tags:user:{nick}", async entry =>
+        var matchingTags = await _cache.GetOrCreateAsync($"tags:user:{userId}", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
             return await _booru.TagHistories
                 .AsQueryable()
-                .Where(th => th.Nick.ToLower() == Nick)
+                .Where(th => th.UserId == userId)
                 .GroupBy(th => th.Tag)
                 .OrderByDescending(g => g.Count())
                 .Select(g => new TagStat { Tag = g.Key, Total = g.Count(), Mode = TagStat.StatMode.Tag })
                 .ToListAsync();
         });
         Stats = matchingTags;
-        if (matchingTags.Any())
-        {
-            Nick = await _booru.TagHistories.AsQueryable().Where(th => th.Nick.ToLower() == Nick).Select(th => th.Nick).FirstOrDefaultAsync();
-        }
+        User = await _users.Users.FindAsync(userId);
     }
 }

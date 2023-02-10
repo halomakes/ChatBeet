@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChatBeet.Attributes;
+﻿namespace ChatBeet.Attributes;
 
 public class ParameterAttribute : Attribute
 {

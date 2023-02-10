@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChatBeet.Models;
+﻿namespace ChatBeet.Models;
 
 public class LoginCompleteNotification
 {

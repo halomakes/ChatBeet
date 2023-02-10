@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ChatBeet.Commands;
+using ChatBeet.Data;
 using ChatBeet.Notifications;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
@@ -30,9 +31,11 @@ public partial class DessHandler : INotificationHandler<DiscordNotification<Mess
         await using var scope = _serviceScopeFactory.CreateAsyncScope();
         var booru = scope.ServiceProvider.GetRequiredService<BooruService>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var commandModule = new BooruCommandModule(booru, mediator);
+        var users = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
+        var commandModule = new BooruCommandModule(booru, mediator, users);
+        var user = await users.GetUserAsync(notification.Event.Author);
         var (text, embed) = await commandModule.GetResponseContent("akatsuki_kirika", true,
-            notification.Event.Author.DiscriminatedUsername());
+            user.Id);
         var builder = new DiscordMessageBuilder()
             .WithContent(text);
         if (embed is not null)

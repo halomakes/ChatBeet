@@ -1,8 +1,13 @@
-﻿namespace ChatBeet.Data.Entities;
+﻿using Newtonsoft.Json;
+
+namespace ChatBeet.Data.Entities;
 
 public class UserPreferenceSetting
 {
-    public string Nick { get; set; }
+    public Guid UserId { get; set; }
     public UserPreference Preference { get; set; }
     public string Value { get; set; }
+    
+    [JsonIgnore]
+    public virtual User? User { get; set; }
 }

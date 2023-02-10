@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ChatBeet.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;

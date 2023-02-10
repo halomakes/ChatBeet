@@ -1,23 +1,21 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Data.Entities;
+﻿using ChatBeet.Data.Entities;
 using ChatBeet.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Services;
 
 public class KeywordService
 {
-    private readonly KeywordContext _db;
+    private readonly IKeywordsRepository _db;
     private readonly IMemoryCache _cache;
 
     public static DateTime StatsLastUpdated { get; private set; }
 
-    public KeywordService(KeywordContext db, IMemoryCache cache)
+    public KeywordService(IKeywordsRepository db, IMemoryCache cache)
     {
         _db = db;
         _cache = cache;
@@ -29,25 +27,26 @@ public class KeywordService
         return await _db.Keywords.AsQueryable().ToListAsync();
     });
 
-    public async Task<Keyword> GetKeywordAsync(int id)
+    public async Task<Keyword> GetKeywordAsync(Guid id)
     {
         var keywords = await GetKeywordsAsync();
         return keywords.FirstOrDefault(k => k.Id == id);
     }
 
-    public Task<KeywordStat> GetKeywordStatAsync(int id) => _cache.GetOrCreateAsync($"keywords:stats:{id}", async entry =>
+    public Task<KeywordStat> GetKeywordStatAsync(Guid id) => _cache.GetOrCreateAsync($"keywords:stats:{id}", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
         var keyword = await GetKeywordAsync(id);
-        var stats = await _db.Records
+        var stats = await _db.Hits
+            .Include(h => h.User)
             .AsQueryable()
             .Where(r => r.KeywordId == keyword.Id)
-            .GroupBy(r => r.Nick)
+            .GroupBy(r => r.UserId)
             .OrderByDescending(g => g.Count())
             .Select(g => new KeywordStat.UserKeywordStat
             {
-                Nick = g.Key,
+                User = g.First().User,
                 Hits = g.Count(),
                 Excerpt = g.Min(gp => gp.Message)
             })
@@ -66,16 +65,17 @@ public class KeywordService
         StatsLastUpdated = DateTime.UtcNow;
 
         var keywords = await GetKeywordsAsync();
-        var allStats = await _db.Records
+        var allStats = await _db.Hits
+            .Include(h => h.User)
             .AsQueryable()
-            .GroupBy(r => new { r.KeywordId, r.Nick })
+            .GroupBy(r => new { r.KeywordId, r.UserId })
             .OrderByDescending(g => g.Count())
             .Select(g => new
             {
                 g.Key.KeywordId,
                 Stats = new KeywordStat.UserKeywordStat
                 {
-                    Nick = g.Key.Nick,
+                    User = g.First().User,
                     Hits = g.Count(),
                     Excerpt = g.Min(gp => gp.Message)
                 }

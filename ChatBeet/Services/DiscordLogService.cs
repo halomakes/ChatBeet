@@ -3,7 +3,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using Humanizer;
 using Microsoft.Extensions.Options;
-using System;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Services;

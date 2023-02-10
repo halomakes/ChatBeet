@@ -1,8 +1,6 @@
 ﻿using ChatBeet.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Tenor;

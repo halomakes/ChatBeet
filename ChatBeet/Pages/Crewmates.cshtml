@@ -12,7 +12,7 @@
         {
             <div class="crewmate" style="order: @pair.Second">
                 <partial name="_Crewmate" model="pair.First.Color" />
-                <span>@pair.First.Nick <br />@pair.First.Level</span>
+                <span>@pair.First.User.DisplayName() <br />@pair.First.Level</span>
             </div>
         }
     </div>

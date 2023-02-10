@@ -1,21 +1,22 @@
 ﻿using ChatBeet.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Pages.FixedTimeRanges;
 
 public class DetailsModel : PageModel
 {
-    private readonly Data.ProgressContext _context;
+    private readonly IProgressRepository _context;
 
-    public DetailsModel(Data.ProgressContext context)
+    public DetailsModel(IProgressRepository context)
     {
         _context = context;
     }
 
-    public FixedTimeRange FixedTimeRange { get; set; }
+    public ProgressSpan ProgressSpan { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string id)
     {
@@ -24,9 +25,9 @@ public class DetailsModel : PageModel
             return NotFound();
         }
 
-        FixedTimeRange = await _context.FixedTimeRanges.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
+        ProgressSpan = await _context.Spans.AsQueryable().FirstOrDefaultAsync(m => m.Key == id);
 
-        if (FixedTimeRange == null)
+        if (ProgressSpan == null)
         {
             return NotFound();
         }

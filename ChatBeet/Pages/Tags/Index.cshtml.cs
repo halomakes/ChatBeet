@@ -1,19 +1,17 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Data.Entities;
+﻿using ChatBeet.Data.Entities;
 using ChatBeet.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Data;
 
 namespace ChatBeet.Pages.Tags;
 
 public class IndexModel : PageModel
 {
-    private readonly BooruContext _db;
+    private readonly IBooruRepository _db;
     private readonly IMemoryCache _cache;
     private static readonly Random rng = new();
 
@@ -22,7 +20,7 @@ public class IndexModel : PageModel
     public IEnumerable<TopTag> UserStats { get; private set; }
     public DateTime Earliest { get; private set; }
 
-    public IndexModel(BooruContext db, IMemoryCache cache)
+    public IndexModel(IBooruRepository db, IMemoryCache cache)
     {
         _db = db;
         _cache = cache;
@@ -46,7 +44,7 @@ public class IndexModel : PageModel
         Earliest = await _cache.GetOrCreate("tags:date", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-            return await EntityFrameworkQueryableExtensions.MinAsync(_db.TagHistories, th => th.Timestamp);
+            return await EntityFrameworkQueryableExtensions.MinAsync(_db.TagHistories, th => th.CreatedAt);
         });
     }
 

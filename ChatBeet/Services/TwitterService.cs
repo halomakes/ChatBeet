@@ -3,8 +3,6 @@ using ChatBeet.Utilities;
 using LinqToTwitter;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Services;

@@ -5,21 +5,49 @@ using System.Threading.Tasks;
 
 namespace ChatBeet.Data;
 
-public class BooruContext : DbContext
+public interface IBooruRepository : IApplicationRepository
 {
-    public BooruContext(DbContextOptions<BooruContext> optsBuilder) : base(optsBuilder) { }
+    DbSet<BlacklistedTag> BlacklistedTags { get; }
+    DbSet<TagHistory> TagHistories { get; }
+    Task<List<TopTag>> GetTopTags();
+}
 
-    public virtual DbSet<BooruBlacklist> Blacklists { get; set; }
-    public virtual DbSet<TagHistory> TagHistories { get; set; }
-    public virtual DbSet<TopTag> TopTags { get; set; }
+public partial class CbDbContext : IBooruRepository
+{
+    public virtual DbSet<BlacklistedTag> BlacklistedTags { get; set; } = null!;
+    public virtual DbSet<TagHistory> TagHistories { get; set; } = null!;
+    public virtual DbSet<TopTag> TopTags { get; set; } = null!;
 
     public Task<List<TopTag>> GetTopTags() => TopTags
         .FromSqlRaw(@"select Tag, Nick, Total from (select t.Id, t.Tag, t.Nick, count(*) as Total from TagHistories t group by t.Tag, t.Nick order by Total desc) i group by i.Nick order by i.Total desc limit 10")
         .ToListAsync();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    private void ConfigureBooru(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BooruBlacklist>().HasKey(b => new { b.Nick, b.Tag });
+        modelBuilder.Entity<BlacklistedTag>(builder =>
+        {
+            builder.ToTable("blacklisted_tags", "booru");
+            builder.HasKey(b => new { b.UserId, b.Tag });
+            builder.Property(b => b.Tag)
+                .IsRequired()
+                .HasMaxLength(150);
+            builder.HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId);
+        });
+        modelBuilder.Entity<TagHistory>(builder =>
+        {
+            builder.ToTable("tag_history", "booru");
+            builder.HasKey(b => b.Id);
+            builder.Property(b => b.UserId)
+                .IsRequired();
+            builder.Property(b => b.Tag)
+                .IsRequired()
+                .HasMaxLength(150);
+            builder.HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId);
+        });
         modelBuilder.Entity<TopTag>().HasNoKey();
     }
 }

@@ -53,10 +53,6 @@
                         <div class="dropdown-menu" aria-labelledby="infoDropdown">
                             <a class="dropdown-item" asp-page="/Commands/Index">Commands</a>
                             <a class="dropdown-item" asp-page="/Defs">Definitions</a>
-                            @if (isLoggedIn)
-                            {
-                                <a class="dropdown-item" asp-page="/Replacements/Index">Replacement Sets</a>
-                            }
                             <a class="dropdown-item" asp-page="/FixedTimeRanges/Index">Fixed Time Ranges</a>
                         </div>
                     </li>

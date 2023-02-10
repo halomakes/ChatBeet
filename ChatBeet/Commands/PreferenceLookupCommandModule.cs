@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Services;
 using DSharpPlus;
@@ -11,12 +12,12 @@ namespace ChatBeet.Commands;
 public class PreferenceLookupCommandModule : ApplicationCommandModule
 {
     private readonly UserPreferencesService _preferences;
-    private readonly IrcMigrationService _migration;
+    private readonly IUsersRepository _users;
 
-    public PreferenceLookupCommandModule(UserPreferencesService preferences, IrcMigrationService migration)
+    public PreferenceLookupCommandModule(UserPreferencesService preferences, IUsersRepository users)
     {
         _preferences = preferences;
-        _migration = migration;
+        _users = users;
     }
     private async Task GetPronouns(BaseContext ctx, DiscordUser user)
     {
@@ -28,7 +29,7 @@ public class PreferenceLookupCommandModule : ApplicationCommandModule
         }
         else
         {
-            var internalId = await _migration.GetInternalUsernameAsync(user);
+            var internalId = (await _users.GetUserAsync(user)).Id;
             var subject = (await _preferences.Get(internalId, UserPreference.SubjectPronoun))?.ToLower();
             var @object = (await _preferences.Get(internalId, UserPreference.ObjectPronoun))?.ToLower();
 

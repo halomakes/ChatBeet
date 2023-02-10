@@ -1,5 +1,4 @@
 ﻿using Humanizer;
-using System;
 using System.Collections.Generic;
 
 namespace ChatBeet.Utilities;

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Services;
 using ChatBeet.Utilities;
@@ -18,12 +17,14 @@ public class SuspicionCommandModule : ApplicationCommandModule
     private readonly UserPreferencesService _prefsService;
     private readonly DiscordClient _client;
     private readonly NegativeResponseService _negativeResponseService;
+    private readonly IUsersRepository _users;
 
-    public SuspicionCommandModule(SuspicionService db, UserPreferencesService prefsService, DiscordClient client, NegativeResponseService negativeResponseService)
+    public SuspicionCommandModule(SuspicionService db, UserPreferencesService prefsService, DiscordClient client, NegativeResponseService negativeResponseService, IUsersRepository users)
     {
         _db = db;
         _prefsService = prefsService;
         _negativeResponseService = negativeResponseService;
+        _users = users;
         _client = client;
     }
 
@@ -36,16 +37,19 @@ public class SuspicionCommandModule : ApplicationCommandModule
         }
         else
         {
-            if (await _db.HasRecentlyReportedAsync(suspect.DiscriminatedUsername(), ctx.User.DiscriminatedUsername()))
+            var suspectId = (await _users.GetUserAsync(suspect)).Id;
+            var userId = (await _users.GetUserAsync(ctx.User)).Id;
+            
+            if (await _db.HasRecentlyReportedAsync(suspectId, userId))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                     .WithContent("You must wait at least 2 minutes each time you raise suspicion against a user."));
             }
             else
             {
-                await _db.ReportSuspiciousActivityAsync(suspect.DiscriminatedUsername(), ctx.User.DiscriminatedUsername(), bypassDebounceCheck: true);
+                await _db.ReportSuspiciousActivityAsync(suspectId, userId, bypassDebounceCheck: true);
 
-                var suspicionLevel = await _db.GetSuspicionLevelAsync(suspect.DiscriminatedUsername());
+                var suspicionLevel = await _db.GetSuspicionLevelAsync(suspectId);
 
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                     .WithContent($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is now {suspicionLevel}."));
@@ -56,8 +60,9 @@ public class SuspicionCommandModule : ApplicationCommandModule
     [SlashCommand("check", "Check how suspicious a user is")]
     public async Task GetSuspicionLevel(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
-        var suspicionLevel = await _db.GetSuspicionLevelAsync(suspect.DiscriminatedUsername());
-        var maxLevel = (await _db.GetActiveSuspicionsAsync()).GroupBy(s => s.Suspect.ToLower())
+        var suspectId = (await _users.GetUserAsync(suspect)).Id;
+        var suspicionLevel = await _db.GetSuspicionLevelAsync(suspectId);
+        var maxLevel = (await _db.GetActiveSuspicionsAsync()).GroupBy(s => s.SuspectId)
             .Select(s => s.Count())
             .Max();
 
@@ -66,7 +71,7 @@ public class SuspicionCommandModule : ApplicationCommandModule
         string comment = string.Empty;
         if (!string.IsNullOrEmpty(descriptor))
         {
-            var pronounPref = await _prefsService.Get(suspect.DiscriminatedUsername(), UserPreference.SubjectPronoun);
+            var pronounPref = await _prefsService.Get(suspectId, UserPreference.SubjectPronoun);
             var subjectPhrase = GetSubjectPhrase(pronounPref);
             comment = $" {subjectPhrase} {descriptor}.";
         }

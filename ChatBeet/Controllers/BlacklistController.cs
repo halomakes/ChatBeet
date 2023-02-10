@@ -2,7 +2,6 @@
 using ChatBeet.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,10 +13,12 @@ namespace ChatBeet.Controllers;
 public class BlacklistController : ControllerBase
 {
     private readonly BooruService _booru;
+    private readonly WebIdentityService _webIdentity;
 
-    public BlacklistController(BooruService booru)
+    public BlacklistController(BooruService booru, WebIdentityService webIdentity)
     {
         _booru = booru;
+        _webIdentity = webIdentity;
     }
 
     /// <summary>
@@ -26,7 +27,7 @@ public class BlacklistController : ControllerBase
     [HttpGet, Authorize]
     public async Task<ActionResult<IEnumerable<string>>> Get()
     {
-        return Ok(await _booru.GetBlacklistedTags(User?.Identity?.Name));
+        return Ok(await _booru.GetBlacklistedTags((await _webIdentity.GetCurrentUserAsync()).Id));
     }
 
     /// <summary>
@@ -43,7 +44,7 @@ public class BlacklistController : ControllerBase
     public async Task Remove(string tagList)
     {
         var allTags = tagList.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        await _booru.WhitelistTags(User.GetNick(), allTags);
+        await _booru.WhitelistTags((await _webIdentity.GetCurrentUserAsync()).Id, allTags);
     }
 
     /// <summary>
@@ -54,6 +55,6 @@ public class BlacklistController : ControllerBase
     public async Task Add(string tagList)
     {
         var allTags = tagList.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        await _booru.BlacklistTags(User.GetNick(), allTags);
+        await _booru.BlacklistTags((await _webIdentity.GetCurrentUserAsync()).Id, allTags);
     }
 }

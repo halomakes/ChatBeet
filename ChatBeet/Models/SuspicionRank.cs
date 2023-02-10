@@ -1,4 +1,6 @@
-﻿namespace ChatBeet.Models;
+﻿using ChatBeet.Data.Entities;
+
+namespace ChatBeet.Models;
 
 /// <summary>
 /// Describes how sus a crewmate is
@@ -8,7 +10,7 @@ public class SuspicionRank
     /// <summary>
     /// Nick of user
     /// </summary>
-    public string Nick { get; set; }
+    public User User { get; set; }
 
     /// <summary>
     /// Current suspicion level
@@ -18,7 +20,7 @@ public class SuspicionRank
     /// <summary>
     /// Color of crewmate
     /// </summary>
-    public string Color { get; set; }
+    public string? Color { get; set; }
 
     /// <summary>
     /// Total suspicion ever raised
