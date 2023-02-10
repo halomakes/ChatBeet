@@ -1,5 +1,4 @@
 ﻿using ChatBeet.Data;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,7 +11,7 @@ namespace ChatBeet.Services;
 
 public class ContextInitializer : IHostedService
 {
-    private readonly IServiceProvider serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
     private static readonly IEnumerable<Type> contextTypes = new List<Type> {
         typeof(MemoryCellContext),
         typeof(BooruContext),
@@ -26,12 +25,12 @@ public class ContextInitializer : IHostedService
 
     public ContextInitializer(IServiceProvider serviceProvider)
     {
-        this.serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        using var scope = serviceProvider.CreateScope();
+        using var scope = _serviceProvider.CreateScope();
         foreach (var ctxType in contextTypes)
         {
             var ctx = scope.ServiceProvider.GetRequiredService(ctxType) as DbContext;

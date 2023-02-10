@@ -3,10 +3,8 @@ using ChatBeet.Configuration;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
-using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
-using GravyBot;
 using IF.Lastfm.Core.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -202,14 +200,6 @@ public class UserPreferencesService
         if (!rgx.IsMatch(value))
             return $"{value} is not a valid color in Hex format.";
         return default;
-    }
-
-    public static string GetConfirmationMessage(UserPreference preference, string value)
-    {
-        var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
-        return string.IsNullOrEmpty(value)
-            ? $"Cleared value for {IrcValues.ITALIC}{displayName}{IrcValues.RESET}"
-            : $"Set {IrcValues.ITALIC}{displayName}{IrcValues.RESET} to {IrcValues.BOLD}{value}{IrcValues.RESET}";
     }
 
     public static string GetDiscordConfirmationMessage(UserPreference preference, string value)

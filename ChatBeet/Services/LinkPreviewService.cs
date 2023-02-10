@@ -10,13 +10,13 @@ namespace ChatBeet.Services;
 
 public class LinkPreviewService
 {
-    private readonly IMemoryCache cache;
-    private readonly HttpClient client;
+    private readonly IMemoryCache _cache;
+    private readonly HttpClient _client;
 
     public LinkPreviewService(IMemoryCache cache, IHttpClientFactory clientFactory)
     {
-        this.cache = cache;
-        client = clientFactory.CreateClient("compression");
+        _cache = cache;
+        _client = clientFactory.CreateClient("compression");
     }
 
     public async Task<HtmlDocument> GetDocumentAsync(Uri url)
@@ -27,7 +27,7 @@ public class LinkPreviewService
         return htmlDoc;
     }
 
-    private Task<string> GetUrlContentAsync(Uri url) => cache.GetOrCreateAsync($"opengraph:{url}", async entry =>
+    private Task<string> GetUrlContentAsync(Uri url) => _cache.GetOrCreateAsync($"opengraph:{url}", async entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromMinutes(5);
         var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -47,7 +47,7 @@ public class LinkPreviewService
         request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
         request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
         request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
-        var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadAsStringAsync();

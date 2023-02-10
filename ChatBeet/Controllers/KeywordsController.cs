@@ -11,23 +11,23 @@ namespace ChatBeet.Controllers;
 [ResponseCache(Duration = 300)]
 public class KeywordsController : ControllerBase
 {
-    private readonly KeywordService service;
+    private readonly KeywordService _service;
 
     public KeywordsController(KeywordService service)
     {
-        this.service = service;
+        _service = service;
     }
 
     /// <summary>
     /// Get stats for all keywords
     /// </summary>
     [HttpGet]
-    public Task<IEnumerable<KeywordStat>> GetStats() => service.GetKeywordStatsAsync();
+    public Task<IEnumerable<KeywordStat>> GetStats() => _service.GetKeywordStatsAsync();
 
     /// <summary>
     /// Get stats for a keyword
     /// </summary>
     /// <param name="id">ID of the keyword</param>
     [HttpGet("{id}")]
-    public Task<KeywordStat> GetStat([FromRoute] int id) => service.GetKeywordStatAsync(id);
+    public Task<KeywordStat> GetStat([FromRoute] int id) => _service.GetKeywordStatAsync(id);
 }

@@ -13,26 +13,26 @@ namespace ChatBeet.Pages;
 [ResponseCache(VaryByHeader = "User-Agent", Duration = 30)]
 public class IndexModel : PageModel
 {
-    private readonly ILogger<IndexModel> logger;
-    private readonly IMemoryCache cache;
-    private readonly IWebHostEnvironment env;
+    private readonly ILogger<IndexModel> _logger;
+    private readonly IMemoryCache _cache;
+    private readonly IWebHostEnvironment _env;
 
     public string ReadmeHtml { get; private set; }
 
     public IndexModel(ILogger<IndexModel> logger, IMemoryCache cache, IWebHostEnvironment env)
     {
-        this.logger = logger;
-        this.cache = cache;
-        this.env = env;
+        _logger = logger;
+        _cache = cache;
+        _env = env;
     }
 
     public async Task OnGet()
     {
-        var readmeMarkdown = await cache.GetOrCreateAsync("readme", async entry =>
+        var readmeMarkdown = await _cache.GetOrCreateAsync("readme", async entry =>
         {
             entry.SlidingExpiration = TimeSpan.FromMinutes(15);
 
-            var filepath = Path.Combine(env.WebRootPath, "README.md");
+            var filepath = Path.Combine(_env.WebRootPath, "README.md");
             return await System.IO.File.ReadAllTextAsync(filepath);
         });
 

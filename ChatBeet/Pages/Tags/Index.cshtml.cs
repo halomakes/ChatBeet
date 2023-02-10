@@ -13,8 +13,8 @@ namespace ChatBeet.Pages.Tags;
 
 public class IndexModel : PageModel
 {
-    private readonly BooruContext db;
-    private readonly IMemoryCache cache;
+    private readonly BooruContext _db;
+    private readonly IMemoryCache _cache;
     private static readonly Random rng = new();
 
     public IEnumerable<TagStat> GeneralStats { get; private set; }
@@ -24,8 +24,8 @@ public class IndexModel : PageModel
 
     public IndexModel(BooruContext db, IMemoryCache cache)
     {
-        this.db = db;
-        this.cache = cache;
+        _db = db;
+        _cache = cache;
     }
 
     public async Task OnGet()
@@ -38,22 +38,22 @@ public class IndexModel : PageModel
             .OrderBy(s => rng.Next())
             .Take(20)
             .ToList();
-        UserStats = await cache.GetOrCreate("tags:user", async entry =>
+        UserStats = await _cache.GetOrCreate("tags:user", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-            return await db.GetTopTags();
+            return await _db.GetTopTags();
         });
-        Earliest = await cache.GetOrCreate("tags:date", async entry =>
+        Earliest = await _cache.GetOrCreate("tags:date", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-            return await EntityFrameworkQueryableExtensions.MinAsync(db.TagHistories, th => th.Timestamp);
+            return await EntityFrameworkQueryableExtensions.MinAsync(_db.TagHistories, th => th.Timestamp);
         });
     }
 
-    private async Task<IEnumerable<TagStat>> GetStats() => await cache.GetOrCreateAsync("tags:stats", async entry =>
+    private async Task<IEnumerable<TagStat>> GetStats() => await _cache.GetOrCreateAsync("tags:stats", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-        return await db.TagHistories.AsQueryable()
+        return await _db.TagHistories.AsQueryable()
             .GroupBy(th => th.Tag)
             .Select(g => new TagStat { Tag = g.Key, Total = g.Count(), Mode = TagStat.StatMode.Tag })
             .ToListAsync();

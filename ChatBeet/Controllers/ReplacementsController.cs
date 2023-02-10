@@ -13,18 +13,18 @@ namespace ChatBeet.Controllers;
 [ResponseCache(Duration = 300)]
 public class ReplacementsController : ControllerBase
 {
-    private readonly ReplacementContext db;
+    private readonly ReplacementContext _db;
 
     public ReplacementsController(ReplacementContext db)
     {
-        this.db = db;
+        _db = db;
     }
 
     /// <summary>
     /// Get all replacement sets
     /// </summary>
     [HttpGet]
-    public IQueryable<ReplacementSet> GetSets() => db.Sets;
+    public IQueryable<ReplacementSet> GetSets() => _db.Sets;
 
     /// <summary>
     /// Get a replacement set
@@ -34,7 +34,7 @@ public class ReplacementsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ReplacementSet>> GetSet([FromRoute] int id)
     {
-        var set = await db.Sets
+        var set = await _db.Sets
             .Include(s => s.Mappings)
             .FirstOrDefaultAsync(s => s.Id == id);
         if (set == null)
@@ -47,7 +47,7 @@ public class ReplacementsController : ControllerBase
     /// </summary>
     /// <param name="id">ID of set</param>
     [HttpGet("{id}/Mappings")]
-    public IQueryable<ReplacementMapping> GetSetMappings([FromRoute] int id) => db.Mappings.AsQueryable().Where(s => s.SetId == id);
+    public IQueryable<ReplacementMapping> GetSetMappings([FromRoute] int id) => _db.Mappings.AsQueryable().Where(s => s.SetId == id);
 
     /// <summary>
     /// Get a single mapping
@@ -57,7 +57,7 @@ public class ReplacementsController : ControllerBase
     [HttpGet("{id}/Mappings/{input}")]
     public async Task<ActionResult<ReplacementMapping>> GetMapping([FromRoute] int id, [FromRoute] string input)
     {
-        var map = await db.Mappings
+        var map = await _db.Mappings
             .AsQueryable()
             .Where(m => m.SetId == id && m.Input.ToLower() == input.ToLower())
             .FirstOrDefaultAsync();
@@ -81,13 +81,13 @@ public class ReplacementsController : ControllerBase
         if (id == default)
             return BadRequest("Set ID is required.");
         mapping.SetId = id;
-        if (!await db.Sets.AsQueryable().AnyAsync(s => s.Id == id))
+        if (!await _db.Sets.AsQueryable().AnyAsync(s => s.Id == id))
             return BadRequest($"Set {id} does not exist.");
-        if (await db.Mappings.AsQueryable().AnyAsync(m => m.SetId == id && m.Input.ToLower() == mapping.Input.ToLower()))
+        if (await _db.Mappings.AsQueryable().AnyAsync(m => m.SetId == id && m.Input.ToLower() == mapping.Input.ToLower()))
             return BadRequest($"Set {id} already contains key {mapping.Input}");
 
-        db.Mappings.Add(mapping);
-        await db.SaveChangesAsync();
+        _db.Mappings.Add(mapping);
+        await _db.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetMapping), new { id, input = mapping.Input });
     }
@@ -101,15 +101,15 @@ public class ReplacementsController : ControllerBase
     [HttpDelete("{id}/Mappings/{input}")]
     public async Task<ActionResult> DeleteMapping([FromRoute] int id, [FromRoute] string input)
     {
-        var map = await db.Mappings
+        var map = await _db.Mappings
             .AsQueryable()
             .Where(m => m.SetId == id && m.Input.ToLower() == input.ToLower())
             .FirstOrDefaultAsync();
         if (map == default)
             return NotFound();
 
-        db.Mappings.Remove(map);
-        await db.SaveChangesAsync();
+        _db.Mappings.Remove(map);
+        await _db.SaveChangesAsync();
 
         return Ok();
     }

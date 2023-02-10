@@ -1,6 +1,6 @@
 using Microsoft.ML.Data;
 
-namespace SampleClassification.Model
+namespace SentimentAnalysis
 {
     public class SentimentAnalysis
     {

@@ -13,25 +13,25 @@ namespace ChatBeet.Controllers;
 [ResponseCache(Duration = 300)]
 public class PreferencesController : Controller
 {
-    private readonly UserPreferencesService prefsService;
+    private readonly UserPreferencesService _prefsService;
 
     public PreferencesController(UserPreferencesService prefsService)
     {
-        this.prefsService = prefsService;
+        _prefsService = prefsService;
     }
 
     /// <summary>
     /// Get all set preferences
     /// </summary>
     [HttpGet, Authorize]
-    public async Task<IEnumerable<UserPreferenceSetting>> GetPreferences() => await prefsService.Get(User?.Identity?.Name);
+    public async Task<IEnumerable<UserPreferenceSetting>> GetPreferences() => await _prefsService.Get(User?.Identity?.Name);
 
     /// <summary>
     /// Get an individual preference
     /// </summary>
     /// <param name="preference">Preference to get</param>
     [HttpGet("{preference}"), Authorize]
-    public async Task<string> GetPreference([FromRoute] UserPreference preference) => await prefsService.Get(User?.Identity?.Name, preference);
+    public async Task<string> GetPreference([FromRoute] UserPreference preference) => await _prefsService.Get(User?.Identity?.Name, preference);
 
     /// <summary>
     /// Set a preference
@@ -44,7 +44,7 @@ public class PreferencesController : Controller
         if (string.IsNullOrEmpty(change.Nick))
             return Unauthorized("You do not have access to user preferences.");
 
-        var normalized = await prefsService.Set(change);
+        var normalized = await _prefsService.Set(change);
 
         return Ok(normalized);
     }

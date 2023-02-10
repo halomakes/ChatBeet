@@ -12,7 +12,7 @@ public class SuspicionService
 {
     private readonly SuspicionContext _ctx;
     private readonly IrcMigrationService _irc;
-    private readonly TimeSpan ActivePeriod = DateTime.Now.AddYears(2) - DateTime.Now;
+    private readonly TimeSpan _activePeriod = DateTime.Now.AddYears(2) - DateTime.Now;
 
     public SuspicionService(SuspicionContext ctx, IrcMigrationService irc)
     {
@@ -20,7 +20,7 @@ public class SuspicionService
         _irc = irc;
     }
 
-    public DateTime ActiveWindowStart => DateTime.Now - ActivePeriod;
+    public DateTime ActiveWindowStart => DateTime.Now - _activePeriod;
 
     public async Task<IEnumerable<Suspicion>> GetActiveSuspicionsAsync()
     {

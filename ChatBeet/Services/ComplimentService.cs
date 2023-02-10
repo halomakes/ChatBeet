@@ -7,16 +7,16 @@ namespace ChatBeet.Services;
 
 public class ComplimentService
 {
-    private readonly HttpClient client;
+    private readonly HttpClient _client;
 
     public ComplimentService(HttpClient client)
     {
-        this.client = client;
+        _client = client;
     }
 
     public async Task<string> GetComplimentAsync()
     {
-        var result = await client.GetAsync("https://complimentr.com/api");
+        var result = await _client.GetAsync("https://complimentr.com/api");
         var content = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(await result.Content.ReadAsStreamAsync());
         return content["compliment"];
     }

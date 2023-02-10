@@ -1,5 +1,4 @@
 ﻿using ChatBeet.Configuration;
-using ChatBeet.Utilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
@@ -13,39 +12,39 @@ namespace ChatBeet.Services;
 
 public class TenorGifService
 {
-    private readonly TenorClient client;
-    private readonly IMemoryCache cache;
-    private readonly ChatBeetConfiguration.TenorConfiguration config;
+    private readonly TenorClient _client;
+    private readonly IMemoryCache _cache;
+    private readonly ChatBeetConfiguration.TenorConfiguration _config;
 
     public TenorGifService(IHttpClientFactory clientFactory, IMemoryCache cache, IOptions<ChatBeetConfiguration> options)
     {
-        this.cache = cache;
-        config = options.Value.Tenor;
+        _cache = cache;
+        _config = options.Value.Tenor;
         var settings = new TenorConfiguration
         {
-            ApiKey = config.ApiKey,
+            ApiKey = _config.ApiKey,
             ContentFilter = ContentFilter.Off,
             MediaFilter = MediaFilter.Minimal,
             Locale = ChatBeetConfiguration.Culture
         };
-        client = new TenorClient(settings, clientFactory.CreateClient());
+        _client = new TenorClient(settings, clientFactory.CreateClient());
     }
 
     public async Task<string> GetGifAsync(string search)
     {
-        var result = await cache.GetOrCreateAsync($"tenor:{search}", async e =>
+        var result = await _cache.GetOrCreateAsync($"tenor:{search}", async e =>
         {
             e.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
-            return await client.SearchAsync(search, limit: config.QueryLimit);
+            return await _client.SearchAsync(search, limit: _config.QueryLimit);
         });
         var sequenceKey = $"tenor:seq:{search}";
-        var seq = cache.GetOrCreate(sequenceKey, entry =>
+        var seq = _cache.GetOrCreate(sequenceKey, entry =>
         {
             entry.SlidingExpiration = TimeSpan.FromMinutes(10);
             return -1;
         });
-        cache.Set(sequenceKey, ++seq);
+        _cache.Set(sequenceKey, ++seq);
 
         if (result?.Results?.Any() ?? false)
         {

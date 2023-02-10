@@ -1,19 +1,19 @@
-﻿using ChatBeet.Commands.Discord;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity;
 using DSharpPlus.SlashCommands;
-using GravyBot;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ChatBeet.Commands;
 using ChatBeet.Notifications;
 using DSharpPlus.Interactivity.Extensions;
 using MediatR;
+using MessageTransformCommandModule = ChatBeet.Commands.MessageTransformCommandModule;
 
 namespace ChatBeet.Services;
 
@@ -114,8 +114,6 @@ public class DiscordBotService : BackgroundService
     private async Task PublishMessage<TEvent>(DiscordClient sender, TEvent @event) where TEvent : DiscordEventArgs
     {
         await using var scope = _services.CreateAsyncScope();
-        var queue = scope.ServiceProvider.GetRequiredService<MessageQueueService>();
-        queue.Push(@event);
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         await mediator.Publish(new DiscordNotification<TEvent>(@event));
     }

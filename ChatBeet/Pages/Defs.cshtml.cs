@@ -2,35 +2,34 @@ using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
 using ChatBeet.Utilities;
-using GravyBot;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace ChatBeet.Pages;
 
 public class DefsModel : PageModel
 {
-    private readonly MemoryCellContext db;
-    private readonly MessageQueueService messageQueue;
+    private readonly MemoryCellContext _db;
+    private readonly IMediator _messageQueue;
 
     public IEnumerable<MemoryCell> Cells { get; private set; }
 
     [BindProperty]
     public DefinitionChange Info { get; set; }
 
-    public DefsModel(MemoryCellContext db, MessageQueueService messageQueue)
+    public DefsModel(MemoryCellContext db, IMediator messageQueue)
     {
-        this.db = db;
-        this.messageQueue = messageQueue;
+        _db = db;
+        _messageQueue = messageQueue;
     }
 
     public async Task OnGet()
     {
-        var defs = await db.MemoryCells.ToListAsync();
+        var defs = await _db.MemoryCells.ToListAsync();
         defs.Reverse();
         Cells = defs;
     }
@@ -43,11 +42,11 @@ public class DefsModel : PageModel
             {
                 Info.Key = Info.Key.Trim();
                 Info.NewValue = Info.NewValue.Trim();
-                var oldDef = await db.MemoryCells.FirstOrDefaultAsync(m => m.Key.ToLower() == Info.Key.ToLower());
+                var oldDef = await _db.MemoryCells.FirstOrDefaultAsync(m => m.Key.ToLower() == Info.Key.ToLower());
                 Info.NewNick = User.GetNick();
                 if (oldDef == default)
                 {
-                    db.MemoryCells.Add(new MemoryCell
+                    _db.MemoryCells.Add(new MemoryCell
                     {
                         Key = Info.Key,
                         Value = Info.NewValue,
@@ -63,8 +62,8 @@ public class DefsModel : PageModel
                     oldDef.Value = Info.NewValue;
                 }
 
-                await db.SaveChangesAsync();
-                messageQueue.Push(Info);
+                await _db.SaveChangesAsync();
+                await _messageQueue.Publish(Info);
             }
         }
 

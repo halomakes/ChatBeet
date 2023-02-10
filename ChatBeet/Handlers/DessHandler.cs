@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using ChatBeet.Commands.Discord;
+using ChatBeet.Commands;
 using ChatBeet.Notifications;
 using ChatBeet.Services;
 using ChatBeet.Utilities;

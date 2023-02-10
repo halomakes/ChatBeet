@@ -1,7 +1,6 @@
 ﻿using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
-using GravyIrc.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System;
@@ -13,37 +12,22 @@ namespace ChatBeet.Services;
 
 public class KeywordService
 {
-    private readonly KeywordContext db;
-    private readonly IMemoryCache cache;
+    private readonly KeywordContext _db;
+    private readonly IMemoryCache _cache;
 
     public static DateTime StatsLastUpdated { get; private set; }
 
     public KeywordService(KeywordContext db, IMemoryCache cache)
     {
-        this.db = db;
-        this.cache = cache;
+        _db = db;
+        _cache = cache;
     }
 
-    public Task<List<Keyword>> GetKeywordsAsync() => cache.GetOrCreateAsync("keywords", async entry =>
+    public Task<List<Keyword>> GetKeywordsAsync() => _cache.GetOrCreateAsync("keywords", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-        return await db.Keywords.AsQueryable().ToListAsync();
+        return await _db.Keywords.AsQueryable().ToListAsync();
     });
-
-    public Task RecordKeywordEntryAsync(Keyword keyword, PrivateMessage message) => RecordKeywordEntryAsync(keyword.Id, message);
-
-    public async Task RecordKeywordEntryAsync(int keywordId, PrivateMessage message)
-    {
-        var record = new KeywordRecord
-        {
-            KeywordId = keywordId,
-            Message = message.Message,
-            Nick = message.From,
-            Time = message.DateReceived
-        };
-        db.Records.Add(record);
-        await db.SaveChangesAsync();
-    }
 
     public async Task<Keyword> GetKeywordAsync(int id)
     {
@@ -51,12 +35,12 @@ public class KeywordService
         return keywords.FirstOrDefault(k => k.Id == id);
     }
 
-    public Task<KeywordStat> GetKeywordStatAsync(int id) => cache.GetOrCreateAsync($"keywords:stats:{id}", async entry =>
+    public Task<KeywordStat> GetKeywordStatAsync(int id) => _cache.GetOrCreateAsync($"keywords:stats:{id}", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
         var keyword = await GetKeywordAsync(id);
-        var stats = await db.Records
+        var stats = await _db.Records
             .AsQueryable()
             .Where(r => r.KeywordId == keyword.Id)
             .GroupBy(r => r.Nick)
@@ -76,13 +60,13 @@ public class KeywordService
         };
     });
 
-    public Task<IEnumerable<KeywordStat>> GetKeywordStatsAsync() => cache.GetOrCreateAsync("keyword:stats", async entry =>
+    public Task<IEnumerable<KeywordStat>> GetKeywordStatsAsync() => _cache.GetOrCreateAsync("keyword:stats", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
         StatsLastUpdated = DateTime.UtcNow;
 
         var keywords = await GetKeywordsAsync();
-        var allStats = await db.Records
+        var allStats = await _db.Records
             .AsQueryable()
             .GroupBy(r => new { r.KeywordId, r.Nick })
             .OrderByDescending(g => g.Count())

@@ -11,27 +11,27 @@ namespace ChatBeet.Pages;
 
 public class CrewmatesModel : PageModel
 {
-    private readonly UserPreferencesService userPreferencesService;
-    private readonly SuspicionService suspicionService;
+    private readonly UserPreferencesService _userPreferencesService;
+    private readonly SuspicionService _suspicionService;
 
     public CrewmatesModel(UserPreferencesService userPreferencesService, SuspicionService suspicionService)
     {
-        this.userPreferencesService = userPreferencesService;
-        this.suspicionService = suspicionService;
+        _userPreferencesService = userPreferencesService;
+        _suspicionService = suspicionService;
     }
 
     public List<SuspicionRank> Ranks { get; private set; }
 
     public async Task OnGet()
     {
-        var mostSuspicious = (await suspicionService.GetActiveSuspicionsAsync())
+        var mostSuspicious = (await _suspicionService.GetActiveSuspicionsAsync())
             .GroupBy(s => s.Suspect.ToLower())
             .Select(g => new { Nick = g.Key, Count = g.Count() })
             .OrderByDescending(t => t.Count)
             .Take(9)
             .ToList();
 
-        var colorPrefs = await userPreferencesService.Get(mostSuspicious.Select(s => s.Nick), UserPreference.GearColor);
+        var colorPrefs = await _userPreferencesService.Get(mostSuspicious.Select(s => s.Nick), UserPreference.GearColor);
 
         Ranks = mostSuspicious.Select(s =>
         {

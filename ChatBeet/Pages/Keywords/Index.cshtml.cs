@@ -9,19 +9,19 @@ namespace ChatBeet.Pages.Keywords;
 
 public class IndexModel : PageModel
 {
-    private readonly KeywordService service;
+    private readonly KeywordService _service;
 
     public IEnumerable<KeywordStat> Stats { get; private set; }
     public DateTime LastUpdated { get; private set; }
 
     public IndexModel(KeywordService service)
     {
-        this.service = service;
+        _service = service;
     }
 
     public async Task OnGet()
     {
-        Stats = await service.GetKeywordStatsAsync();
+        Stats = await _service.GetKeywordStatsAsync();
         LastUpdated = KeywordService.StatsLastUpdated;
     }
 }

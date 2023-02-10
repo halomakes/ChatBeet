@@ -1,9 +1,7 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Data.Entities;
+﻿using ChatBeet.Data.Entities;
 using ChatBeet.Models;
 using ChatBeet.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +14,13 @@ namespace ChatBeet.Controllers;
 [ResponseCache(Duration = 300)]
 public class SuspicionController : Controller
 {
-    private readonly UserPreferencesService userPreferencesService;
-    private readonly SuspicionService suspicionService;
+    private readonly UserPreferencesService _userPreferencesService;
+    private readonly SuspicionService _suspicionService;
 
     public SuspicionController(UserPreferencesService userPreferencesService, SuspicionService suspicionService)
     {
-        this.userPreferencesService = userPreferencesService;
-        this.suspicionService = suspicionService;
+        _userPreferencesService = userPreferencesService;
+        _suspicionService = suspicionService;
     }
 
     /// <summary>
@@ -31,19 +29,19 @@ public class SuspicionController : Controller
     [HttpGet]
     public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels()
     {
-        var mostSuspicious = (await suspicionService.GetSuspicionsAsync())
+        var mostSuspicious = (await _suspicionService.GetSuspicionsAsync())
             .AsQueryable()
             .GroupBy(s => s.Suspect.ToLower())
             .Select(g => new
             {
                 Nick = g.Key,
-                Active = g.Where(grp => grp.TimeReported >= suspicionService.ActiveWindowStart).Count(),
+                Active = g.Where(grp => grp.TimeReported >= _suspicionService.ActiveWindowStart).Count(),
                 Total = g.Count()
             })
             .OrderByDescending(t => t.Active)
             .ToList();
 
-        var colorPrefs = await userPreferencesService.Get(mostSuspicious.Select(s => s.Nick), UserPreference.GearColor);
+        var colorPrefs = await _userPreferencesService.Get(mostSuspicious.Select(s => s.Nick), UserPreference.GearColor);
 
         var result = mostSuspicious.Select(s =>
         {

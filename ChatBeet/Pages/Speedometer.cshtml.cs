@@ -1,31 +1,26 @@
 using ChatBeet.Configuration;
-using ChatBeet.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using System;
+using ChatBeet.Services;
 
 namespace ChatBeet.Pages;
 
 public class SpeedometerModel : PageModel
 {
-    private readonly SpeedometerService speedoService;
-    private readonly ChatBeetConfiguration config;
+    private readonly ChatBeetConfiguration _config;
 
     public int Rate { get; set; }
     public string ChannelName { get; set; }
 
-    public SpeedometerModel(SpeedometerService speedoService, IOptions<ChatBeetConfiguration> options)
+    public SpeedometerModel(IOptions<ChatBeetConfiguration> options)
     {
-        this.speedoService = speedoService;
-        config = options.Value;
+        _config = options.Value;
     }
 
     public void OnGet([FromQuery] string channel)
     {
-        ChannelName = string.IsNullOrEmpty(channel) ? config.MainChannel : channel.Trim();
-        if (!ChannelName.StartsWith('#'))
-            ChannelName = $"#{ChannelName}";
-        Rate = speedoService.GetRecentMessageCount(ChannelName, TimeSpan.FromMinutes(1));
+        Rate = SpeedometerService.GetRecentMessageCount(default, TimeSpan.FromMinutes(1));
     }
 }

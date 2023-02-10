@@ -13,23 +13,23 @@ namespace ChatBeet.Services;
 
 public class DeviantartService
 {
-    private readonly HttpClient client;
-    private readonly IMemoryCache cache;
+    private readonly HttpClient _client;
+    private readonly IMemoryCache _cache;
 
     public DeviantartService(IHttpClientFactory clientFactory, IMemoryCache cache)
     {
-        client = clientFactory.CreateClient();
-        this.cache = cache;
+        _client = clientFactory.CreateClient();
+        _cache = cache;
     }
 
     public async Task<SyndicationItem> GetRecentImageAsync(string search)
     {
-        var items = await cache.GetOrCreateAsync($"deviantart:{search}", async e =>
+        var items = await _cache.GetOrCreateAsync($"deviantart:{search}", async e =>
         {
             e.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
             var url = $"https://backend.deviantart.com/rss.xml?type=deviation&q={HttpUtility.UrlEncode(search)}";
-            var response = await client.GetAsync(url);
+            var response = await _client.GetAsync(url);
             var reader = XmlReader.Create(new StringReader(await response.Content.ReadAsStringAsync()));
             var feed = SyndicationFeed.Load(reader);
             return feed.Items.ToList();

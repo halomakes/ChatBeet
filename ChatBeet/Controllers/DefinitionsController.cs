@@ -2,12 +2,12 @@ using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
 using ChatBeet.Utilities;
-using GravyBot;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace ChatBeet.Controllers;
 
@@ -16,13 +16,13 @@ namespace ChatBeet.Controllers;
 [ResponseCache(Duration = 300)]
 public class DefinitionsController : ControllerBase
 {
-    private readonly MemoryCellContext db;
-    private readonly MessageQueueService messageQueue;
+    private readonly MemoryCellContext _db;
+    private readonly IMediator _messageQueue;
 
-    public DefinitionsController(MemoryCellContext db, MessageQueueService messageQueue)
+    public DefinitionsController(MemoryCellContext db, IMediator messageQueue)
     {
-        this.db = db;
-        this.messageQueue = messageQueue;
+        _db = db;
+        _messageQueue = messageQueue;
     }
 
     private async Task SetDefinition(string key, string value)
@@ -31,11 +31,11 @@ public class DefinitionsController : ControllerBase
 
         info.Key = key.Trim();
         info.NewValue = value.Trim();
-        var oldDef = await db.MemoryCells.AsQueryable().FirstOrDefaultAsync(m => m.Key.ToLower() == key.ToLower());
+        var oldDef = await _db.MemoryCells.AsQueryable().FirstOrDefaultAsync(m => m.Key.ToLower() == key.ToLower());
         info.NewNick = User.GetNick();
         if (oldDef == default)
         {
-            db.MemoryCells.Add(new MemoryCell
+            _db.MemoryCells.Add(new MemoryCell
             {
                 Key = info.Key,
                 Value = info.NewValue,
@@ -51,8 +51,8 @@ public class DefinitionsController : ControllerBase
             oldDef.Value = info.NewValue;
         }
 
-        await db.SaveChangesAsync();
-        messageQueue.Push(info);
+        await _db.SaveChangesAsync();
+        await _messageQueue.Publish(info);
     }
 
 
@@ -60,7 +60,7 @@ public class DefinitionsController : ControllerBase
     /// Get all definitions
     /// </summary>
     [HttpGet]
-    public IQueryable<MemoryCell> GetDefinitions() => db.MemoryCells;
+    public IQueryable<MemoryCell> GetDefinitions() => _db.MemoryCells;
 
     /// <summary>
     /// Get a definition
@@ -69,7 +69,7 @@ public class DefinitionsController : ControllerBase
     [HttpGet("{key}")]
     public async Task<ActionResult<MemoryCell>> GetDefinition([FromRoute] string key)
     {
-        var def = await db.MemoryCells
+        var def = await _db.MemoryCells
             .AsQueryable()
             .FirstOrDefaultAsync(m => m.Key.ToLower() == key.ToLower());
         if (def == null)
@@ -92,7 +92,7 @@ public class DefinitionsController : ControllerBase
             return BadRequest("Key is required.");
         if (key != cell.Key)
             return BadRequest("Key in path and body must match.");
-        if (!await db.MemoryCells.AsNoTracking().AnyAsync(s => s.Key.ToLower() == key.ToLower()))
+        if (!await _db.MemoryCells.AsNoTracking().AnyAsync(s => s.Key.ToLower() == key.ToLower()))
             return BadRequest($"Definition for {key} does not exist.");
 
         await SetDefinition(key, cell.Value);

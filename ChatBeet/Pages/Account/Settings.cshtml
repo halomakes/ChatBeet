@@ -2,7 +2,6 @@
 @model ChatBeet.Pages.Account.SettingsModel
 @using ChatBeet.Data.Entities;
 @using ChatBeet.Utilities;
-@using ChatBeet.Attributes;
 @{
     ViewBag.Title = "Settings";
 }
@@ -37,7 +36,7 @@ else
             }
             @foreach (var e in Enum.GetValues(typeof(UserPreference)).Cast<UserPreference>())
             {
-                var label = EnumerationExtensions.GetAttribute<ChatBeet.Attributes.ParameterAttribute, UserPreference>(e).DisplayName;
+                var label = EnumerationExtensions.GetAttribute<Attributes.ParameterAttribute, UserPreference>(e).DisplayName;
                 <option value="@e">@label</option>
             }
         </select>

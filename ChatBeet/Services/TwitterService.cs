@@ -11,13 +11,13 @@ namespace ChatBeet.Services;
 
 public class TwitterService
 {
-    private readonly ChatBeetConfiguration.TwitterConfiguration twitterConfig;
-    private readonly IMemoryCache cache;
+    private readonly ChatBeetConfiguration.TwitterConfiguration _twitterConfig;
+    private readonly IMemoryCache _cache;
 
     public TwitterService(IOptions<ChatBeetConfiguration> twitterOptions, IMemoryCache cache)
     {
-        twitterConfig = twitterOptions.Value.Twitter;
-        this.cache = cache;
+        _twitterConfig = twitterOptions.Value.Twitter;
+        _cache = cache;
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ public class TwitterService
     /// <returns>Recent tweet with an image attached</returns>
     public async Task<Status> GetRecentTweet(string handle, bool mediaOnly = true, bool randomize = true, Func<Status, bool> filter = null)
     {
-        var tweets = await cache.GetOrCreateAsync($"twitter:{handle}", async entry =>
+        var tweets = await _cache.GetOrCreateAsync($"twitter:{handle}", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
             var twitterContext = await GetContext();
@@ -56,7 +56,7 @@ public class TwitterService
 
     public async Task<Status> GetRandomTweetByHashtag(string hashtag, bool mediaOnly = true, Func<Status, bool> filter = null)
     {
-        var searches = await cache.GetOrCreateAsync($"twitter:#{hashtag}", async entry =>
+        var searches = await _cache.GetOrCreateAsync($"twitter:#{hashtag}", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
             var twitterContext = await GetContext();
@@ -81,7 +81,7 @@ public class TwitterService
     /// Get a tweet by its ID
     /// </summary>
     /// <param name="id">ID of the tweet</param>
-    public async Task<Status> GetTweet(ulong id) => await cache.GetOrCreateAsync($"twitter:status:{id}", async entry =>
+    public async Task<Status> GetTweet(ulong id) => await _cache.GetOrCreateAsync($"twitter:status:{id}", async entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromMinutes(5);
         var twitterContext = await GetContext();
@@ -99,8 +99,8 @@ public class TwitterService
         {
             CredentialStore = new InMemoryCredentialStore()
             {
-                ConsumerKey = twitterConfig.ConsumerKey,
-                ConsumerSecret = twitterConfig.ConsumerSecret
+                ConsumerKey = _twitterConfig.ConsumerKey,
+                ConsumerSecret = _twitterConfig.ConsumerSecret
             }
         };
 

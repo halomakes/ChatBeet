@@ -14,26 +14,26 @@ namespace ChatBeet.Pages.Tags;
 [Authorize]
 public class UserModel : PageModel
 {
-    private readonly BooruContext booru;
-    private readonly IMemoryCache cache;
+    private readonly BooruContext _booru;
+    private readonly IMemoryCache _cache;
 
     public string Nick { get; private set; }
     public IEnumerable<TagStat> Stats { get; private set; }
 
     public UserModel(BooruContext booru, IMemoryCache cache)
     {
-        this.booru = booru;
-        this.cache = cache;
+        _booru = booru;
+        _cache = cache;
     }
 
     public async Task OnGet(string nick)
     {
         Nick = nick.Trim().ToLower();
-        var matchingTags = await cache.GetOrCreateAsync($"tags:user:{nick}", async entry =>
+        var matchingTags = await _cache.GetOrCreateAsync($"tags:user:{nick}", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
-            return await booru.TagHistories
+            return await _booru.TagHistories
                 .AsQueryable()
                 .Where(th => th.Nick.ToLower() == Nick)
                 .GroupBy(th => th.Tag)
@@ -44,7 +44,7 @@ public class UserModel : PageModel
         Stats = matchingTags;
         if (matchingTags.Any())
         {
-            Nick = await booru.TagHistories.AsQueryable().Where(th => th.Nick.ToLower() == Nick).Select(th => th.Nick).FirstOrDefaultAsync();
+            Nick = await _booru.TagHistories.AsQueryable().Where(th => th.Nick.ToLower() == Nick).Select(th => th.Nick).FirstOrDefaultAsync();
         }
     }
 }

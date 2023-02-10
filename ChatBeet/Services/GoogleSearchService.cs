@@ -9,13 +9,13 @@ namespace ChatBeet.Services;
 
 public class GoogleSearchService
 {
-    private readonly HttpClient client;
-    private readonly IMemoryCache cache;
+    private readonly HttpClient _client;
+    private readonly IMemoryCache _cache;
 
     public GoogleSearchService(IHttpClientFactory clientFactory, IMemoryCache cache)
     {
-        client = clientFactory.CreateClient("noredirect");
-        this.cache = cache;
+        _client = clientFactory.CreateClient("no-redirect");
+        _cache = cache;
     }
 
     public async Task<Uri> GetFeelingLuckyResultAsync(string query)
@@ -23,10 +23,10 @@ public class GoogleSearchService
         var feelingLuckyUri = new Uri($"https://www.google.com/search?btnI=1&q={WebUtility.UrlEncode(query)}");
         try
         {
-            var result = await cache.GetOrCreateAsync($"google:{feelingLuckyUri}", async entry =>
+            var result = await _cache.GetOrCreateAsync($"google:{feelingLuckyUri}", async entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromMinutes(5);
-                var page = await client.GetAsync(feelingLuckyUri);
+                var page = await _client.GetAsync(feelingLuckyUri);
                 return new GoogleResult
                 {
                     Uri = feelingLuckyUri,

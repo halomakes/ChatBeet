@@ -6,22 +6,22 @@ namespace ChatBeet.Services;
 
 public class LastFmService
 {
-    private readonly LastfmClient client;
+    private readonly LastfmClient _client;
 
     public LastFmService(LastfmClient client)
     {
-        this.client = client;
+        _client = client;
     }
 
     public async Task<LastTrack> GetTrackInfo(string track, string artist)
     {
-        var response = await client.Track.GetInfoAsync(track, artist);
+        var response = await _client.Track.GetInfoAsync(track, artist);
         return response?.Content;
     }
 
     public async Task<LastArtist> GetArtistInfo(string artist)
     {
-        var response = await client.Artist.GetInfoAsync(artist);
+        var response = await _client.Artist.GetInfoAsync(artist);
         return response?.Content;
     }
 }

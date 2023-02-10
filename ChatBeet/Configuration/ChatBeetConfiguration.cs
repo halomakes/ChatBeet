@@ -1,5 +1,4 @@
-﻿using GravyBot.Commands;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using Untappd.Client;
 
@@ -18,7 +17,6 @@ public class ChatBeetConfiguration
     public MessageCollectionConfiguration MessageCollection { get; set; } = new MessageCollectionConfiguration();
     public UntappdConfig Untappd { get; set; }
     public Dictionary<string, string> Urls { get; set; }
-    public Dictionary<string, ChannelPolicy> Policies { get; set; }
     public static CultureInfo Culture = new("en-US");
     public string MainChannel { get; set; }
     public string Sauce { get; set; }

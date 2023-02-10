@@ -1,16 +1,9 @@
 using BooruSharp.Booru;
 using ChatBeet.Configuration;
 using ChatBeet.Data;
-using ChatBeet.Models;
-using ChatBeet.Rules;
 using ChatBeet.Services;
 using DSharpPlus;
-using DSharpPlus.EventArgs;
 using Genbox.WolframAlpha;
-using GravyBot;
-using GravyBot.Commands;
-using GravyBot.DefaultRules;
-using GravyIrc.Messages;
 using IF.Lastfm.Core.Api;
 using Meowtrix.PixivApi;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -32,8 +25,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
-using AspNet.Security.OAuth.Discord;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Untappd.Client;
@@ -56,50 +47,105 @@ public class Startup
     {
         services.AddControllers();
         services.AddRazorPages();
-
-        var botConfig = new ChatBeetConfiguration();
-        Configuration.Bind("Rules", botConfig);
-
-        services.AddIrcBot(Configuration.GetSection("Irc"), pipeline =>
-        {
-            pipeline.AddSampleRules();
-
-            pipeline.RegisterAsyncRule<RecentTweetRule, PrivateMessage>();
-            pipeline.RegisterRule<AutoYatoRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<RememberRule, PrivateMessage>();
-            pipeline.RegisterRule<ReplacementSetRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<DadJokeRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<DownloadCompleteRule, DownloadCompleteMessage>();
-            pipeline.RegisterRule<KarmaReactRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<TwitterUrlPreviewRule, PrivateMessage>();
-            pipeline.RegisterRule<LoginTokenRule, LoginTokenRequest>();
-            pipeline.RegisterRule<LoginNotificationRule, LoginCompleteNotification>();
-            pipeline.RegisterRule<DefUpdatedRule, DefinitionChange>();
-            pipeline.RegisterRule<UserPreferencesRule, PreferenceChange>();
-            pipeline.RegisterAsyncRule<BirthdaysRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<KeywordRule, PrivateMessage>();
-            pipeline.RegisterRule<StackTraceRule, Exception>();
-            pipeline.RegisterAsyncRule<InterrogativeRecallRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<CommandingRecallRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<SuspectRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<ChatRateRule, PrivateMessage>();
-            pipeline.RegisterAsyncRule<DessRule, PrivateMessage>();
-            pipeline.RegisterRule<AmazonSmileRule, PrivateMessage>();
-            pipeline.RegisterRule<IrcLinkRule, IrcLinkRequest>();
-            pipeline.AddCommandOrchestrator();
-        });
-
+        services.AddMemoryCache();
         services.AddMediatR(typeof(Startup));
+        services.AddHttpContextAccessor();
 
-        services.AddCommandOrchestrator(builder =>
+        services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules"));
+        services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.All; });
+
+        AddHttpClients(services);
+        AddAuthentication(services);
+        AddThirdPartyProviders(services);
+        AddInternalServices(services);
+        ConfigureDatabases(services);
+        AddDiscordBot(services);
+        ConfigureSwagger(services);
+
+        services.AddWebOptimizer(pipeline => { pipeline.CompileScssFiles(); });
+    }
+
+    private void AddDiscordBot(IServiceCollection services)
+    {
+        services.Configure<DiscordConfiguration>(c =>
         {
-            builder.RegisterProcessors(Assembly.GetExecutingAssembly());
-            builder.RegisterProcessor<HelpCommandProcessor>();
-            builder.AddChannelPolicy("NoMain", botConfig.Policies["NoMain"]);
+            c.Token = Configuration.GetValue<string>("Discord:Token");
+            c.TokenType = TokenType.Bot;
+            c.Intents = DiscordIntents.MessageContents | DiscordIntents.AllUnprivileged;
         });
+        services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
+        services.AddHostedService<DiscordBotService>();
+        services.Configure<DiscordBotConfiguration>(Configuration.GetSection("Discord"));
+        services.AddTransient<DiscordLogService>();
+    }
 
+    private static void ConfigureSwagger(IServiceCollection services)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "ChatBeet",
+                Description = "A chat bot, but also a root vegetable."
+            });
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            c.IncludeXmlComments(xmlPath);
+        });
+    }
+
+    private static void ConfigureDatabases(IServiceCollection services)
+    {
+        services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
+        services.AddDbContext<BooruContext>(opts => opts.UseSqlite("Data Source=db/booru.db"));
+        services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"));
+        services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"));
+        services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
+        services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
+        services.AddDbContext<ProgressContext>(opts => opts.UseSqlite("Data Source=db/progress.db"));
+        services.AddDbContext<IrcLinkContext>(opts => opts.UseSqlite("Data Source=db/ircmigration.db"));
+    }
+
+    private void AddAuthentication(IServiceCollection services)
+    {
+        services.AddAuthentication(options => { options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; }).AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+            })
+            .AddDiscord(options =>
+            {
+                options.ClientSecret = Configuration.GetValue<string>("Discord:ClientSecret");
+                options.ClientId = Configuration.GetValue<string>("Discord:ClientId");
+                options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "https://cdn.discordapp.com/avatars/{0}/{1}.{2}",
+                        user.GetString("id"),
+                        user.GetString("avatar"),
+                        user.GetString("avatar")!.StartsWith("a_") ? "gif" : "png"));
+            });
+    }
+
+    private static void AddInternalServices(IServiceCollection services)
+    {
+        services.AddScoped<UserPreferencesService>();
+        services.AddScoped<KeywordService>();
+        services.AddScoped<NegativeResponseService>();
+        services.AddScoped<GoogleSearchService>();
+        services.AddScoped<LinkPreviewService>();
+        services.AddScoped<SpeedometerService>();
+        services.AddHostedService<ContextInitializer>();
+        services.AddScoped<IrcMigrationService>();
+        services.AddTransient<GraphicsService>();
+        services.AddScoped<SuspicionService>();
+    }
+
+    private static void AddHttpClients(IServiceCollection services)
+    {
         services.AddHttpClient();
-        services.AddHttpClient("noredirect").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+        services.AddHttpClient("no-redirect").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
         {
             AllowAutoRedirect = false
         });
@@ -107,14 +153,16 @@ public class Startup
         {
             AutomaticDecompression = DecompressionMethods.All
         });
+    }
 
+    private void AddThirdPartyProviders(IServiceCollection services)
+    {
         services.AddScoped<ComplimentService>();
         services.AddScoped<DadJokeService>();
         services.AddScoped<PixivApiClient>();
         services.AddScoped<DeviantartService>();
         services.AddScoped<AnilistClient>();
         services.AddScoped<AnilistService>();
-        services.Configure<ChatBeetConfiguration>(Configuration.GetSection("Rules"));
         services.AddScoped<TwitterService>();
         services.AddScoped<TenorGifService>();
         services.AddScoped<Gelbooru>();
@@ -130,19 +178,9 @@ public class Startup
             return new IGDB.IGDBClient(config.ClientId, config.ClientSecret);
         });
         services.AddScoped<BooruService>();
-        services.AddScoped<UserPreferencesService>();
-        services.AddScoped<KeywordService>();
-        services.AddHttpContextAccessor();
-        services.AddScoped<NegativeResponseService>();
-        services.AddScoped(provider => new OpenWeatherMapClient(Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
-        services.AddScoped<GoogleSearchService>();
-        services.AddScoped<LinkPreviewService>();
-        services.AddScoped(provider =>
-        {
-            var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
-            return new DogApi.DogApiClient(client, Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
-        });
-        services.AddScoped<SpeedometerService>();
+        services.AddScoped<MemeService>();
+        services.AddScoped<UrbanDictionaryApi>();
+        services.AddScoped<YoutubeClient>();
         services.AddScoped(provider =>
         {
             var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
@@ -155,75 +193,13 @@ public class Startup
             var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
             return new SauceNETClient(config.Value.Sauce);
         });
-        services.AddSingleton(provider => new WolframAlphaClient(Configuration.GetValue<string>("Rules:Wolfram:AppId")));
-
-        services.AddHostedService<ContextInitializer>();
-        services.AddDbContext<MemoryCellContext>(opts => opts.UseSqlite("Data Source=db/memorycell.db"));
-        services.AddDbContext<BooruContext>(opts => opts.UseSqlite("Data Source=db/booru.db"));
-        services.AddDbContext<PreferencesContext>(opts => opts.UseSqlite("Data Source=db/userprefs.db"));
-        services.AddDbContext<KeywordContext>(opts => opts.UseSqlite("Data Source=db/keywords.db"));
-        services.AddDbContext<ReplacementContext>(opts => opts.UseSqlite("Data Source=db/replacements.db"));
-        services.AddDbContext<SuspicionContext>(opts => opts.UseSqlite("Data Source=db/suspicions.db"));
-        services.AddDbContext<ProgressContext>(opts => opts.UseSqlite("Data Source=db/progress.db"));
-        services.AddDbContext<IrcLinkContext>(opts => opts.UseSqlite("Data Source=db/ircmigration.db"));
-
-        services.AddMemoryCache();
-
-        services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie(options =>
-            {
-                options.LoginPath = "/Account/Login";
-                options.LogoutPath = "/Account/Logout";
-            })
-            .AddDiscord(options =>
-            {
-                options.ClientSecret = Configuration.GetValue<string>("Discord:ClientSecret");
-                options.ClientId = Configuration.GetValue<string>("Discord:ClientId");
-                options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "https://cdn.discordapp.com/avatars/{0}/{1}.{2}",
-                        user.GetString("id"),
-                        user.GetString("avatar"),
-                        user.GetString("avatar").StartsWith("a_") ? "gif" : "png"));
-            });
-        services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.All; });
-
-        services.AddSwaggerGen(c =>
+        services.AddScoped(_ => new OpenWeatherMapClient(Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
+        services.AddSingleton(_ => new WolframAlphaClient(Configuration.GetValue<string>("Rules:Wolfram:AppId")));
+        services.AddScoped(provider =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Version = "v1",
-                Title = "ChatBeet",
-                Description = "A chat bot, but also a root vegetable."
-            });
-            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            c.IncludeXmlComments(xmlPath);
+            var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
+            return new DogApi.DogApiClient(client, Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
         });
-
-        services.AddWebOptimizer(pipeline => { pipeline.CompileScssFiles(); });
-
-        // discord stuff
-        services.Configure<DiscordConfiguration>(c =>
-        {
-            c.Token = Configuration.GetValue<string>("Discord:Token");
-            c.TokenType = TokenType.Bot;
-            c.Intents = DiscordIntents.MessageContents | DiscordIntents.AllUnprivileged;
-        });
-        services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
-        services.AddHostedService<DiscordBotService>();
-        services.Configure<DiscordBotConfiguration>(Configuration.GetSection("Discord"));
-        services.AddTransient<DiscordLogService>();
-        services.AddScoped<IrcMigrationService>();
-
-        services.AddTransient<GraphicsService>();
-        services.AddScoped<SuspicionService>();
-        services.AddScoped<MemeService>();
-        services.AddScoped<UrbanDictionaryApi>();
-        services.AddScoped<YoutubeClient>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

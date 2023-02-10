@@ -1,4 +1,7 @@
-﻿@model IEnumerable<TagStat>
+﻿@using ChatBeet.Models
+@using ChatBeet.TagHelpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<ChatBeet.Models.TagStat>
 @{
     var max = Model.Max(s => s.Total);
     var count = 0;

@@ -13,11 +13,11 @@ namespace ChatBeet.Controllers;
 [ApiController]
 public class BlacklistController : ControllerBase
 {
-    private readonly BooruService booru;
+    private readonly BooruService _booru;
 
     public BlacklistController(BooruService booru)
     {
-        this.booru = booru;
+        _booru = booru;
     }
 
     /// <summary>
@@ -26,14 +26,14 @@ public class BlacklistController : ControllerBase
     [HttpGet, Authorize]
     public async Task<ActionResult<IEnumerable<string>>> Get()
     {
-        return Ok(await booru.GetBlacklistedTags(User?.Identity?.Name));
+        return Ok(await _booru.GetBlacklistedTags(User?.Identity?.Name));
     }
 
     /// <summary>
     /// Get globally blacklisted tags
     /// </summary>
     [HttpGet("global")]
-    public ActionResult<IEnumerable<string>> GetGlobal() => Ok(booru.GetGlobalBlacklistedTags());
+    public ActionResult<IEnumerable<string>> GetGlobal() => Ok(_booru.GetGlobalBlacklistedTags());
 
     /// <summary>
     /// Remove tags from your booru blacklist
@@ -43,7 +43,7 @@ public class BlacklistController : ControllerBase
     public async Task Remove(string tagList)
     {
         var allTags = tagList.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        await booru.WhitelistTags(User.GetNick(), allTags);
+        await _booru.WhitelistTags(User.GetNick(), allTags);
     }
 
     /// <summary>
@@ -54,6 +54,6 @@ public class BlacklistController : ControllerBase
     public async Task Add(string tagList)
     {
         var allTags = tagList.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        await booru.BlacklistTags(User.GetNick(), allTags);
+        await _booru.BlacklistTags(User.GetNick(), allTags);
     }
 }

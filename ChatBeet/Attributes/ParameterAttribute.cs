@@ -4,10 +4,10 @@ namespace ChatBeet.Attributes;
 
 public class ParameterAttribute : Attribute
 {
-    public ParameterAttribute(string InlineName, string DisplayName = default)
+    public ParameterAttribute(string inlineName, string displayName = default)
     {
-        this.InlineName = InlineName;
-        this.DisplayName = DisplayName;
+        InlineName = inlineName;
+        DisplayName = displayName;
     }
 
     public string DisplayName { get; set; }

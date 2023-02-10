@@ -13,11 +13,11 @@ namespace ChatBeet.Controllers;
 [ApiController]
 public class FixedTimeRangesController : ControllerBase
 {
-    private readonly ProgressContext dbContext;
+    private readonly ProgressContext _dbContext;
 
     public FixedTimeRangesController(ProgressContext dbContext)
     {
-        this.dbContext = dbContext;
+        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public class FixedTimeRangesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<FixedTimeRange>>> GetFixedTimeRanges()
     {
-        return await dbContext.FixedTimeRanges.AsQueryable().ToListAsync();
+        return await _dbContext.FixedTimeRanges.AsQueryable().ToListAsync();
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class FixedTimeRangesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<FixedTimeRange>> GetFixedTimeRange(string id)
     {
-        var fixedTimeRange = await dbContext.FixedTimeRanges.FindAsync(id);
+        var fixedTimeRange = await _dbContext.FixedTimeRanges.FindAsync(id);
 
         if (fixedTimeRange == null)
         {
@@ -59,11 +59,11 @@ public class FixedTimeRangesController : ControllerBase
             return BadRequest();
         }
 
-        dbContext.Entry(fixedTimeRange).State = EntityState.Modified;
+        _dbContext.Entry(fixedTimeRange).State = EntityState.Modified;
 
         try
         {
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -87,10 +87,10 @@ public class FixedTimeRangesController : ControllerBase
     [HttpPost, Authorize]
     public async Task<ActionResult<FixedTimeRange>> PostFixedTimeRange(FixedTimeRange fixedTimeRange)
     {
-        dbContext.FixedTimeRanges.Add(fixedTimeRange);
+        _dbContext.FixedTimeRanges.Add(fixedTimeRange);
         try
         {
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {
@@ -114,20 +114,20 @@ public class FixedTimeRangesController : ControllerBase
     [HttpDelete("{id}"), Authorize]
     public async Task<IActionResult> DeleteFixedTimeRange(string id)
     {
-        var fixedTimeRange = await dbContext.FixedTimeRanges.FindAsync(id);
+        var fixedTimeRange = await _dbContext.FixedTimeRanges.FindAsync(id);
         if (fixedTimeRange == null)
         {
             return NotFound();
         }
 
-        dbContext.FixedTimeRanges.Remove(fixedTimeRange);
-        await dbContext.SaveChangesAsync();
+        _dbContext.FixedTimeRanges.Remove(fixedTimeRange);
+        await _dbContext.SaveChangesAsync();
 
         return NoContent();
     }
 
     private bool FixedTimeRangeExists(string id)
     {
-        return dbContext.FixedTimeRanges.Any(e => e.Key == id);
+        return _dbContext.FixedTimeRanges.Any(e => e.Key == id);
     }
 }

@@ -1,12 +1,11 @@
 ﻿@page
 @model ChatBeet.Pages.Commands.IndexModel
-@using ChatBeet.Utilities
-@using System.Text.RegularExpressions
-@using System.ComponentModel.DataAnnotations
-@using Humanizer
+@using DSharpPlus
+@using DSharpPlus.SlashCommands
+@inject DiscordClient Discord;
 @{
     ViewBag.Title = "Commands";
-    var ParameterRgx = new Regex(@"(\{[^\{\}]+\})+", RegexOptions.Compiled);
+    var commands = Discord.GetSlashCommands();
 }
 
 <h1>Commands</h1>
@@ -16,115 +15,91 @@
 
 <cache>
     <div id="accordion">
-        @foreach (var binding in Model.Builder.Bindings.OrderBy(b => b.Key))
+        @foreach (var binding in commands.RegisteredCommands.First().Value.OrderBy(c => c.Name))
         {
-            var id = TagBuilder.CreateSanitizedId(binding.Key, "_");
+            var id = TagBuilder.CreateSanitizedId(binding.Name, "_");
             <div class="card" id="@id">
                 <div class="card-header d-flex justify-content-between flex-wrap align-items-md-center flex-md-row flex-column align-items-start" id="heading-@id" data-toggle="collapse" data-target="#collapse-@id" aria-expanded="false" aria-controls="collapse-@id" role="button">
                     <h4 class="mb-0">
-                        @binding.Key
+                        @binding.Name
                     </h4>
-                    @if (!string.IsNullOrWhiteSpace(binding.Value.Command.Description))
+                    @if (!string.IsNullOrWhiteSpace(binding.Description))
                     {
-                        <span>@binding.Value.Command.Description</span>
+                        <span>@binding.Description</span>
                     }
                 </div>
 
                 <div id="collapse-@id" class="collapse" aria-labelledby="heading-@id" data-parent="#accordion">
                     <div class="card-body">
                         <p>
-                            @binding.Value.Command.Description
+                            @binding.Description
                         </p>
                         <div class="mb-4">
                             <h5>Example Usage</h5>
                             <code>
-                                <span class="text-white-50">@Model.CommandPrefix</span>
-                                @foreach (var segment in ParameterRgx.Split(binding.Value.Command.CommandFormat))
+                                <span class="text-white-50">/@binding.Name</span>
+                                @foreach (var opt in binding.Options)
                                 {
-                                    if (segment.StartsWith("{"))
-                                    {
-                                        <text>@segment</text>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-white">@segment</span>
-                                    }
+                                    <span class="text-white">&lt;@opt.Name&gt;</span>
                                 }
                             </code>
                         </div>
 
-                        @if (binding.Value.Command.ParameterNames.Any())
+                        @if (binding.Options.Any())
                         {
-                            var methodParams = binding.Value.Method.GetParameters();
                             <div class="mb-4">
                                 <h5>Parameters</h5>
                                 <ul>
-                                    @foreach (var parameter in methodParams)
+                                    @foreach (var opt in binding.Options)
                                     {
-                                        var validators = parameter.GetCustomAttributes(typeof(ValidationAttribute), true).Cast<ValidationAttribute>();
-
                                         <li>
-                                            <code>@parameter.Name</code>
-                                            <span class="text-white-50">(@parameter.GetFriendlyTypeName())</span>
-                                            @if (validators.Any())
-                                            {
-                                                <ul>
-                                                    @foreach (var validator in validators)
-                                                    {
-                                                        <li>
-                                                            @validator.FormatErrorMessage(parameter.Name)
-                                                        </li>
-                                                    }
-                                                </ul>
-                                            }
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        }
-
-                        @{
-                            var hasRestriction = binding.Value.HasPolicy
-                                || binding.Value.IsChannelOnly
-                                || binding.Value.IsDirectOnly
-                                || binding.Value.IsRateLimited;
-                        }
-                        @if (hasRestriction)
-                        {
-                            <div class="mb-4">
-                                <h5>Restrictions</h5>
-                                <ul>
-                                    @if (binding.Value.IsChannelOnly)
-                                    {
-                                        <li>This command can only be used in channels.</li>
-                                    }
-                                    @if (binding.Value.IsDirectOnly)
-                                    {
-                                        <li>This command can only be used in direct messages.</li>
-                                    }
-                                    @if (binding.Value.IsRateLimited)
-                                    {
-                                        <li>This command can only be used once every @binding.Value.RateLimitPeriod.Value.Humanize().</li>
-                                    }
-                                    @if (binding.Value.HasPolicy && Model.Builder.Policies.Any(p => p.Key.ToLower() == binding.Value.PolicyName.ToLower()))
-                                    {
-                                        var policy = Model.Builder.Policies.First(p => p.Key.ToLower() == binding.Value.PolicyName.ToLower()).Value;
-                                        <li>
-                                            @switch (policy.Mode)
-                                            {
-                                                case GravyBot.Commands.ChannelPolicy.PolicyMode.Blacklist:
-                                                    <text>This command cannot be used in these channels:</text>
-                                                    break;
-                                                case GravyBot.Commands.ChannelPolicy.PolicyMode.Whitelist:
-                                                    <text>This command can only be used in these channels:</text>
-                                                    break;
-                                                default: break;
-                                            }
+                                            <code>@opt.Name</code>
+                                            <span class="text-white-50">(@opt.Type)</span>
+                                            <div>@opt.Description</div>
                                             <ul>
-                                                @foreach (var chan in policy.Channels)
+                                                <li>
+                                                    @(opt.Required == true ? "Required" : "Optional").
+                                                </li>
+                                                @if (opt.Choices.Any())
                                                 {
                                                     <li>
-                                                        @chan
+                                                        Available Choices:
+                                                        <ul>
+                                                            @foreach (var c in opt.Choices)
+                                                            {
+                                                                <li>@c.Name</li>
+                                                            }
+                                                        </ul>
+                                                    </li>
+                                                }
+                                                @if (opt.AutoComplete == true)
+                                                {
+                                                    <li>
+                                                        Autocomplete available.
+                                                    </li>
+                                                }
+                                                @if (opt.MinLength is not null)
+                                                {
+                                                    <li>
+                                                        Min Length: @opt.MinLength
+                                                    </li>
+                                                }
+                                                @if (opt.MaxLength is not null)
+                                                {
+                                                    <li>
+                                                        Max Length: @opt.MaxLength
+                                                    </li>
+                                                }
+                                                @if (opt.MinValue is not null)
+                                                {
+                                                    <li>
+                                                        Min Value: @opt.MinValue
+                                                    </li>
+                                                }
+                                                @if (opt.MaxValue is not null)
+                                                {
+                                                    <li>
+                                                        Max Value: @opt.MaxValue
                                                     </li>
                                                 }
                                             </ul>
@@ -133,6 +108,14 @@
                                 </ul>
                             </div>
                         }
+
+                        <div class="mb-4">
+                            <h5>Restrictions</h5>
+                            <ul>
+                                <li>This command @(binding.AllowDMUsage == true ? "can" : "cannot") be used in direct messages.</li>
+                            </ul>
+                        </div>
+
                     </div>
                 </div>
             </div>

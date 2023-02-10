@@ -4,7 +4,7 @@ using System.Linq;
 namespace ChatBeet.Utilities;
 public class YesNoGenerator
 {
-    private static DateTime LastIndeterminateResponse;
+    private static DateTime _lastIndeterminateResponse;
     private static readonly TimeSpan AntiAnnoyingWindow = TimeSpan.FromMinutes(10);
     private static readonly string[] PositiveResponses = new[] {
         "It is certain",
@@ -37,14 +37,14 @@ public class YesNoGenerator
 
     public static string GetResponse()
     {
-        if (DateTime.Now - LastIndeterminateResponse < AntiAnnoyingWindow)
+        if (DateTime.Now - _lastIndeterminateResponse < AntiAnnoyingWindow)
         {
             var response = PositiveResponses
                     .Union(IndeterminateResponses)
                     .Union(NegativeResponses)
                     .PickRandom();
             if (IndeterminateResponses.Contains(response))
-                LastIndeterminateResponse = DateTime.Now;
+                _lastIndeterminateResponse = DateTime.Now;
             return response;
         }
         return PositiveResponses

@@ -19,7 +19,7 @@ public partial class DownloadCompleteHandler : INotificationHandler<DownloadComp
 
     public DownloadCompleteHandler(IOptions<DiscordBotConfiguration> discordConfig, IServiceScopeFactory serviceScopeFactory)
     {
-        this._discordConfig = discordConfig.Value;
+        _discordConfig = discordConfig.Value;
         _serviceScopeFactory = serviceScopeFactory;
     }
 

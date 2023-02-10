@@ -4,7 +4,6 @@ using ChatBeet.Configuration;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Utilities;
-using GravyBot;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -14,26 +13,28 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using ChatBeet.Notifications;
+using MediatR;
 
 namespace ChatBeet.Services;
 
 public class BooruService
 {
-    private readonly IMemoryCache cache;
-    private readonly Gelbooru gelbooru;
-    private readonly ChatBeetConfiguration.BooruConfiguration booruConfig;
-    private readonly BooruContext context;
-    private readonly MessageQueueService messageQueue;
-    private readonly HttpClient httpClient;
+    private readonly IMemoryCache _cache;
+    private readonly Gelbooru _gelbooru;
+    private readonly ChatBeetConfiguration.BooruConfiguration _booruConfig;
+    private readonly BooruContext _context;
+    private readonly IMediator _messageQueue;
+    private readonly HttpClient _httpClient;
 
-    public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context, MessageQueueService messageQueue, HttpClient httpClient)
+    public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context, IMediator messageQueue, HttpClient httpClient)
     {
-        this.cache = cache;
-        this.gelbooru = gelbooru;
-        booruConfig = options.Value.Booru;
-        this.context = context;
-        this.messageQueue = messageQueue;
-        this.httpClient = httpClient;
+        _cache = cache;
+        _gelbooru = gelbooru;
+        _booruConfig = options.Value.Booru;
+        _context = context;
+        _messageQueue = messageQueue;
+        _httpClient = httpClient;
     }
 
     [Obsolete("Remove with IRC")]
@@ -53,18 +54,18 @@ public class BooruService
     public async Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
     {
         var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:general" : "-rating:general") : string.Empty;
-        var globalBlacklist = Negate(booruConfig.BlacklistedTags);
+        var globalBlacklist = Negate(_booruConfig.BlacklistedTags);
         var userBlacklist = string.IsNullOrEmpty(requestor)
             ? new List<string>()
             : Negate(await GetBlacklistedTags(requestor));
 
         var allTags = tags.Concat(globalBlacklist).Concat(userBlacklist).Append(filter);
 
-        var results = await cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", entry =>
+        var results = await _cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-            return gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
+            return _gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
         });
 
         return PickImage(results);
@@ -88,13 +89,13 @@ public class BooruService
         }
     }
 
-    public IEnumerable<string> GetGlobalBlacklistedTags() => booruConfig.BlacklistedTags;
+    public IEnumerable<string> GetGlobalBlacklistedTags() => _booruConfig.BlacklistedTags;
 
-    public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await cache.GetOrCreateAsync(GetCacheEntry(nick), entry =>
+    public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await _cache.GetOrCreateAsync(GetCacheEntry(nick), entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromMinutes(15);
 
-        return context.Blacklists.AsNoTracking()
+        return _context.Blacklists.AsNoTracking()
             .Where(b => b.Nick == nick)
             .Select(b => b.Tag)
             .ToListAsync();
@@ -102,7 +103,7 @@ public class BooruService
 
     public async Task BlacklistTags(string nick, IEnumerable<string> tags)
     {
-        var existingTags = await context.Blacklists.AsQueryable()
+        var existingTags = await _context.Blacklists.AsQueryable()
             .Where(t => t.Nick == nick)
             .Where(t => tags.Contains(t.Tag))
             .ToListAsync();
@@ -115,27 +116,27 @@ public class BooruService
                 Tag = t
             });
 
-        context.Blacklists.AddRange(tagsToAdd);
-        await context.SaveChangesAsync();
+        _context.Blacklists.AddRange(tagsToAdd);
+        await _context.SaveChangesAsync();
         ClearCache(nick);
     }
 
     public async Task WhitelistTags(string nick, IEnumerable<string> tags)
     {
-        context.Blacklists.RemoveRange(context.Blacklists.AsQueryable().Where(b => b.Nick == nick && tags.Contains(b.Tag)));
+        _context.Blacklists.RemoveRange(_context.Blacklists.AsQueryable().Where(b => b.Nick == nick && tags.Contains(b.Tag)));
 
-        await context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         ClearCache(nick);
     }
 
-    public async Task<IEnumerable<string>> GetTagsAsync(string query) => await cache.GetOrCreateAsync($"booru:tags:{query}", async entry =>
+    public async Task<IEnumerable<string>> GetTagsAsync(string query) => await _cache.GetOrCreateAsync($"booru:tags:{query}", async entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromHours(1);
-        var response = await httpClient.GetFromJsonAsync<TagResponse>($"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&limit=25&name_pattern={query}%");
+        var response = await _httpClient.GetFromJsonAsync<TagResponse>($"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&limit=25&name_pattern={query}%");
         return response.Tag.Select(t => t.Name).ToList();
     });
 
-    private void ClearCache(string nick) => cache.Remove(GetCacheEntry(nick));
+    private void ClearCache(string nick) => _cache.Remove(GetCacheEntry(nick));
 
     private static string GetCacheEntry(string nick) => $"boorublacklist:{nick}";
 
@@ -147,12 +148,12 @@ public class BooruService
         {
             var usableTags = tags.Where(t => !t.StartsWith("-")).Where(t => !t.Contains(":"));
             var tagEntries = usableTags.Select(t => new TagHistory { Nick = nick, Tag = t });
-            context.TagHistories.AddRange(tagEntries);
-            await context.SaveChangesAsync();
+            _context.TagHistories.AddRange(tagEntries);
+            await _context.SaveChangesAsync();
         }
         catch (Exception e)
         {
-            messageQueue.Push(e);
+            await _messageQueue.Publish(new BackendExceptionNotification(e));
         }
     }
 

@@ -11,13 +11,13 @@ namespace ChatBeet.Services;
 
 public class DadJokeService
 {
-    private readonly HttpClient client;
-    private readonly IMemoryCache cache;
+    private readonly HttpClient _client;
+    private readonly IMemoryCache _cache;
 
     public DadJokeService(IHttpClientFactory clientFactory, IMemoryCache cache)
     {
-        client = clientFactory.CreateClient();
-        this.cache = cache;
+        _client = clientFactory.CreateClient();
+        _cache = cache;
     }
 
     public async Task<string> GetDadJokeAsync()
@@ -29,7 +29,7 @@ public class DadJokeService
         };
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
         if (response.IsSuccessStatusCode)
         {
             using var contentStream = await response.Content.ReadAsStreamAsync();
