@@ -34,7 +34,6 @@ public class UserModel : PageModel
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
             return await _booru.TagHistories
-                .AsQueryable()
                 .Where(th => th.UserId == userId)
                 .GroupBy(th => th.Tag)
                 .OrderByDescending(g => g.Count())

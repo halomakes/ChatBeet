@@ -96,7 +96,7 @@ public class Startup
 
     private void ConfigureDatabases(IServiceCollection services)
     {
-        services.AddDbContext<CbDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("ChatBeet")));
+        services.AddDbContext<CbDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("ChatBeet")).UseSnakeCaseNamingConvention());
 
         services.AddScoped<IUsersRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
         services.AddScoped<IBooruRepository>(ctx => ctx.GetRequiredService<CbDbContext>());

@@ -76,10 +76,10 @@ public class ProgressCommandModule : ApplicationCommandModule
     public async Task GetOffsetDay(InteractionContext ctx)
     {
         var offset = TimeZoneInfo.Local.BaseUtcOffset - TimeSpan.FromHours(1);
-        var centralTimeZone = TimeZoneInfo.GetSystemTimeZones().First(tz => tz.BaseUtcOffset == offset);
+        var centralTimeZone = TimeZoneInfo.CreateCustomTimeZone("yato", offset, "Yato", "Yato");
         var nowCentral = TimeZoneInfo.ConvertTime(DateTime.UtcNow, centralTimeZone);
         var startOfDay = new DateTimeOffset(nowCentral.Year, nowCentral.Month, nowCentral.Day, 0, 0, 0, centralTimeZone.BaseUtcOffset);
-        await ProgressResult(ctx, startOfDay.DateTime, startOfDay.AddDays(1).DateTime, $"(in the {Formatter.Italic("objectively better")} time zone) {Formatter.Bold("Today")} is");
+        await ProgressResult(ctx, startOfDay.UtcDateTime, startOfDay.AddDays(1).UtcDateTime, $"(in the {Formatter.Italic("objectively better")} time zone) {Formatter.Bold("Today")} is", DateTime.UtcNow);
     }
 
     [SlashCommand("hour", "Get progress for the current hour")]
@@ -161,8 +161,8 @@ public class ProgressCommandModule : ApplicationCommandModule
     private Task ProgressResult(InteractionContext ctx, double ratio, string preFormat) =>
         SendResult(ctx, ratio, Progress.GetCompletionDescription(ratio, preFormat));
 
-    private Task ProgressResult(InteractionContext ctx, DateTime start, DateTime end, string preFormat) =>
-        SendResult(ctx, Progress.GetRatio(_now, start, end), Progress.GetCompletionDescription(_now, start, end, preFormat));
+    private Task ProgressResult(InteractionContext ctx, DateTime start, DateTime end, string preFormat, DateTime? now = null) =>
+        SendResult(ctx, Progress.GetRatio(now ?? _now, start, end), Progress.GetCompletionDescription(now ?? _now, start, end, preFormat));
 
     private async Task SendResult(InteractionContext ctx, double ratio, string message)
     {

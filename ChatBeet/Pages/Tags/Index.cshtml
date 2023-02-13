@@ -15,7 +15,7 @@
         @foreach (var usr in Model.UserStats)
         {
             <div>
-                <b><a asp-page="User" asp-route-nick="@usr.UserId" class="text-success">@usr.UserId</a></b>
+                <b><a asp-page="User" asp-route-userid="@usr.UserId" class="text-success">@usr.User?.DisplayName()</a></b>
                 <span>searched for</span>
                 <b><a asp-page="Tag" asp-route-tagname="@usr.Tag" class="text-success">@usr.Tag.Replace("_", " ")</a></b>
                 @usr.Total @(usr.Total == 1 ? "time" : "times").

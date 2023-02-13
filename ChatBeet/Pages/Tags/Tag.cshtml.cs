@@ -33,12 +33,18 @@ public class TagModel : PageModel
 
             var entries = await _booru.TagHistories
                 .Include(h => h.User)
-                .AsQueryable()
-                .Where(th => th.Tag.ToLower() == tagName)
-                .GroupBy(th => th.User)
-                .OrderByDescending(g => g.Count())
+                .Where(th => th.Tag!.ToLower() == tagName)
                 .ToListAsync();
-            return entries.Select(g => new TagStat { Tag = g.Key.DisplayName(), Total = g.Count(), Mode = TagStat.StatMode.User });
+            return entries
+                .GroupBy(th => th.UserId)
+                .OrderByDescending(g => g.Count())
+                .Select(g => new TagStat
+                {
+                    Tag = g.First().User!.DisplayName()!, 
+                    Total = g.Count(), 
+                    Mode = TagStat.StatMode.User, 
+                    User = g.First().User
+                });
         });
         Stats = matchingTags;
     }

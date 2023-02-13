@@ -22,9 +22,9 @@
         }
         else
         {
-            <a class="list-group-item list-group-item-action position-relative overflow-none" asp-page="User" asp-route-nick="@stat.Tag">
+            <a class="list-group-item list-group-item-action position-relative overflow-none" asp-page="User" asp-route-userid="@(stat.User?.Id ?? Guid.Empty)">
                 <span class="ml-2">
-                    @stat.Tag.Replace("_", " ")
+                    @stat.User?.DisplayName()
                     <span class="badge badge-pill badge-primary ml-1">@stat.Total</span>
                 </span>
                 <background-bar class="bg-primary" value="stat.Total" animation-delay="count * offset" collection-max="max"></background-bar>
