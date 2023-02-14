@@ -37,6 +37,9 @@ public class DiscordBotService : BackgroundService
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
+        _client.GuildCreated += PublishMessage;
+        _client.GuildUpdated += PublishMessage;
+        _client.GuildAvailable += PublishMessage;
         _client.UseInteractivity(new InteractivityConfiguration()
         {
             PollBehaviour = PollBehaviour.KeepEmojis,
@@ -112,8 +115,13 @@ public class DiscordBotService : BackgroundService
 
     private async Task PublishMessage<TEvent>(DiscordClient sender, TEvent @event) where TEvent : DiscordEventArgs
     {
+        await PublishMessage(new DiscordNotification<TEvent>(@event));
+    }
+    
+    private async Task PublishMessage<T>(T @event)
+    {
         await using var scope = _services.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Publish(new DiscordNotification<TEvent>(@event));
+        await mediator.Publish(@event);
     }
 }

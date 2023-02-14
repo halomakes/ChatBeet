@@ -13,16 +13,21 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { SideDrawerComponent } from './side-drawer/side-drawer.component';
+import { MatListModule } from '@angular/material/list';
 
 const MaterialComponents = [
   MatToolbarModule,
   MatButtonModule,
   MatIconModule,
   MatMenuModule,
-  MatDividerModule
+  MatDividerModule,
+  MatSidenavModule,
+  MatListModule
 ]
 
 @NgModule({
@@ -31,7 +36,8 @@ const MaterialComponents = [
     NavMenuComponent,
     HomeComponent,
     CounterComponent,
-    FetchDataComponent
+    FetchDataComponent,
+    SideDrawerComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -48,4 +54,8 @@ const MaterialComponents = [
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(iconRegistry: MatIconRegistry) {
+    iconRegistry.setDefaultFontSetClass('material-symbols-outlined');
+  }
+}

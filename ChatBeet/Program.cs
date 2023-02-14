@@ -96,7 +96,7 @@ void AddDiscordBot(WebApplicationBuilder builder)
     {
         c.Token = builder.Configuration.GetValue<string>("Discord:Token");
         c.TokenType = TokenType.Bot;
-        c.Intents = DiscordIntents.MessageContents | DiscordIntents.AllUnprivileged;
+        c.Intents = DiscordIntents.MessageContents | DiscordIntents.Guilds | DiscordIntents.AllUnprivileged;
     });
     builder.Services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
     builder.Services.AddHostedService<DiscordBotService>();

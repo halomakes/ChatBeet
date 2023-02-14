@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { tap } from 'rxjs';
 import { AdministrationService } from '../administration.service';
 import { IdentityService } from '../identity.service';
@@ -15,6 +15,9 @@ export class NavMenuComponent implements OnInit {
   public currentGuild?: Guild;
   public availableGuilds?: Array<Guild>;
   public inviteLink?: string;
+
+  @Output()
+  public navToggled: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private identity: IdentityService, private admin: AdministrationService) { }
 
