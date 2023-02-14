@@ -1,44 +1,31 @@
-<header>
-  <nav
-    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
-  >
-    <div class="container">
-      <a class="navbar-brand" [routerLink]="['/']">ASP.NETCoreWebApplication1</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target=".navbar-collapse"
-        aria-label="Toggle navigation"
-        [attr.aria-expanded]="isExpanded"
-        (click)="toggle()"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div
-        class="navbar-collapse collapse d-sm-inline-flex justify-content-end"
-        [ngClass]="{ show: isExpanded }"
-      >
-        <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
-            >
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
-            >
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header>
+<mat-toolbar color="primary">
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>ChatBeet</span>
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon" aria-label="Log In" *ngIf="!isLoggedIn">
+    <mat-icon>login</mat-icon>
+  </button>
+  <button mat-icon-button class="example-icon guild-switcher-icon" aria-label="Current Guild"
+    [matMenuTriggerFor]="guildPicker" *ngIf="isLoggedIn">
+    <img *ngIf="currentGuild?.iconUrl; else pickGuild" [src]="currentGuild?.iconUrl" [alt]="currentGuild?.name"
+      class="navbar-avatar" />
+    <ng-template #pickGuild>
+      <mat-icon>groups</mat-icon>
+    </ng-template>
+  </button>
+</mat-toolbar>
+
+<mat-menu #guildPicker>
+  <button mat-menu-item *ngFor="let g of availableGuilds" (click)="selectGuild(g)">
+    <span class="guild-option" [class.active]="g.id == currentGuild?.id">
+      <img [src]="g.iconUrl" class="menu-item-image" />
+      <span>{{ g.name }}</span>
+    </span>
+  </button>
+  <button mat-menu-item>
+    <mat-icon>link</mat-icon>
+    <span>Connect New Guild</span>
+  </button>
+</mat-menu>

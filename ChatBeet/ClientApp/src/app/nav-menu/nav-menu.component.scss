@@ -1,0 +1,29 @@
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.navbar-avatar {
+  $size: 32px;
+  width: $size;
+  height: $size;
+  border-radius: $size/2;
+}
+
+.menu-item-image {
+  $size: 24px;
+  width: $size;
+  height: $size;
+  border-radius: $size/2;
+  margin-right: 16px;
+}
+
+.guild-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+}
+
+.guild-option.active {
+  font-weight: bold;
+}
