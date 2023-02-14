@@ -4,28 +4,45 @@
   </button>
   <span>ChatBeet</span>
   <span class="example-spacer"></span>
-  <button mat-icon-button class="example-icon" aria-label="Log In" *ngIf="!isLoggedIn">
+  <a mat-icon-button class="example-icon" aria-label="Log In" *ngIf="!isLoggedIn" href="/account/login">
     <mat-icon>login</mat-icon>
-  </button>
-  <button mat-icon-button class="example-icon guild-switcher-icon" aria-label="Current Guild"
-    [matMenuTriggerFor]="guildPicker" *ngIf="isLoggedIn">
-    <img *ngIf="currentGuild?.iconUrl; else pickGuild" [src]="currentGuild?.iconUrl" [alt]="currentGuild?.name"
+  </a>
+  <button mat-icon-button class="example-icon guild-switcher-icon" aria-label="Current User" *ngIf="isLoggedIn"
+    [matMenuTriggerFor]="userFlyout">
+    <img *ngIf="currentUser?.avatarUrl; else blankUser" [src]="currentUser?.avatarUrl" [alt]="currentUser?.displayName"
       class="navbar-avatar" />
-    <ng-template #pickGuild>
-      <mat-icon>groups</mat-icon>
+    <ng-template #blankUser>
+      <mat-icon>user</mat-icon>
     </ng-template>
   </button>
 </mat-toolbar>
 
-<mat-menu #guildPicker>
+<mat-menu #userFlyout>
+  <div class="user-detail">
+    <img *ngIf="currentUser?.avatarUrl" [src]="currentUser?.avatarUrl" [alt]="currentUser?.displayName"
+      class="navbar-avatar" />
+    <div class="username">
+      <span>{{currentUser?.discord?.name}}</span>
+      <span class="discriminator">#{{currentUser?.discord?.discriminator}}</span>
+    </div>
+  </div>
+  <button mat-menu-item routerLink="/preferences">
+    <mat-icon>settings</mat-icon>
+    <span>Preferences</span>
+  </button>
+  <a mat-menu-item href="/account/logout">
+    <mat-icon>logout</mat-icon>
+    <span>Log Out</span>
+  </a>
+  <mat-divider></mat-divider>
   <button mat-menu-item *ngFor="let g of availableGuilds" (click)="selectGuild(g)">
     <span class="guild-option" [class.active]="g.id == currentGuild?.id">
       <img [src]="g.iconUrl" class="menu-item-image" />
       <span>{{ g.name }}</span>
     </span>
   </button>
-  <button mat-menu-item>
+  <a *ngIf="inviteLink" mat-menu-item [href]="inviteLink" target="_blank">
     <mat-icon>link</mat-icon>
     <span>Connect New Guild</span>
-  </button>
+  </a>
 </mat-menu>

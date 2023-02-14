@@ -31,14 +31,16 @@ public class UsersController : Controller
     {
         var currentUser = await _identity.GetCurrentUserAsync();
         if (currentUser?.Discord?.Id is null)
-            return Ok(new UserViewModel(currentUser!, Enumerable.Empty<GuildViewModel>()));
+            return Ok(new UserViewModel(currentUser!, Enumerable.Empty<GuildViewModel>(), null));
         var memberships = await Task.WhenAll(_discord.Guilds.Select(async g => (Guild: g.Value, Members: await GetMembersAsync(g.Value))));
+        var discordUser = await _discord.GetUserAsync(currentUser.Discord.Id.Value);
         return Ok(new UserViewModel(
             User: currentUser,
             Guilds: memberships
                 .Where(m => m.Members.Any(x => x.Id == currentUser.Discord.Id))
                 .Select(m => new GuildViewModel(m.Guild))
-                .ToList()
+                .ToList(),
+            AvatarUrl: discordUser.AvatarUrl
         ));
     }
 

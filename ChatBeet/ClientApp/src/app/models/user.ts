@@ -4,6 +4,7 @@ export class User {
     irc?: IrcIdentity;
     createdAt: Date;
     updatedAt?: Date;
+    avatarUrl?: string;
 
     get displayName(): string | undefined {
         return this.discord?.name
@@ -11,7 +12,7 @@ export class User {
             : this?.irc?.nick;
     }
 
-    constructor(data: any) {
+    constructor(data: any, avatarUrl?: string) {
         this.id = data.id;
         if (data.discord)
             this.discord = new DiscordIdentity(data.discord);
@@ -19,6 +20,7 @@ export class User {
             this.irc = new IrcIdentity(data.irc);
         this.createdAt = new Date(data.createdAt);
         this.updatedAt = data.updatedAt ? new Date(data.updatedAt) : undefined;
+        this.avatarUrl = avatarUrl;
     }
 }
 
@@ -59,9 +61,11 @@ export class Guild {
 export class CurrentUserModel {
     user: User;
     guilds: Array<Guild>;
+    avatarUrl?: string;
 
     constructor(data: any) {
-        this.user = new User(data.user);
+        this.user = new User(data.user, data.avatarUrl);
         this.guilds = (data.guilds as any[]).map(g => new Guild(g));
+        this.avatarUrl = data.avatarUrl;
     }
 }

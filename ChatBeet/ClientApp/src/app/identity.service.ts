@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of, tap } from 'rxjs';
+import { EventEmitter, Injectable } from '@angular/core';
+import { catchError, map, Observable, of, startWith, tap } from 'rxjs';
 import { CurrentUserModel, Guild, User } from './models/user';
 
 @Injectable({
@@ -10,6 +10,7 @@ export class IdentityService {
   private static currentUser?: CurrentUserModel;
   private static currentGuild?: Guild;
   private static isLoggedIn?: boolean | null = null;
+  private static guildChanges: EventEmitter<Guild | undefined> = new EventEmitter<Guild | undefined>();
 
   constructor(private http: HttpClient) {
     this.loadStoredGuild();
@@ -23,13 +24,18 @@ export class IdentityService {
     map(r => r?.guilds)
   );
 
-  public get selectedGuild(): Guild | undefined {
-    return IdentityService.currentGuild;
+  public get guildChanges(): Observable<Guild | undefined> {
+    return IdentityService.currentGuild ?
+      IdentityService.guildChanges.pipe(
+        startWith(IdentityService.currentGuild)
+      )
+      : IdentityService.guildChanges;
   }
 
   public set selectedGuild(guild: Guild | undefined) {
     IdentityService.currentGuild = guild;
     localStorage.setItem('guild', JSON.stringify(guild));
+    IdentityService.guildChanges.emit(guild);
   }
 
   private loadStoredGuild = (): void => {

@@ -19,7 +19,7 @@ $chatbeet-warn: mat.define-palette(mat.$red-palette);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
-$chatbeet-theme: mat.define-light-theme(
+$chatbeet-theme: mat.define-dark-theme(
   (
     color: (
       primary: $chatbeet-primary,

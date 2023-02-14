@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { map } from 'rxjs';
+import { tap } from 'rxjs';
+import { AdministrationService } from '../administration.service';
 import { IdentityService } from '../identity.service';
 import { Guild, User } from '../models/user';
 
@@ -11,18 +12,23 @@ import { Guild, User } from '../models/user';
 export class NavMenuComponent implements OnInit {
   public isLoggedIn: boolean = false;
   public currentUser?: User;
-  public get currentGuild(): Guild | undefined {
-    return this.identity.selectedGuild;
-  }
+  public currentGuild?: Guild;
   public availableGuilds?: Array<Guild>;
+  public inviteLink?: string;
 
-  constructor(private identity: IdentityService) { }
+  constructor(private identity: IdentityService, private admin: AdministrationService) { }
 
   ngOnInit(): void {
-    this.identity.getCurrentUser().pipe(map(u => {
+    this.identity.getCurrentUser().pipe(tap(u => {
       this.isLoggedIn = !!u?.user;
       this.currentUser = u?.user;
       this.availableGuilds = u?.guilds;
+    })).subscribe();
+    this.admin.getInvitation().pipe(tap(l => {
+      this.inviteLink = l;
+    })).subscribe();
+    this.identity.guildChanges.pipe(tap(g => {
+      this.currentGuild = g;
     })).subscribe();
   }
 
