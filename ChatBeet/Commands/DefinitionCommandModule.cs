@@ -3,6 +3,7 @@ using ChatBeet.Commands.Autocomplete;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Models;
+using ChatBeet.Notifications;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -12,13 +13,13 @@ using Microsoft.EntityFrameworkCore;
 namespace ChatBeet.Commands;
 
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
-public class MemoryCellCommandModule : ApplicationCommandModule
+public class DefinitionCommandModule : ApplicationCommandModule
 {
     private readonly IDefinitionsRepository _dbContext;
     private readonly IUsersRepository _users;
     private readonly IMediator _queue;
 
-    public MemoryCellCommandModule(IDefinitionsRepository dbContext, IMediator queue, IUsersRepository users)
+    public DefinitionCommandModule(IDefinitionsRepository dbContext, IMediator queue, IUsersRepository users)
     {
         _dbContext = dbContext;
         _queue = queue;
@@ -46,8 +47,11 @@ public class MemoryCellCommandModule : ApplicationCommandModule
         var cell = await _dbContext.Definitions.FirstOrDefaultAsync(c => c.GuildId == ctx.Guild.Id && c.Key.ToLower() == key.ToLower());
 
         if (cell is not null)
+        {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent($"{Formatter.Bold(cell.Key)}: {cell.Value}"));
+            await _queue.Publish(new BonkableMessageNotification(await ctx.GetOriginalResponseAsync()));
+        }
         else
             await NotFound(ctx, key);
     }
@@ -83,6 +87,7 @@ public class MemoryCellCommandModule : ApplicationCommandModule
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(@$"Got it! 👍
 Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.CreatedBy}."));
+            await _queue.Publish(new BonkableMessageNotification(await ctx.GetOriginalResponseAsync()));
         }
 
         if (ctx.Channel.IsPrivate)

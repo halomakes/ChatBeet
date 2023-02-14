@@ -70,7 +70,7 @@ public class DiscordBotService : BackgroundService
         commands.RegisterCommands<ComplimentCommandModule>();
         commands.RegisterCommands<DoggoCommandModule>();
         commands.RegisterCommands<GoogleCommandModule>();
-        commands.RegisterCommands<MemoryCellCommandModule>();
+        commands.RegisterCommands<DefinitionCommandModule>();
         commands.RegisterCommands<SystemInfoCommandModule>();
         commands.RegisterCommands<SuspicionCommandModule>();
         commands.RegisterCommands<MessageTransformCommandModule>();
