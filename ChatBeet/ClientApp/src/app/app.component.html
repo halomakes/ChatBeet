@@ -1,11 +1,11 @@
 <body>
-  <app-nav-menu (navToggled)="sidenav.toggle()"></app-nav-menu>
+  <app-nav-menu (navToggled)="sidenav.toggle()" class="mat-elevation-z4" style="z-index:1000"></app-nav-menu>
   <mat-sidenav-container class="example-container" hasBackdrop="true">
     <mat-sidenav #sidenav mode="over">
       <app-side-drawer></app-side-drawer>
     </mat-sidenav>
     <mat-sidenav-content>
-      <main class="container">
+      <main>
         <router-outlet></router-outlet>
       </main>
     </mat-sidenav-content>

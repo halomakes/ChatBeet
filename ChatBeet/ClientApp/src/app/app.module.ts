@@ -19,6 +19,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { MatListModule } from '@angular/material/list';
+import { MatTableModule } from '@angular/material/table';
+import { KarmaComponent } from './karma/karma.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -27,7 +33,12 @@ const MaterialComponents = [
   MatMenuModule,
   MatDividerModule,
   MatSidenavModule,
-  MatListModule
+  MatListModule,
+  MatTableModule,
+  MatFormFieldModule,
+  MatPaginatorModule,
+  MatInputModule,
+  MatSortModule
 ]
 
 @NgModule({
@@ -37,7 +48,8 @@ const MaterialComponents = [
     HomeComponent,
     CounterComponent,
     FetchDataComponent,
-    SideDrawerComponent
+    SideDrawerComponent,
+    KarmaComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -45,7 +57,7 @@ const MaterialComponents = [
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
+      { path: 'karma', component: KarmaComponent },
       { path: 'fetch-data', component: FetchDataComponent },
     ]),
     BrowserAnimationsModule,

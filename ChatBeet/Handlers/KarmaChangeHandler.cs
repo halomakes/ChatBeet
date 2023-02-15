@@ -44,12 +44,12 @@ public partial class KarmaChangeHandler : INotificationHandler<DiscordNotificati
         try
         {
             await karma.RecordVote(notification.Event.Guild.Id, target, currentUser, mode);
-            var level = await karma.GetLevel(notification.Event.Guild.Id, target);
+            var level = await karma.GetLevelAsync(notification.Event.Guild.Id, target);
             await notification.Event.Message.RespondAsync(new DiscordMessageBuilder()
                 .WithContent($"{target.ToPossessive()} karma is now {level}."));
             await mediator.Publish(new KarmaChangeNotification(
                     notification.Event.Message,
-                    await karma.GetCanonicalKey(notification.Event.Guild.Id, target),
+                    await karma.GetCanonicalKeyAsync(notification.Event.Guild.Id, target),
                     level,
                     level + (mode == KarmaVote.VoteType.Up ? -1 : 1))
                 , cancellationToken);

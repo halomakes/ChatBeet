@@ -30,7 +30,7 @@ public class KarmaCommandModule : ApplicationCommandModule
     public async Task Check(InteractionContext ctx, [Option("key", "Key of the entry to look up")] string key)
     {
         key = key.Trim();
-        var level = await _karma.GetLevel(ctx.Guild.Id, key);
+        var level = await _karma.GetLevelAsync(ctx.Guild.Id, key);
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
             .WithContent($"{key.ToPossessive()} karma is {level}."));
     }
@@ -42,11 +42,11 @@ public class KarmaCommandModule : ApplicationCommandModule
         key = key.Trim();
         try
         {
-            await _karma.Increment(ctx.Guild.Id, key, currentUser);
-            var level = await _karma.GetLevel(ctx.Guild.Id, key);
+            await _karma.IncrementAsync(ctx.Guild.Id, key, currentUser);
+            var level = await _karma.GetLevelAsync(ctx.Guild.Id, key);
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent($"{key.ToPossessive()} karma is now {level}."));
-            await _mediator.Publish(new KarmaChangeNotification(await ctx.GetOriginalResponseAsync(), await _karma.GetCanonicalKey(ctx.Guild.Id, key), level, level - 1));
+            await _mediator.Publish(new KarmaChangeNotification(await ctx.GetOriginalResponseAsync(), await _karma.GetCanonicalKeyAsync(ctx.Guild.Id, key), level, level - 1));
         }
         catch (KarmaRateLimitException e)
         {
@@ -63,11 +63,11 @@ public class KarmaCommandModule : ApplicationCommandModule
         key = key.Trim();
         try
         {
-            await _karma.Decrement(ctx.Guild.Id, key, currentUser);
-            var level = await _karma.GetLevel(ctx.Guild.Id, key);
+            await _karma.DecrementAsync(ctx.Guild.Id, key, currentUser);
+            var level = await _karma.GetLevelAsync(ctx.Guild.Id, key);
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent($"{key.ToPossessive()} karma is now {level}."));
-            await _mediator.Publish(new KarmaChangeNotification(await ctx.GetOriginalResponseAsync(), await _karma.GetCanonicalKey(ctx.Guild.Id, key), level, level + 1));
+            await _mediator.Publish(new KarmaChangeNotification(await ctx.GetOriginalResponseAsync(), await _karma.GetCanonicalKeyAsync(ctx.Guild.Id, key), level, level + 1));
         }
         catch (KarmaRateLimitException e)
         {

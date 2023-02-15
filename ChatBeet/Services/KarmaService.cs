@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
@@ -20,12 +21,12 @@ public class KarmaService
         _guilds = guilds;
     }
 
-    public async Task Increment(ulong guildId, string target, User requester)
+    public async Task IncrementAsync(ulong guildId, string target, User requester)
     {
         await RecordVote(guildId, target, requester, KarmaVote.VoteType.Up);
     }
 
-    public async Task<string> GetCanonicalKey(ulong guildId, string target)
+    public async Task<string> GetCanonicalKeyAsync(ulong guildId, string target)
     {
         var alternateUsers = await _users.Users
             .Where(u => u.Irc!.Nick!.ToLower() == target.ToLower() || u.Discord!.Name!.ToLower() == target)
@@ -40,23 +41,28 @@ public class KarmaService
         return match?.Mention() ?? target;
     }
 
-    public async Task Decrement(ulong guildId, string target, User requester)
+    public async Task DecrementAsync(ulong guildId, string target, User requester)
     {
         await RecordVote(guildId, target, requester, KarmaVote.VoteType.Down);
     }
 
-    public async Task<int> GetLevel(ulong guildId, string target)
+    public async Task<int> GetLevelAsync(ulong guildId, string target)
     {
-        target = await GetCanonicalKey(guildId, target);
+        target = await GetCanonicalKeyAsync(guildId, target);
         return await _karma.Karma
             .Where(k => k.GuildId == guildId)
             .Where(k => k.Key!.ToLower() == target.ToLower())
             .SumAsync(k => k.Type == KarmaVote.VoteType.Up ? 1 : -1);
     }
 
+    public async Task<Dictionary<string, int>> GetLevelsAsync(ulong guildId) => await _karma.Karma
+        .Where(k => k.GuildId == guildId)
+        .GroupBy(k => k.Key!.ToLower())
+        .ToDictionaryAsync(g => g.Key, g => g.Sum(k => k.Type == KarmaVote.VoteType.Up ? 1 : -1));
+
     public async Task RecordVote(ulong guildId, string target, User requester, KarmaVote.VoteType type)
     {
-        target = await GetCanonicalKey(guildId, target);
+        target = await GetCanonicalKeyAsync(guildId, target);
         await AssertRateLimitAsync(guildId, target, requester);
         _karma.Karma.Add(new KarmaVote
         {
@@ -83,7 +89,7 @@ public class KarmaService
         {
             var delay = DateTime.Now - lastUpdate.CreatedAt;
             if (delay < RateLimit)
-                throw new KarmaRateLimitException(RateLimit -  delay);
+                throw new KarmaRateLimitException(RateLimit - delay);
         }
     }
 }

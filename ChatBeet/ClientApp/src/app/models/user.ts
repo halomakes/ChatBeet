@@ -45,7 +45,7 @@ export class IrcIdentity {
 }
 
 export class Guild {
-    id: number;
+    id: string;
     iconUrl?: string;
     splashUrl?: string;
     name: string;

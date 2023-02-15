@@ -8,7 +8,8 @@ const PROXY_CONFIG = [
     context: [
       "/api",
       "/swagger",
-      "/account"
+      "/account",
+      "/signin-discord"
    ],
     target: target,
     secure: false,

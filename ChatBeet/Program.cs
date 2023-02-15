@@ -3,6 +3,8 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using BooruSharp.Booru;
 using ChatBeet.Authorization;
 using ChatBeet.Configuration;
@@ -72,7 +74,23 @@ static void Configure(WebApplication app)
 
 void RegisterServices(WebApplicationBuilder builder)
 {
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(opts =>
+        {
+            opts.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            {
+                Modifiers =
+                {
+                    static t =>
+                    {
+                        if (t.Type == typeof(long) || t.Type == typeof(ulong))
+                        {
+                            t.NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
+                        }
+                    }
+                }
+            };
+        });
     builder.Services.AddRazorPages();
     builder.Services.AddMemoryCache();
     builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
