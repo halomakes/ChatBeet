@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using BooruSharp.Booru;
+using ChatBeet.Authorization;
 using ChatBeet.Configuration;
 using ChatBeet.Data;
 using ChatBeet.Services;
@@ -14,6 +15,7 @@ using MediatR;
 using Meowtrix.PixivApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -153,6 +155,9 @@ void AddAuthentication(WebApplicationBuilder builder)
                     user.GetString("avatar"),
                     user.GetString("avatar")!.StartsWith("a_") ? "gif" : "png"));
         });
+
+    builder.Services.AddAuthorization(opts => { opts.AddPolicy(InGuildRequirement.Policy, policy => policy.Requirements.Add(new InGuildRequirement())); });
+    builder.Services.AddScoped<IAuthorizationHandler, InGuildHandler>();
 }
 
 void AddInternalServices(WebApplicationBuilder builder)
@@ -167,6 +172,8 @@ void AddInternalServices(WebApplicationBuilder builder)
     builder.Services.AddTransient<GraphicsService>();
     builder.Services.AddScoped<SuspicionService>();
     builder.Services.AddScoped<WebIdentityService>();
+    builder.Services.AddScoped<GuildService>();
+    builder.Services.AddScoped<KarmaService>();
 }
 
 void AddHttpClients(WebApplicationBuilder builder)

@@ -11,7 +11,7 @@ namespace ChatBeet.Handlers;
 public class BotKarmaReactHandler : INotificationHandler<KarmaChangeNotification>
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private static string _username;
+    private static string? _mention;
 
     public BotKarmaReactHandler(IServiceScopeFactory serviceScopeFactory)
     {
@@ -38,12 +38,12 @@ public class BotKarmaReactHandler : INotificationHandler<KarmaChangeNotification
 
     private string GetUsername()
     {
-        if (_username is not null)
-            return _username;
+        if (_mention is not null)
+            return _mention;
 
         using var scope = _serviceScopeFactory.CreateScope();
         var client = scope.ServiceProvider.GetRequiredService<DiscordClient>();
-        _username = client.CurrentUser.Username;
-        return _username;
+        _mention = client.CurrentUser.Mention;
+        return _mention;
     }
 }

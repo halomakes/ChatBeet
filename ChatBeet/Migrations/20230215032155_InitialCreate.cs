@@ -42,18 +42,6 @@ namespace ChatBeet.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "top_tags",
-                columns: table => new
-                {
-                    userid = table.Column<Guid>(name: "user_id", type: "uuid", nullable: false),
-                    tag = table.Column<string>(type: "text", nullable: false),
-                    total = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                });
-
-            migrationBuilder.CreateTable(
                 name: "users",
                 schema: "core",
                 columns: table => new
@@ -128,6 +116,25 @@ namespace ChatBeet.Migrations
                     table.PrimaryKey("pk_tag_history", x => x.id);
                     table.ForeignKey(
                         name: "fk_tag_history_users_user_id",
+                        column: x => x.userid,
+                        principalSchema: "core",
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "top_tags",
+                columns: table => new
+                {
+                    userid = table.Column<Guid>(name: "user_id", type: "uuid", nullable: false),
+                    tag = table.Column<string>(type: "text", nullable: false),
+                    total = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.ForeignKey(
+                        name: "fk_top_tags_users_user_id",
                         column: x => x.userid,
                         principalSchema: "core",
                         principalTable: "users",
@@ -220,6 +227,7 @@ namespace ChatBeet.Migrations
                 schema: "interactions",
                 columns: table => new
                 {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     key = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     guildid = table.Column<decimal>(name: "guild_id", type: "numeric(20,0)", nullable: false),
                     voterid = table.Column<Guid>(name: "voter_id", type: "uuid", nullable: false),
@@ -228,7 +236,7 @@ namespace ChatBeet.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_karma", x => new { x.guildid, x.key });
+                    table.PrimaryKey("pk_karma", x => x.id);
                     table.ForeignKey(
                         name: "fk_karma_guilds_guild_id",
                         column: x => x.guildid,
@@ -360,6 +368,12 @@ namespace ChatBeet.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_karma_guild_id",
+                schema: "interactions",
+                table: "karma",
+                column: "guild_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_karma_voter_id",
                 schema: "interactions",
                 table: "karma",
@@ -405,6 +419,11 @@ namespace ChatBeet.Migrations
                 name: "ix_tag_history_user_id",
                 schema: "booru",
                 table: "tag_history",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_top_tags_user_id",
+                table: "top_tags",
                 column: "user_id");
         }
 

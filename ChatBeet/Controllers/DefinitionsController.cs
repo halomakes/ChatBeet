@@ -3,6 +3,7 @@ using ChatBeet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using ChatBeet.Authorization;
 using ChatBeet.Data;
 using ChatBeet.Services;
 using MediatR;
@@ -13,6 +14,7 @@ namespace ChatBeet.Controllers;
 [Route("api/Guilds/{guildId}/[controller]")]
 [ApiController]
 [ResponseCache(Duration = 300)]
+[Authorize(Policy = InGuildRequirement.Policy)]
 public class DefinitionsController : ControllerBase
 {
     private readonly IDefinitionsRepository _db;

@@ -1,12 +1,9 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChatBeet.Models;
 using ChatBeet.Services;
 using DSharpPlus;
-using DSharpPlus.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace ChatBeet.Controllers;
 
@@ -15,15 +12,15 @@ namespace ChatBeet.Controllers;
 [ApiController]
 public class UsersController : Controller
 {
-    private readonly WebIdentityService _identity;
     private readonly DiscordClient _discord;
-    private readonly IMemoryCache _cache;
+    private readonly WebIdentityService _identity;
+    private readonly GuildService _guilds;
 
-    public UsersController(DiscordClient discord, WebIdentityService identity, IMemoryCache cache)
+    public UsersController(WebIdentityService identity, GuildService guilds, DiscordClient discord)
     {
-        _discord = discord;
         _identity = identity;
-        _cache = cache;
+        _guilds = guilds;
+        _discord = discord;
     }
 
     [HttpGet("@me")]
@@ -32,7 +29,7 @@ public class UsersController : Controller
         var currentUser = await _identity.GetCurrentUserAsync();
         if (currentUser?.Discord?.Id is null)
             return Ok(new UserViewModel(currentUser!, Enumerable.Empty<GuildViewModel>(), null));
-        var memberships = await Task.WhenAll(_discord.Guilds.Select(async g => (Guild: g.Value, Members: await GetMembersAsync(g.Value))));
+        var memberships = await Task.WhenAll(_guilds.GetGuilds().Select(async g => (Guild: g, Members: await _guilds.GetMembersAsync(g))));
         var discordUser = await _discord.GetUserAsync(currentUser.Discord.Id.Value);
         return Ok(new UserViewModel(
             User: currentUser,
@@ -43,10 +40,4 @@ public class UsersController : Controller
             AvatarUrl: discordUser.AvatarUrl
         ));
     }
-
-    private async Task<IEnumerable<DiscordMember>> GetMembersAsync(DiscordGuild guild) => (await _cache.GetOrCreateAsync($"guild:{guild.Id}:members", async entry =>
-    {
-        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-        return (await guild.GetAllMembersAsync()).ToList();
-    }))!;
 }

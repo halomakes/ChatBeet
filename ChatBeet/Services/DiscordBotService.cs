@@ -91,6 +91,7 @@ public class DiscordBotService : BackgroundService
         commands.RegisterCommands<MiataCommandModule>();
         commands.RegisterCommands<UrbanDictionaryCommandModule>();
         commands.RegisterCommands<YoutubeCommandModule>();
+        commands.RegisterCommands<KarmaCommandModule>();
         await _client.ConnectAsync();
         await base.StartAsync(cancellationToken);
     }

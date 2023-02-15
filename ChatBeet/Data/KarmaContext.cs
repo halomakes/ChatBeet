@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using ChatBeet.Data.Entities;
+using ChatBeet.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Data;
@@ -17,7 +19,7 @@ public partial class CbDbContext : IKarmaRepository
         modelBuilder.Entity<KarmaVote>(builder =>
         {
             builder.ToTable("karma", "interactions");
-            builder.HasKey(b => new { b.GuildId, b.Key });
+            builder.HasKey(b => b.Id);
             builder.HasOne(b => b.Guild)
                 .WithMany()
                 .HasForeignKey(b => b.GuildId)

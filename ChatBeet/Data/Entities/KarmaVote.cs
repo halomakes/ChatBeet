@@ -2,6 +2,7 @@ namespace ChatBeet.Data.Entities;
 
 public class KarmaVote
 {
+    public Guid Id { get; set; }
     public string? Key { get; set; }
     public ulong GuildId { get; set; }
     public Guid VoterId { get; set; }

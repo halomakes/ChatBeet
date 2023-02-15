@@ -143,20 +143,26 @@ namespace ChatBeet.Migrations
 
             modelBuilder.Entity("ChatBeet.Data.Entities.KarmaVote", b =>
                 {
-                    b.Property<decimal>("GuildId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id");
-
-                    b.Property<string>("Key")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("key");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("current_timestamp");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("key");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer")
@@ -166,8 +172,11 @@ namespace ChatBeet.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("voter_id");
 
-                    b.HasKey("GuildId", "Key")
+                    b.HasKey("Id")
                         .HasName("pk_karma");
+
+                    b.HasIndex("GuildId")
+                        .HasDatabaseName("ix_karma_guild_id");
 
                     b.HasIndex("VoterId")
                         .HasDatabaseName("ix_karma_voter_id");
@@ -377,6 +386,9 @@ namespace ChatBeet.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_top_tags_user_id");
+
                     b.ToTable("top_tags", (string)null);
                 });
 
@@ -583,6 +595,18 @@ namespace ChatBeet.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_tag_history_users_user_id");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ChatBeet.Data.Entities.TopTag", b =>
+                {
+                    b.HasOne("ChatBeet.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_top_tags_users_user_id");
 
                     b.Navigation("User");
                 });
