@@ -25,6 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { DiscordContentComponent } from './discord-content/discord-content.component';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -49,7 +50,8 @@ const MaterialComponents = [
     CounterComponent,
     FetchDataComponent,
     SideDrawerComponent,
-    KarmaComponent
+    KarmaComponent,
+    DiscordContentComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

@@ -22,5 +22,5 @@ public class KarmaController : Controller
     public async Task<ActionResult<Dictionary<string, int>>> GetKarmaValues([FromRoute] ulong guildId) => Ok(await _karma.GetLevelsAsync(guildId));
 
     [HttpGet("{key}")]
-    public async Task<ActionResult<int>> GetKarmaValue([FromRoute] ulong guildId, [FromRoute, Required] string key) => Ok(await _karma.GetLevelAsync(guildId, key));
+    public async Task<ActionResult<int>> GetKarmaValue([FromRoute] ulong guildId, [FromRoute, Required] string key) => Json(await _karma.GetLevelAsync(guildId, key));
 }

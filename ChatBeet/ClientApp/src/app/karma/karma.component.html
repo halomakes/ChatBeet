@@ -5,11 +5,13 @@
         <input matInput (keyup)="applyFilter($event)" placeholder="miata" #input>
     </mat-form-field>
 
-    <div class="mat-elevation-z8" *ngIf="dataSource.data">
+    <div class="mat-elevation-z8 wide" *ngIf="dataSource.data">
         <table mat-table [dataSource]="dataSource" matSort matSortActive="level" matSortDirection="desc">
             <ng-container matColumnDef="key">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Key </th>
-                <td mat-cell *matCellDef="let row"> {{row.key}} </td>
+                <td mat-cell *matCellDef="let row">
+                    <app-discord-content [content]="row.key"></app-discord-content>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="level">
