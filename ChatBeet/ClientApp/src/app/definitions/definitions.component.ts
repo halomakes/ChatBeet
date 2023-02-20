@@ -1,3 +1,4 @@
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -10,11 +11,20 @@ import { DefinitionsService } from './definitions.service';
 @Component({
   selector: 'app-definitions',
   templateUrl: './definitions.component.html',
-  styleUrls: ['./definitions.component.scss']
+  styleUrls: ['./definitions.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class DefinitionsComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['key', 'authorName', 'updatedAt'];
+  columnsToDisplay: string[] = ['key', 'authorName', 'updatedAt'];
+  columnsToDisplayWithExpand = [...this.columnsToDisplay, 'expand']
   dataSource: MatTableDataSource<Definition> = new MatTableDataSource();
+  expandedDefinition: Definition | undefined;
 
   @ViewChild(MatPaginator) paginator?: MatPaginator;
   @ViewChild(MatSort) sort?: MatSort;

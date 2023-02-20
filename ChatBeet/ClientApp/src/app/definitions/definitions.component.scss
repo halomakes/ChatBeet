@@ -1,13 +1,39 @@
-table {
-    width: 100%;
-}
-
 .mat-mdc-form-field {
     font-size: 14px;
     width: 100%;
 }
 
-td,
-th {
-    width: 25%;
+table {
+    width: 100%;
+}
+
+tr.example-detail-row {
+    height: 0;
+}
+
+tr {
+    overflow: hidden;
+}
+
+td.mat-column-expandedDetail {
+    background-color: transparentize(black, 0.9);
+}
+
+tr:not(.example-detail-row) {
+    cursor: pointer;
+    &:hover {
+        background: transparentize(black, 0.85);
+    }
+    &:active {
+        background: transparentize(black, 0.9);
+    }
+}
+
+.expand-detail {
+    overflow-y: hidden;
+}
+
+app-discord-content {
+    padding: 16px;
+    display: block;
 }

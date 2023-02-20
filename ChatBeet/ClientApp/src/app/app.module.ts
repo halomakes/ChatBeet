@@ -17,16 +17,19 @@ import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
-import { KarmaComponent } from './karma/karma.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { MatRippleModule } from '@angular/material/core';
+
+import { SideDrawerComponent } from './side-drawer/side-drawer.component';
+import { KarmaComponent } from './karma/karma.component';
 import { DiscordContentComponent } from './discord-content/discord-content.component';
 import { DefinitionsComponent } from './definitions/definitions.component';
+
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -40,7 +43,8 @@ const MaterialComponents = [
   MatFormFieldModule,
   MatPaginatorModule,
   MatInputModule,
-  MatSortModule
+  MatSortModule,
+  MatRippleModule
 ]
 
 @NgModule({
