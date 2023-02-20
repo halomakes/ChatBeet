@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using ChatBeet.Exceptions;
 using ChatBeet.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -7,61 +7,50 @@ using DSharpPlus.SlashCommands;
 
 namespace ChatBeet.Commands;
 
+[SlashModuleLifespan(SlashModuleLifespan.Scoped)]
 public class HighGroundCommandModule : ApplicationCommandModule
 {
-    public static readonly Dictionary<DiscordGuild, DiscordUser> HighestUsers = new();
-    private static readonly Dictionary<ulong, DateTime> InvocationHistory = new();
-    private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(5);
+    private readonly MustafarService _mustafar;
     private readonly GraphicsService _graphics;
 
-    public HighGroundCommandModule(GraphicsService graphics)
+    public HighGroundCommandModule(GraphicsService graphics, MustafarService mustafar)
     {
         _graphics = graphics;
+        _mustafar = mustafar;
     }
 
     [SlashCommand("jump", "Claim the high ground")]
     public async Task Claim(InteractionContext ctx)
     {
-        var server = ctx.Channel.Guild;
-        var user = ctx.User;
         await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-        if (InvocationHistory.TryGetValue(user.Id, out var lastActivation) && (DateTime.Now - lastActivation) < Timeout)
+        try
         {
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
-                .WithContent($"Shouldn't have skipped leg day.  You will be ready to jump again {Formatter.Timestamp(lastActivation + Timeout)}."));
-            return;
-        }
-        else
-        {
-            InvocationHistory[user.Id] = DateTime.Now;
-        }
-
-        if (!HighestUsers.ContainsKey(server))
-        {
-            HighestUsers[server] = user;
-            using var graphic = await _graphics.BuildHighGroundImageAsync($"#{ctx.Channel.Name}", user.Username);
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
-                .WithContent($"{Formatter.Mention(user)} has the high ground.")
+            var change = await _mustafar.ClaimAsync(ctx.Guild.Id, ctx.User);
+            if (change.Previous is null)
+            {
+                await using var graphic = await _graphics.BuildHighGroundImageAsync($"#{ctx.Channel.Name}", ctx.User.Username);
+                await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
+                    .WithContent($"{Formatter.Mention(ctx.User)} has the high ground.")
                     .AddFile("high-ground.webp", graphic));
-            return;
+            }
+            else
+            {
+                await using var graphic = await _graphics.BuildHighGroundImageAsync(change.Previous.Discord!.Name!, ctx.User.Username);
+                await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
+                    .WithContent($"It's over, {change.Previous.Mention()}! {Formatter.Mention(ctx.User)} has the high ground!")
+                    .AddFile("high-ground.webp", graphic));
+            }
         }
-        else if (user == HighestUsers[server])
+        catch (WimpyLegsException e)
         {
-            HighestUsers.Remove(server);
             await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
-                .WithContent($"{Formatter.Mention(user)} trips and falls off the high ground."));
-            return;
+                .WithContent($"Shouldn't have skipped leg day.  You will be ready to jump again {Formatter.Timestamp(e.NextJump)}."));
         }
-        else
+        catch (StumbleException)
         {
-            var oldKing = HighestUsers[server];
-            HighestUsers[server] = user;
-            var graphic = await _graphics.BuildHighGroundImageAsync(oldKing.Username, user.Username);
             await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
-                .WithContent($"It's over, {Formatter.Mention(oldKing)}! {Formatter.Mention(user)} has the high ground!")
-                .AddFile("high-ground.webp", graphic));
-            return;
+                .WithContent($"{Formatter.Mention(ctx.User)} trips and falls off the high ground."));
         }
     }
 }

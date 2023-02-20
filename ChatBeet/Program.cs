@@ -192,6 +192,7 @@ void AddInternalServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<WebIdentityService>();
     builder.Services.AddScoped<GuildService>();
     builder.Services.AddScoped<KarmaService>();
+    builder.Services.AddScoped<MustafarService>();
 }
 
 void AddHttpClients(WebApplicationBuilder builder)

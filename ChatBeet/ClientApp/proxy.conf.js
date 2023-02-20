@@ -9,7 +9,8 @@ const PROXY_CONFIG = [
       "/api",
       "/swagger",
       "/account",
-      "/signin-discord"
+      "/signin-discord",
+      "/img"
    ],
     target: target,
     secure: false,

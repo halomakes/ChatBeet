@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using ChatBeet.Authorization;
 using ChatBeet.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatBeet.Controllers;
@@ -9,6 +11,7 @@ namespace ChatBeet.Controllers;
 [Route("api/Guilds/{guildId}/[controller]")]
 [ApiController]
 [ResponseCache(Duration = 300)]
+[Authorize(Policy = InGuildRequirement.Policy)]
 public class KarmaController : Controller
 {
     private readonly KarmaService _karma;

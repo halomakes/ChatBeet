@@ -29,6 +29,7 @@ import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { KarmaComponent } from './karma/karma.component';
 import { DiscordContentComponent } from './discord-content/discord-content.component';
 import { DefinitionsComponent } from './definitions/definitions.component';
+import { HighGroundComponent } from './high-ground/high-ground.component';
 
 
 const MaterialComponents = [
@@ -57,7 +58,8 @@ const MaterialComponents = [
     SideDrawerComponent,
     KarmaComponent,
     DiscordContentComponent,
-    DefinitionsComponent
+    DefinitionsComponent,
+    HighGroundComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -67,6 +69,7 @@ const MaterialComponents = [
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'karma', component: KarmaComponent },
       { path: 'definitions', component: DefinitionsComponent },
+      { path: 'high-ground', component: HighGroundComponent },
     ]),
     BrowserAnimationsModule,
     ...MaterialComponents

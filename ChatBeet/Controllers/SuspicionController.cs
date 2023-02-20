@@ -3,12 +3,15 @@ using ChatBeet.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ChatBeet.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChatBeet.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Guilds/{guildId}/[controller]")]
 [ApiController]
 [ResponseCache(Duration = 300)]
+[Authorize(Policy = InGuildRequirement.Policy)]
 public class SuspicionController : Controller
 {
     private readonly SuspicionService _suspicionService;
@@ -22,5 +25,5 @@ public class SuspicionController : Controller
     /// Get current suspicion levels
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels() => Ok(await _suspicionService.GetSuspicionLevels());
+    public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels([FromRoute]ulong guildId) => Ok(await _suspicionService.GetSuspicionLevels());
 }
