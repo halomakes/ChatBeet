@@ -1,0 +1,25 @@
+<div class="container">
+    <h1 class="wide">Progress Spans</h1>
+    <div *ngIf="spans" class="wide">
+        <mat-card *ngFor="let span of spans">
+            <mat-card-header>
+                <mat-card-title>{{span.key}}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <app-progress-preview [span]="span" mode="text"></app-progress-preview>
+            </mat-card-content>
+            <mat-card-actions align="end">
+                <button mat-button>Delete</button>
+                <button mat-button>Edit</button>
+            </mat-card-actions>
+            <mat-card-footer>
+                <app-progress-preview [span]="span" mode="bar"></app-progress-preview>
+            </mat-card-footer>
+        </mat-card>
+    </div>
+</div>
+<div class="fab">
+    <button mat-fab color="accent" aria-label="Create a span">
+        <mat-icon>add</mat-icon>
+    </button>
+</div>

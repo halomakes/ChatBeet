@@ -25,6 +25,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatRippleModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatCardModule } from '@angular/material/card';
 
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { KarmaComponent } from './karma/karma.component';
@@ -32,6 +34,8 @@ import { DiscordContentComponent } from './discord-content/discord-content.compo
 import { DefinitionsComponent } from './definitions/definitions.component';
 import { HighGroundComponent } from './high-ground/high-ground.component';
 import { CrewmatesComponent } from './crewmates/crewmates.component';
+import { ProgressListComponent } from './progress/progress-list/progress-list.component';
+import { ProgressPreviewComponent } from './progress/progress-preview/progress-preview.component';
 
 
 const MaterialComponents = [
@@ -48,7 +52,9 @@ const MaterialComponents = [
   MatInputModule,
   MatSortModule,
   MatRippleModule,
-  MatChipsModule
+  MatChipsModule,
+  MatProgressBarModule,
+  MatCardModule
 ]
 
 @NgModule({
@@ -63,7 +69,9 @@ const MaterialComponents = [
     DiscordContentComponent,
     DefinitionsComponent,
     HighGroundComponent,
-    CrewmatesComponent
+    CrewmatesComponent,
+    ProgressListComponent,
+    ProgressPreviewComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -75,6 +83,7 @@ const MaterialComponents = [
       { path: 'definitions', component: DefinitionsComponent },
       { path: 'high-ground', component: HighGroundComponent },
       { path: 'crewmates', component: CrewmatesComponent },
+      { path: 'progress', component: ProgressListComponent }
     ]),
     BrowserAnimationsModule,
     ...MaterialComponents

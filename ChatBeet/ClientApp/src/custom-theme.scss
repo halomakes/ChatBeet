@@ -60,3 +60,12 @@ body {
 .wide {
   width: 100%;
 }
+
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
