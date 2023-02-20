@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { catchError, map, Observable, of, startWith, tap } from 'rxjs';
-import { CurrentUserModel, Guild, User } from './models/user';
+import { User } from './common/user';
+import { CurrentUserModel } from "./common/CurrentUserModel";
+import { Guild } from "./common/Guild";
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,5 @@
 <div class="container">
-    <h1 class="wide">Karma</h1>
+    <h1 class="wide">Definitions</h1>
     <mat-form-field class="wide">
         <mat-label>Filter</mat-label>
         <input matInput (keyup)="applyFilter($event)" placeholder="miata" #input>
@@ -14,9 +14,14 @@
                 </td>
             </ng-container>
 
-            <ng-container matColumnDef="level">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Level </th>
-                <td mat-cell *matCellDef="let row"> {{row.level}} </td>
+            <ng-container matColumnDef="authorName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Author </th>
+                <td mat-cell *matCellDef="let row"> {{row.authorName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="updatedAt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Updated </th>
+                <td mat-cell *matCellDef="let row"> {{row.updatedAt | date:'short'}} </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

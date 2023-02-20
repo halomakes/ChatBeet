@@ -73,7 +73,8 @@ public class DefinitionCommandModule : ApplicationCommandModule
         {
             CreatedBy = user.Id,
             Key = key,
-            Value = value
+            Value = value,
+            GuildId = ctx.Guild.Id
         });
         await _dbContext.SaveChangesAsync();
 

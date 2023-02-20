@@ -26,6 +26,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { DiscordContentComponent } from './discord-content/discord-content.component';
+import { DefinitionsComponent } from './definitions/definitions.component';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -51,7 +52,8 @@ const MaterialComponents = [
     FetchDataComponent,
     SideDrawerComponent,
     KarmaComponent,
-    DiscordContentComponent
+    DiscordContentComponent,
+    DefinitionsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -60,7 +62,7 @@ const MaterialComponents = [
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'karma', component: KarmaComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'definitions', component: DefinitionsComponent },
     ]),
     BrowserAnimationsModule,
     ...MaterialComponents

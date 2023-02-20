@@ -2,7 +2,8 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { tap } from 'rxjs';
 import { AdministrationService } from '../administration.service';
 import { IdentityService } from '../identity.service';
-import { Guild, User } from '../models/user';
+import { User } from '../common/user';
+import { Guild } from "../common/Guild";
 
 @Component({
   selector: 'app-nav-menu',

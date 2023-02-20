@@ -34,7 +34,7 @@ public class InGuildHandler : AuthorizationHandler<InGuildRequirement>
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, InGuildRequirement requirement)
     {
         var routeData = _httpContextAccessor.HttpContext!.GetRouteData();
-        if (routeData.Values[requirement.RouteParameter] is ulong guildId)
+        if (routeData.Values[requirement.RouteParameter] is string rawValue && ulong.TryParse(rawValue, out var guildId))
         {
             var guild = _guilds.GetGuilds().FirstOrDefault(g => g.Id == guildId);
             if (guild is not null)
