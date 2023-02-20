@@ -45,15 +45,15 @@ public partial class SuspectHandler : INotificationHandler<DiscordNotification<M
         {
             var internalSuspect = await usersRepo.GetUserAsync(suspect);
             var internalReporter = await usersRepo.GetUserAsync(notification.Event.Author);
-            if (await service.HasRecentlyReportedAsync(internalSuspect.Id, internalReporter.Id))
+            if (await service.HasRecentlyReportedAsync(notification.Event.Guild.Id, internalSuspect.Id, internalReporter.Id))
             {
                 await notification.Event.Message.RespondAsync("You must wait at least 2 minutes each time you raise suspicion against a user.");
             }
             else
             {
-                await service.ReportSuspiciousActivityAsync(internalSuspect.Id, internalReporter.Id, bypassDebounceCheck: true);
+                await service.ReportSuspiciousActivityAsync(notification.Event.Guild.Id, internalSuspect.Id, internalReporter.Id, bypassDebounceCheck: true);
 
-                var suspicionLevel = await service.GetSuspicionLevelAsync(internalSuspect.Id);
+                var suspicionLevel = await service.GetSuspicionLevelAsync(notification.Event.Guild.Id, internalSuspect.Id);
 
                 await notification.Event.Message.RespondAsync($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is now {suspicionLevel}.");
             }

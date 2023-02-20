@@ -1,0 +1,189 @@
+[
+    {
+        "user": {
+            "id": "61d91ad6-530d-4eb1-b0b4-e914c0fc5655",
+            "discord": null,
+            "irc": {
+                "nick": "trump"
+            },
+            "createdAt": "2023-02-20T17:09:53.262437-05:00",
+            "updatedAt": "2023-02-20T17:09:53.262437-05:00",
+            "preferences": []
+        },
+        "level": 86,
+        "color": null,
+        "lifetimeLevel": 3
+    },
+    {
+        "user": {
+            "id": "dd1733aa-708d-4e54-a7f4-135156198c95",
+            "discord": {
+                "id": 109121585272610816,
+                "name": "Schweeds",
+                "discriminator": "4901"
+            },
+            "irc": null,
+            "createdAt": "2023-02-20T16:44:29.924932-05:00",
+            "updatedAt": "2023-02-20T16:44:29.924932-05:00",
+            "preferences": []
+        },
+        "level": 66,
+        "color": null,
+        "lifetimeLevel": 2
+    },
+    {
+        "user": {
+            "id": "3509668b-3917-4dd1-b6cb-627626875ca3",
+            "discord": {
+                "id": 1061137369073451169,
+                "name": "ChatBeet",
+                "discriminator": "8235"
+            },
+            "irc": null,
+            "createdAt": "2023-02-20T16:44:09.346331-05:00",
+            "updatedAt": "2023-02-20T16:44:09.346331-05:00",
+            "preferences": []
+        },
+        "level": 44,
+        "color": null,
+        "lifetimeLevel": 1
+    },
+    {
+        "user": {
+            "id": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+            "discord": {
+                "id": 125851849029976064,
+                "name": "halomademeapc",
+                "discriminator": "8204"
+            },
+            "irc": null,
+            "createdAt": "2023-02-14T22:22:19.451759-05:00",
+            "updatedAt": "2023-02-14T22:22:19.451759-05:00",
+            "preferences": [
+                {
+                    "userId": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+                    "preference": 11,
+                    "value": "#eb7434"
+                }
+            ]
+        },
+        "level": 32,
+        "color": "#eb7434",
+        "lifetimeLevel": 1
+    },
+    {
+        "user": {
+            "id": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+            "discord": {
+                "id": 125851849029976064,
+                "name": "meep",
+                "discriminator": "8204"
+            },
+            "irc": null,
+            "createdAt": "2023-02-14T22:22:19.451759-05:00",
+            "updatedAt": "2023-02-14T22:22:19.451759-05:00",
+            "preferences": [
+                {
+                    "userId": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+                    "preference": 11,
+                    "value": "#eb7434"
+                }
+            ]
+        },
+        "level": 12,
+        "color": "#eb7434",
+        "lifetimeLevel": 1
+    },
+    {
+        "user": {
+            "id": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+            "discord": {
+                "id": 125851849029976064,
+                "name": "asdfa",
+                "discriminator": "8204"
+            },
+            "irc": null,
+            "createdAt": "2023-02-14T22:22:19.451759-05:00",
+            "updatedAt": "2023-02-14T22:22:19.451759-05:00",
+            "preferences": [
+                {
+                    "userId": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+                    "preference": 11,
+                    "value": "#eb7434"
+                }
+            ]
+        },
+        "level": 12,
+        "color": "#eb7434",
+        "lifetimeLevel": 1
+    },
+    {
+        "user": {
+            "id": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+            "discord": {
+                "id": 125851849029976064,
+                "name": "halomademeapc",
+                "discriminator": "8204"
+            },
+            "irc": null,
+            "createdAt": "2023-02-14T22:22:19.451759-05:00",
+            "updatedAt": "2023-02-14T22:22:19.451759-05:00",
+            "preferences": [
+                {
+                    "userId": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+                    "preference": 11,
+                    "value": "#eb7434"
+                }
+            ]
+        },
+        "level": 4,
+        "color": "#eb7434",
+        "lifetimeLevel": 1
+    },
+    {
+        "user": {
+            "id": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+            "discord": {
+                "id": 125851849029976064,
+                "name": "halomademeapc",
+                "discriminator": "8204"
+            },
+            "irc": null,
+            "createdAt": "2023-02-14T22:22:19.451759-05:00",
+            "updatedAt": "2023-02-14T22:22:19.451759-05:00",
+            "preferences": [
+                {
+                    "userId": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+                    "preference": 11,
+                    "value": "#eb7434"
+                }
+            ]
+        },
+        "level": 2,
+        "color": "#eb7434",
+        "lifetimeLevel": 1
+    },
+    {
+        "user": {
+            "id": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+            "discord": {
+                "id": 125851849029976064,
+                "name": "halomademeapc",
+                "discriminator": "8204"
+            },
+            "irc": null,
+            "createdAt": "2023-02-14T22:22:19.451759-05:00",
+            "updatedAt": "2023-02-14T22:22:19.451759-05:00",
+            "preferences": [
+                {
+                    "userId": "d7d2eb4a-e1d9-474e-aa50-8385ac0ecc1d",
+                    "preference": 11,
+                    "value": "#eb7434"
+                }
+            ]
+        },
+        "level": 1,
+        "color": "#eb7434",
+        "lifetimeLevel": 1
+    }
+]

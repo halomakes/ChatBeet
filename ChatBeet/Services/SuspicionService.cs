@@ -19,17 +19,19 @@ public class SuspicionService
 
     public DateTime ActiveWindowStart => DateTime.Now - _activePeriod;
 
-    public async Task<IEnumerable<SuspicionReport>> GetActiveSuspicionsAsync()
+    public async Task<IEnumerable<SuspicionReport>> GetActiveSuspicionsAsync(ulong guildId)
     {
         var suspicions = await ActiveSuspicions
+            .Where(s => s.GuildId == guildId)
             .ToListAsync();
         return suspicions;
     }
 
-    public async Task<IEnumerable<SuspicionReport>> GetSuspicionsAsync()
+    public async Task<IEnumerable<SuspicionReport>> GetSuspicionsAsync(ulong guildId)
     {
         var suspicions = await _ctx.Suspicions
             .Include(s => s.Suspect)
+            .Where(s => s.GuildId == guildId)
             .ToListAsync();
         return suspicions;
     }
@@ -40,11 +42,11 @@ public class SuspicionService
         .AsQueryable()
         .Where(s => s.CreatedAt >= ActiveWindowStart);
 
-    public async Task<int> GetSuspicionLevelAsync(Guid suspectId) =>
-        (await GetActiveSuspicionsAsync())
+    public async Task<int> GetSuspicionLevelAsync(ulong guildId, Guid suspectId) =>
+        (await GetActiveSuspicionsAsync(guildId))
         .Count(s => s.SuspectId == suspectId);
 
-    public async Task<bool> HasRecentlyReportedAsync(Guid suspect, Guid reporter, TimeSpan debounceWindow = default)
+    public async Task<bool> HasRecentlyReportedAsync(ulong guildId, Guid suspect, Guid reporter, TimeSpan debounceWindow = default)
     {
         if (debounceWindow == default)
             debounceWindow = TimeSpan.FromMinutes(2);
@@ -52,6 +54,7 @@ public class SuspicionService
         var lastReport = await _ctx.Suspicions
             .AsQueryable()
             .AsNoTracking()
+            .Where(s => s.GuildId == guildId)
             .Where(s => s.ReporterId == reporter)
             .Where(s => s.SuspectId == suspect)
             .OrderByDescending(s => s.CreatedAt)
@@ -60,12 +63,13 @@ public class SuspicionService
         return lastReport != default && (DateTime.Now - lastReport.CreatedAt) < debounceWindow;
     }
 
-    public async Task ReportSuspiciousActivityAsync(Guid suspect, Guid reporter, bool bypassDebounceCheck = false)
+    public async Task ReportSuspiciousActivityAsync(ulong guildId, Guid suspect, Guid reporter, bool bypassDebounceCheck = false)
     {
-        if (bypassDebounceCheck || !await HasRecentlyReportedAsync(suspect, reporter))
+        if (bypassDebounceCheck || !await HasRecentlyReportedAsync(guildId, suspect, reporter))
         {
             _ctx.Suspicions.Add(new SuspicionReport
             {
+                GuildId = guildId,
                 ReporterId = reporter,
                 SuspectId = suspect,
                 CreatedAt = DateTime.Now
@@ -74,11 +78,12 @@ public class SuspicionService
         }
     }
 
-    public async Task<IEnumerable<SuspicionRank>> GetSuspicionLevels()
+    public async Task<IEnumerable<SuspicionRank>> GetSuspicionLevels(ulong guildId)
     {
         var mostSuspicious = await _ctx.Suspicions
             .Include(s => s.Suspect)
             .ThenInclude(s => s!.Preferences)
+            .Where(s => s.GuildId == guildId)
             .GroupBy(s => s.Suspect!.Id)
             .Select(g => new
             {

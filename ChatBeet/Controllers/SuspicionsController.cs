@@ -12,11 +12,11 @@ namespace ChatBeet.Controllers;
 [ApiController]
 [ResponseCache(Duration = 300)]
 [Authorize(Policy = InGuildRequirement.Policy)]
-public class SuspicionController : Controller
+public class SuspicionsController : Controller
 {
     private readonly SuspicionService _suspicionService;
 
-    public SuspicionController(SuspicionService suspicionService)
+    public SuspicionsController(SuspicionService suspicionService)
     {
         _suspicionService = suspicionService;
     }
@@ -25,5 +25,5 @@ public class SuspicionController : Controller
     /// Get current suspicion levels
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels([FromRoute]ulong guildId) => Ok(await _suspicionService.GetSuspicionLevels());
+    public async Task<ActionResult<IEnumerable<SuspicionRank>>> GetSuspicionLevels([FromRoute]ulong guildId) => Ok(await _suspicionService.GetSuspicionLevels(guildId));
 }

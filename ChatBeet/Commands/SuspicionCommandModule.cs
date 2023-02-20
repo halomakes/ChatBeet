@@ -39,17 +39,17 @@ public class SuspicionCommandModule : ApplicationCommandModule
         {
             var suspectId = (await _users.GetUserAsync(suspect)).Id;
             var userId = (await _users.GetUserAsync(ctx.User)).Id;
-            
-            if (await _db.HasRecentlyReportedAsync(suspectId, userId))
+
+            if (await _db.HasRecentlyReportedAsync(ctx.Guild.Id, suspectId, userId))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                     .WithContent("You must wait at least 2 minutes each time you raise suspicion against a user."));
             }
             else
             {
-                await _db.ReportSuspiciousActivityAsync(suspectId, userId, bypassDebounceCheck: true);
+                await _db.ReportSuspiciousActivityAsync(ctx.Guild.Id, suspectId, userId, bypassDebounceCheck: true);
 
-                var suspicionLevel = await _db.GetSuspicionLevelAsync(suspectId);
+                var suspicionLevel = await _db.GetSuspicionLevelAsync(ctx.Guild.Id, suspectId);
 
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                     .WithContent($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is now {suspicionLevel}."));
@@ -61,8 +61,8 @@ public class SuspicionCommandModule : ApplicationCommandModule
     public async Task GetSuspicionLevel(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
         var suspectId = (await _users.GetUserAsync(suspect)).Id;
-        var suspicionLevel = await _db.GetSuspicionLevelAsync(suspectId);
-        var maxLevel = (await _db.GetActiveSuspicionsAsync()).GroupBy(s => s.SuspectId)
+        var suspicionLevel = await _db.GetSuspicionLevelAsync(ctx.Guild.Id, suspectId);
+        var maxLevel = (await _db.GetActiveSuspicionsAsync(ctx.Guild.Id)).GroupBy(s => s.SuspectId)
             .Select(s => s.Count())
             .Max();
 
@@ -75,21 +75,21 @@ public class SuspicionCommandModule : ApplicationCommandModule
             var subjectPhrase = GetSubjectPhrase(pronounPref);
             comment = $" {subjectPhrase} {descriptor}.";
         }
+
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                .WithContent($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is {suspicionLevel}.{comment}"));
+            .WithContent($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is {suspicionLevel}.{comment}"));
 
         static string GetSubjectPhrase(string pronounPreference)
         {
             if (string.IsNullOrEmpty(pronounPreference))
                 return "That's";
 
-            if (pronounPreference.Equals("they", StringComparison.OrdinalIgnoreCase))
-                return $"{pronounPreference.CapitalizeFirst()} are";
-            else
-                return $"{pronounPreference.CapitalizeFirst()} is";
+            return pronounPreference.Equals("they", StringComparison.OrdinalIgnoreCase) 
+                ? $"{pronounPreference.CapitalizeFirst()} are" 
+                : $"{pronounPreference.CapitalizeFirst()} is";
         }
 
-        static string GetSuspicionDescriptor(int level, int maxLevel)
+        static string? GetSuspicionDescriptor(int level, int maxLevel)
         {
             if (level == 0)
                 return "not sus at all";
@@ -102,26 +102,19 @@ public class SuspicionCommandModule : ApplicationCommandModule
 
             var ratio = (double)(level * 100) / maxLevel;
 
-            if (ratio > 90)
-                return "ultra sus";
-            else if (ratio > 80)
-                return "mega sus";
-            else if (ratio > 70)
-                return "mad sus";
-            else if (ratio > 60)
-                return "very sus";
-            else if (ratio > 50)
-                return "pretty sus ngl";
-            else if (ratio > 40)
-                return "sus if I've ever seen it";
-            else if (ratio > 30)
-                return "a little sus";
-            else if (ratio > 20)
-                return "slightly sus I guess";
-            else if (ratio > 10)
-                return "the teeniest bit sus";
-            else
-                return "not sus enough to really count";
+            return ratio switch
+            {
+                > 90 => "ultra sus",
+                > 80 => "mega sus",
+                > 70 => "mad sus",
+                > 60 => "very sus",
+                > 50 => "pretty sus ngl",
+                > 40 => "sus if I've ever seen it",
+                > 30 => "a little sus",
+                > 20 => "slightly sus I guess",
+                > 10 => "the teeniest bit sus",
+                _ => "not sus enough to really count"
+            };
         }
     }
 }

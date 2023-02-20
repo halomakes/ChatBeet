@@ -17,7 +17,7 @@ public partial class CbDbContext : ISuspicionRepository
         modelBuilder.Entity<SuspicionReport>(builder =>
         {
             builder.ToTable("suspicion_report", "interactions");
-            builder.HasKey(b => b.Id);
+            builder.HasKey(b => new { b.Id, b.CreatedAt });
             builder.Property(b => b.CreatedAt)
                 .HasDefaultValueSql("current_timestamp");
             builder.HasOne(b => b.Guild)

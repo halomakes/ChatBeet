@@ -84,6 +84,20 @@
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\Commands\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FixedTimeRanges\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FixedTimeRanges\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FixedTimeRanges\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FixedTimeRanges\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FixedTimeRanges\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Keywords\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Tags\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Tags\Tag.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Tags\User.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Tags\_TagStats.cshtml" />
+    </ItemGroup>
+
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
         <!-- Ensure Node.js is installed -->
         <Exec Command="node --version" ContinueOnError="true">
