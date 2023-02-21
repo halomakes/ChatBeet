@@ -68,6 +68,7 @@ public class DefinitionsController : ControllerBase
     /// </summary>
     [HttpGet]
     public IQueryable<Definition> GetDefinitions([FromRoute] ulong guildId) => _db.Definitions
+        .Include(d => d.Author)
         .Where(d => d.GuildId == guildId);
 
     /// <summary>
@@ -79,6 +80,7 @@ public class DefinitionsController : ControllerBase
     public async Task<ActionResult<Definition>> GetDefinition([FromRoute] ulong guildId, [FromRoute] string key)
     {
         var def = await _db.Definitions
+            .Include(d => d.Author)
             .Where(d => d.GuildId == guildId)
             .FirstOrDefaultAsync(m => m.Key.ToLower() == key.ToLower());
         if (def == null)

@@ -20,7 +20,12 @@ export class Definition {
         this.value = data.value;
         this.createdBy = data.createdBy;
         this.createdAt = new Date(data.createdAt);
-            this.updatedAt = new Date(data.updatedAt);
-        this.author = new User(data.author);
+        this.updatedAt = new Date(data.updatedAt);
+        if (data.author)
+            this.author = new User(data.author);
+        else {
+            this.author = null!;
+            console.log(data);
+        }
     }
 }
