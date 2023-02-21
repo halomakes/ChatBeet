@@ -87,7 +87,7 @@ public class DefinitionCommandModule : ApplicationCommandModule
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(@$"Got it! 👍
-Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.CreatedBy}."));
+Previous value was {Formatter.Bold(existingCell.Value)}, set by {existingCell.Author?.Mention()}."));
             await _queue.Publish(new BonkableMessageNotification(await ctx.GetOriginalResponseAsync()));
         }
 

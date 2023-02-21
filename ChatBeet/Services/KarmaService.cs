@@ -29,7 +29,7 @@ public class KarmaService
     public async Task<string> GetCanonicalKeyAsync(ulong guildId, string target)
     {
         var alternateUsers = await _users.Users
-            .Where(u => u.Irc!.Nick!.ToLower() == target.ToLower() || u.Discord!.Name!.ToLower() == target)
+            .Where(u => u.Irc!.Nick!.ToLower() == target.ToLower() || u.Discord!.Name!.ToLower() == target.ToLower())
             .ToListAsync();
         if (!alternateUsers.Any())
             return target;
