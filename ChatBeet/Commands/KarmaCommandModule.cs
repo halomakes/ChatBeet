@@ -75,5 +75,11 @@ public class KarmaCommandModule : ApplicationCommandModule
                 .WithContent($"You can change {key.ToPossessive()} karma again {Formatter.Timestamp(e.Delay)}.")
                 .AsEphemeral());
         }
+        catch (SelfKarmaException)
+        {
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent($"You cannot change your own karma.")
+                .AsEphemeral());
+        }
     }
 }

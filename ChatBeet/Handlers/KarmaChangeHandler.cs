@@ -59,5 +59,10 @@ public partial class KarmaChangeHandler : INotificationHandler<DiscordNotificati
             await notification.Event.Message.RespondAsync(new DiscordMessageBuilder()
                 .WithContent($"You can change {target.ToPossessive()} karma again {Formatter.Timestamp(e.Delay)}."));
         }
+        catch (SelfKarmaException)
+        {
+            await notification.Event.Message.RespondAsync(new DiscordMessageBuilder()
+                .WithContent($"You cannot change your own karma."));
+        }
     }
 }

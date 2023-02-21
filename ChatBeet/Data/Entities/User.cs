@@ -11,7 +11,7 @@ public class User
     public DateTime UpdatedAt { get; set; }
 
     public string? Mention() => Discord?.Id is not null
-        ? $"<@{Id}>"
+        ? $"<@{Discord.Id}>"
         : Irc?.Nick;
 
     public string? DisplayName() => Discord?.Name is not null

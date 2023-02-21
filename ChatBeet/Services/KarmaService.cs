@@ -63,6 +63,8 @@ public class KarmaService
     public async Task RecordVote(ulong guildId, string target, User requester, KarmaVote.VoteType type)
     {
         target = await GetCanonicalKeyAsync(guildId, target);
+        if (target.ToLower() == requester.Mention()?.ToLower())
+            throw new SelfKarmaException();
         await AssertRateLimitAsync(guildId, target, requester);
         _karma.Karma.Add(new KarmaVote
         {
