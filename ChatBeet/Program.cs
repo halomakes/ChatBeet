@@ -5,6 +5,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using BooruSharp.Booru;
 using ChatBeet.Authorization;
 using ChatBeet.Configuration;
@@ -173,6 +175,11 @@ void AddAuthentication(WebApplicationBuilder builder)
                     user.GetString("id"),
                     user.GetString("avatar"),
                     user.GetString("avatar")!.StartsWith("a_") ? "gif" : "png"));
+            options.Events.OnRedirectToAuthorizationEndpoint = context =>
+            {
+                context.Response.Redirect(context.RedirectUri.Replace("http%3A%2F%2F", "https%3A%2F%2F"));
+                return Task.FromResult(0);
+            };
         });
 
     builder.Services.AddAuthorization(opts => { opts.AddPolicy(InGuildRequirement.Policy, policy => policy.Requirements.Add(new InGuildRequirement())); });
