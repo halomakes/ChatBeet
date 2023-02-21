@@ -1,6 +1,7 @@
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Migration.Legacy;
+using ChatBeet.Utilities;
 using Microsoft.EntityFrameworkCore;
 using TagHistory = ChatBeet.Data.Entities.TagHistory;
 using UserPreferenceSetting = ChatBeet.Data.Entities.UserPreferenceSetting;
@@ -10,24 +11,33 @@ namespace ChatBeet.Migration;
 public class Migrator
 {
     private readonly ulong _guild;
+    private readonly string _connectionString;
 
-    public Migrator(ulong guild)
+    public Migrator(ulong guild, string connectionString)
     {
         _guild = guild;
+        _connectionString = connectionString;
     }
 
     public async Task Migrate()
     {
-        var options = new DbContextOptionsBuilder<CbDbContext>().UseNpgsql("connection string here").UseSnakeCaseNamingConvention().Options;
+        var options = new DbContextOptionsBuilder<CbDbContext>().UseNpgsql(_connectionString).UseSnakeCaseNamingConvention().Options;
         await using var newDb = new CbDbContext(options);
         await newDb.Database.MigrateAsync();
 
+        Console.WriteLine("Migrating IRC Links");
         await MigrateIrcLinks(newDb);
+        Console.WriteLine("Creating Guild");
         await EnsureGuildExists(newDb);
+        Console.WriteLine("Migrating Booru");
         await MigrateBooru(newDb);
+        Console.WriteLine("Migrating Definitions");
         await MigrateDefinitions(newDb);
+        Console.WriteLine("Migrating Preferences");
         await MigratePreferences(newDb);
+        Console.WriteLine("Migrating Progress Spans");
         await MigrateProgress(newDb);
+        Console.WriteLine("Migrating Suspicions");
         await MigrateSuspicion(newDb);
     }
 
@@ -49,7 +59,7 @@ public class Migrator
 
     private async Task MigrateIrcLinks(CbDbContext ctx)
     {
-        var options = new DbContextOptionsBuilder<IrcLinkContext>().UseSqlite("Data Source=db/ircmigration.db").Options;
+        var options = new DbContextOptionsBuilder<IrcLinkContext>().UseSqlite("Data Source=C:/db/ircmigration.db").Options;
         await using var legacy = new IrcLinkContext(options);
         var links = await legacy.Links.ToListAsync();
         foreach (var link in links)
@@ -84,7 +94,7 @@ public class Migrator
 
     private async Task MigrateBooru(CbDbContext ctx)
     {
-        var options = new DbContextOptionsBuilder<BooruContext>().UseSqlite("Data Source=db/booru.db").Options;
+        var options = new DbContextOptionsBuilder<BooruContext>().UseSqlite("Data Source=C:/db/booru.db").Options;
         await using var legacy = new BooruContext(options);
         var blacklists = await legacy.Blacklists.ToListAsync();
         foreach (var blacklist in blacklists)
@@ -131,7 +141,7 @@ public class Migrator
 
     private async Task MigrateDefinitions(CbDbContext ctx)
     {
-        var options = new DbContextOptionsBuilder<MemoryCellContext>().UseSqlite("Data Source=db/memorycell.db").Options;
+        var options = new DbContextOptionsBuilder<MemoryCellContext>().UseSqlite("Data Source=C:/db/memorycell.db").Options;
         await using var legacy = new MemoryCellContext(options);
         var cells = await legacy.MemoryCells.ToListAsync();
         foreach (var cell in cells)
@@ -160,7 +170,7 @@ public class Migrator
 
     private async Task MigratePreferences(CbDbContext ctx)
     {
-        var options = new DbContextOptionsBuilder<PreferencesContext>().UseSqlite("Data Source=db/userprefs.db").Options;
+        var options = new DbContextOptionsBuilder<PreferencesContext>().UseSqlite("Data Source=C:/db/userprefs.db").Options;
         await using var legacy = new PreferencesContext(options);
         var preferences = await legacy.PreferenceSettings.ToListAsync();
         foreach (var pref in preferences)
@@ -186,7 +196,7 @@ public class Migrator
 
     private async Task MigrateProgress(CbDbContext ctx)
     {
-        var options = new DbContextOptionsBuilder<ProgressContext>().UseSqlite("Data Source=db/progress.db").Options;
+        var options = new DbContextOptionsBuilder<ProgressContext>().UseSqlite("Data Source=C:/db/progress.db").Options;
         await using var legacy = new ProgressContext(options);
         var spans = await legacy.FixedTimeRanges.ToListAsync();
         foreach (var span in spans)
@@ -197,8 +207,8 @@ public class Migrator
                 {
                     GuildId = _guild,
                     Template = span.Template,
-                    BeforeRangeMessage = span.BeforeRangeMessage,
-                    AfterRangeMessage = span.AfterRangeMessage,
+                    BeforeRangeMessage = span.BeforeRangeMessage ?? string.Empty,
+                    AfterRangeMessage = span.AfterRangeMessage ?? string.Empty,
                     Key = span.Key,
                     StartDate = span.StartDate,
                     EndDate = span.EndDate
@@ -215,7 +225,7 @@ public class Migrator
 
     private async Task MigrateSuspicion(CbDbContext ctx)
     {
-        var options = new DbContextOptionsBuilder<SuspicionContext>().UseSqlite("Data Source=db/suspicions.db").Options;
+        var options = new DbContextOptionsBuilder<SuspicionContext>().UseSqlite("Data Source=C:/db/suspicions.db").Options;
         await using var legacy = new SuspicionContext(options);
         var sussyBakas = await legacy.Suspicions.ToListAsync();
         foreach (var sus in sussyBakas)
@@ -244,7 +254,10 @@ public class Migrator
 
     private async Task<User> GetOrCreateUser(CbDbContext ctx, string nick)
     {
-        var existingUser = await ctx.Users.FirstOrDefaultAsync(u => u.Irc!.Nick!.ToLower() == nick.ToLower());
+        var (success, partialUsername, discriminator) = nick.ParseUsername();
+        var existingUser = success
+            ? await ctx.Users.FirstOrDefaultAsync(u => u.Discord!.Name!.ToLower() == partialUsername.ToLower() && u.Discord.Discriminator!.ToLower() == discriminator.ToLower())
+            : await ctx.Users.FirstOrDefaultAsync(u => u.Irc!.Nick!.ToLower() == nick.ToLower());
         if (existingUser is not null)
             return existingUser;
         var entry = ctx.Users.Add(new User

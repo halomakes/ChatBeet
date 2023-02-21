@@ -12,10 +12,11 @@ public class BooruBlacklist
 }
 public class FixedTimeRange
 {
+    [Key]
     public string Key { get; set; }
     public string Template { get; set; } = "This custom range is {percentage} complete.";
-    public string BeforeRangeMessage { get; set; }
-    public string AfterRangeMessage { get; set; }
+    public string? BeforeRangeMessage { get; set; }
+    public string? AfterRangeMessage { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 }
