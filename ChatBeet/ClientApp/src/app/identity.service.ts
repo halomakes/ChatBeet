@@ -40,6 +40,10 @@ export class IdentityService {
     IdentityService.guildChanges.emit(guild);
   }
 
+  public get selectedGuild(): Guild | undefined {
+    return IdentityService.currentGuild;
+  }
+
   private loadStoredGuild = (): void => {
     if (!IdentityService.currentGuild) {
       var content = localStorage.getItem('guild');

@@ -19,7 +19,6 @@ export class ProgressPreviewComponent implements OnChanges {
       this.completion = changes.span.currentValue
         ? new ProgressCompletion(changes.span.currentValue)
         : undefined;
-      console.log(this.completion);
     }
   }
 }

@@ -26,14 +26,14 @@ public class ProgressSpan
     /// </summary>
     /// <remarks>Will show 0% instead if not specified</remarks>
     [MaxLength(200), Display(Name = "Before Range Message")]
-    public string BeforeRangeMessage { get; set; }
+    public string? BeforeRangeMessage { get; set; }
 
     /// <summary>
     /// Message to display if period has already ended
     /// </summary>
     /// <remarks>Will show 100% instead if not specified</remarks>
     [MaxLength(200), Display(Name = "After Range Message")]
-    public string AfterRangeMessage { get; set; }
+    public string? AfterRangeMessage { get; set; }
 
     /// <summary>
     /// Beginning of time range

@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -23,10 +23,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-import { MatRippleModule } from '@angular/material/core';
+import { MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { KarmaComponent } from './karma/karma.component';
@@ -36,7 +39,8 @@ import { HighGroundComponent } from './high-ground/high-ground.component';
 import { CrewmatesComponent } from './crewmates/crewmates.component';
 import { ProgressListComponent } from './progress/progress-list/progress-list.component';
 import { ProgressPreviewComponent } from './progress/progress-preview/progress-preview.component';
-
+import { EditProgressComponent } from './progress/edit-progress/edit-progress.component';
+import { DeleteProgressComponent } from './progress/delete-progress/delete-progress.component';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -54,7 +58,11 @@ const MaterialComponents = [
   MatRippleModule,
   MatChipsModule,
   MatProgressBarModule,
-  MatCardModule
+  MatCardModule,
+  MatDialogModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
+  MatSnackBarModule
 ]
 
 @NgModule({
@@ -71,12 +79,15 @@ const MaterialComponents = [
     HighGroundComponent,
     CrewmatesComponent,
     ProgressListComponent,
-    ProgressPreviewComponent
+    ProgressPreviewComponent,
+    EditProgressComponent,
+    DeleteProgressComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'karma', component: KarmaComponent },

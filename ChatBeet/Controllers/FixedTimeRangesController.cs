@@ -94,7 +94,7 @@ public class FixedTimeRangesController : ControllerBase
             throw;
         }
 
-        return CreatedAtAction("GetFixedTimeRange", new { id = progressSpan.Key }, progressSpan);
+        return CreatedAtAction(nameof(GetFixedTimeRange), new { guildId, key = progressSpan.Key }, progressSpan);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class FixedTimeRangesController : ControllerBase
     /// <param name="guildId">ID of guild</param>
     /// <param name="id">ID of time range</param>
     [HttpDelete("{id}"), Authorize]
-    public async Task<IActionResult> DeleteFixedTimeRange([FromRoute]ulong guildId, [FromRoute] string id)
+    public async Task<IActionResult> DeleteFixedTimeRange([FromRoute] ulong guildId, [FromRoute] string id)
     {
         var fixedTimeRange = await _dbContext.Spans.FirstOrDefaultAsync(s => s.GuildId == guildId && s.Key == id);
         if (fixedTimeRange == null)

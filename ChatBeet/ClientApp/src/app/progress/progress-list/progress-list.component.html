@@ -9,8 +9,8 @@
                 <app-progress-preview [span]="span" mode="text"></app-progress-preview>
             </mat-card-content>
             <mat-card-actions align="end">
-                <button mat-button>Delete</button>
-                <button mat-button>Edit</button>
+                <button mat-button (click)="delete(span)">Delete</button>
+                <button mat-button (click)="edit(span)">Edit</button>
             </mat-card-actions>
             <mat-card-footer>
                 <app-progress-preview [span]="span" mode="bar"></app-progress-preview>
@@ -19,7 +19,7 @@
     </div>
 </div>
 <div class="fab">
-    <button mat-fab color="accent" aria-label="Create a span">
+    <button mat-fab color="accent" aria-label="Create a span" (click)="add()">
         <mat-icon>add</mat-icon>
     </button>
 </div>
