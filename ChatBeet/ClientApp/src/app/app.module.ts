@@ -44,7 +44,6 @@ import { ProgressPreviewComponent } from './progress/progress-preview/progress-p
 import { EditProgressComponent } from './progress/edit-progress/edit-progress.component';
 import { DeleteProgressComponent } from './progress/delete-progress/delete-progress.component';
 import { CommandListComponent } from './command-list/command-list.component';
-import { MarkdownModule } from 'ngx-markdown';
 import { PreferencesComponent } from './preferences/preferences.component';
 import { SetPreferenceComponent } from './set-preference/set-preference.component';
 
@@ -111,8 +110,7 @@ const MaterialComponents = [
       { path: '**', component: HomeComponent }
     ]),
     BrowserAnimationsModule,
-    ...MaterialComponents,
-    MarkdownModule.forRoot({ loader: HttpClient })
+    ...MaterialComponents
   ],
   providers: [],
   bootstrap: [AppComponent]

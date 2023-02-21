@@ -25,7 +25,6 @@ export class Definition {
             this.author = new User(data.author);
         else {
             this.author = null!;
-            console.log(data);
         }
     }
 }

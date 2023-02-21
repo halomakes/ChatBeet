@@ -14,7 +14,6 @@ export class CommandListComponent implements OnInit {
   ngOnInit(): void {
     this.service.getCommands().subscribe(v => {
       this.commands = v;
-      console.log(this.commands);
     });
   }
 

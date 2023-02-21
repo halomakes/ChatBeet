@@ -31,7 +31,6 @@ export class CrewmatesComponent implements OnInit {
         .map((val, idx) => ({ level: levels[idx], order: val }))
         .sort((a, b) => (a.level > b.level) ? -1 : 1);
       this.levels = sorted;
-      console.log(this.levels);
     }
   }
 }
