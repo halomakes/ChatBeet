@@ -1,5 +1,5 @@
 <div class="container">
-    <div *ngIf="user" class="wide">
+    <div *ngIf="user; else login" class="wide">
         <img [src]="user.avatarUrl" alt="avatar">
         <div>
             <h2 style="margin:0">ChatBeet Identity</h2>
@@ -27,6 +27,7 @@
             <b>{{types[preference.preference]}}:</b>&nbsp;<span>{{preference.value}}</span>
         </div>
     </div>
+    <ng-template #login>Log in to continue.</ng-template>
 </div>
 <div class="fab">
     <button mat-fab color="accent" aria-label="Change a preference" (click)="change()">

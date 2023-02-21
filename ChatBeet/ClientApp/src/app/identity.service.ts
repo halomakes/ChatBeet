@@ -62,6 +62,9 @@ export class IdentityService {
         IdentityService.currentUser = r;
         IdentityService.isLoggedIn = true;
         console.log('Logged in as', r);
+        if (!this.selectedGuild && r.guilds.length) {
+          this.selectedGuild = r.guilds[0];
+        }
       }),
       catchError(() => {
         IdentityService.isLoggedIn = false;
