@@ -27,6 +27,11 @@ tr:not(.example-detail-row) {
     &:active {
         background: transparentize(black, 0.9);
     }
+
+    @media screen and (max-width: 600px) {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 .expand-detail {
