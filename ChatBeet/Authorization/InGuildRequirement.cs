@@ -41,7 +41,7 @@ public class InGuildHandler : AuthorizationHandler<InGuildRequirement>
             {
                 var members = await _guilds.GetMembersAsync(guild);
                 var currentUser = await _identityService.GetCurrentUserAsync();
-                if (members.Any(m => m.Id == currentUser.Discord?.Id))
+                if (members?.Any(m => m?.Id == currentUser?.Discord?.Id) ?? false)
                     context.Succeed(requirement);
             }
         }
