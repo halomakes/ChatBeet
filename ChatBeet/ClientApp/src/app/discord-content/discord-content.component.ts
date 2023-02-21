@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { toHTML } from 'discord-markdown';
+import { toHTML } from 'discord-markdown-fix';
 import { tap } from 'rxjs';
 import { MentionService } from './mention.service';
 
@@ -28,9 +28,9 @@ export class DiscordContentComponent implements OnChanges {
     }
     this.htmlContent = toHTML(content, {
       discordCallback: {
-        user: node => this.loadUser(node.id),
-        channel: node => this.loadChannel(node.id),
-        role: node => this.loadRole(node.id)
+        user: (node: any) => this.loadUser(node.id),
+        channel: (node: any) => this.loadChannel(node.id),
+        role: (node: any) => this.loadRole(node.id)
       }
     });
   }
