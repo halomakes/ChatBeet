@@ -29,7 +29,7 @@
                     <div *ngIf="command.type == 1 && !getSubCommands(command).length" style="margin-top:12px;">
                         <h5 style="margin-bottom:0">Example Usage</h5>
                         <code>
-                            <span class="text-white-50">/{{command.name}}</span><span class="text-white" *ngFor="let opt of getOptions(command)">&nbsp;&lt;{{opt.name}}&gt;</span>
+                            <span class="text-primary">/{{command.name}}</span><span class="text-accent" *ngFor="let opt of getOptions(command)">&nbsp;&lt;{{opt.name}}&gt;</span>
                         </code>
                         <mat-divider></mat-divider>
                         <div *ngIf="getOptions(command).length">
@@ -37,7 +37,7 @@
                             <ul>
                                 <li *ngFor="let opt of getOptions(command)">
                                     <span>
-                                        <code>{{opt.name}}</code>
+                                        <code class="text-accent">{{opt.name}}</code>
                                         <mat-chip-list [ngSwitch]="opt.type"
                                             style="display:inline-block; margin-left:12px;">
                                             <mat-chip *ngSwitchCase="3">
@@ -104,13 +104,13 @@
                         <div *ngIf="command.description">{{sub.description}}</div>
                         <h5 style="margin-bottom:0">Example Usage</h5>
                         <code>
-                            <span class="text-white-50">/{{command.name}} {{sub.name}}</span><span class="text-white" *ngFor="let opt of getOptions(sub)">&nbsp;&lt;{{opt.name}}&gt;</span>
+                            <span class="text-primary">/{{command.name}} {{sub.name}}</span><span class="text-accent" *ngFor="let opt of getOptions(sub)">&nbsp;&lt;{{opt.name}}&gt;</span>
                         </code>
                         <h5 style="margin-bottom:0">Options</h5>
                         <ul>
                             <li *ngFor="let opt of getOptions(sub)">
                                 <span>
-                                    <code>{{opt.name}}</code>
+                                    <code class="text-accent">{{opt.name}}</code>
                                     <mat-chip-list [ngSwitch]="opt.type"
                                         style="display:inline-block; margin-left:12px;">
                                         <mat-chip *ngSwitchCase="3">

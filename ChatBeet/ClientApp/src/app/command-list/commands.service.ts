@@ -10,6 +10,6 @@ export class CommandsService {
   constructor(private http: HttpClient) { }
 
   public getCommands = (): Observable<Array<any>> => this.http.get<Array<any>>('/api/system/commands').pipe(
-    map(r => r.sort((a, b) => a.name < b.name ? -1 : 1))
+    map(r => r.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
   );
 }

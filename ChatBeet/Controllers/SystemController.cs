@@ -24,5 +24,5 @@ public class SystemController : Controller
     public ActionResult<IReadOnlyCollection<DiscordApplicationCommand>> GetCommands() => Ok(_discord.GetSlashCommands().RegisteredCommands.FirstOrDefault().Value);
 
     [HttpGet("Status")]
-    public ActionResult<StatusModel> GetStatus() => Ok(new StatusModel(Assembly.GetExecutingAssembly().GetName(), DateTime.Now - Process.GetCurrentProcess().StartTime));
+    public ActionResult<StatusModel> GetStatus() => Ok(new StatusModel(Assembly.GetExecutingAssembly().GetName().Version, DateTime.Now - Process.GetCurrentProcess().StartTime));
 }
