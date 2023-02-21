@@ -43,6 +43,7 @@ static void Configure(WebApplication app)
 {
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     app.UseForwardedHeaders();
+    app.UseHttpsRedirection();
 
     app.UseExceptionHandler("/Error");
 
