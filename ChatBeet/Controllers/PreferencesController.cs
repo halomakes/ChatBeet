@@ -42,10 +42,18 @@ public class PreferencesController : Controller
     /// </summary>
     /// <param name="change">Values to set</param>
     [HttpPut, Authorize]
-    public async Task<ActionResult<string>> SetPreference([FromBody] PreferenceChange change)
+    public async Task<ActionResult<string>> SetPreference([FromBody] PreferenceChangeRequest change)
     {
-        change.User = await GetCurrentUserAsync();
-        var normalized = await _prefsService.Set(change);
-        return Ok(normalized);
+        var validationMessage = _prefsService.GetValidation(change.Preference, change.Value);
+        if (!string.IsNullOrEmpty(validationMessage))
+            return BadRequest(validationMessage);
+        var populatedChange = new PreferenceChange
+        {
+            User = await GetCurrentUserAsync(),
+            Preference = change.Preference,
+            Value = change.Value
+        };
+        var normalized = await _prefsService.Set(populatedChange);
+        return Json(normalized);
     }
 }

@@ -106,7 +106,7 @@
                         <code>
                             <span class="text-primary">/{{command.name}} {{sub.name}}</span><span class="text-accent" *ngFor="let opt of getOptions(sub)">&nbsp;&lt;{{opt.name}}&gt;</span>
                         </code>
-                        <h5 style="margin-bottom:0">Options</h5>
+                        <h5 style="margin-bottom:0" *ngIf="getOptions(sub).length">Options</h5>
                         <ul>
                             <li *ngFor="let opt of getOptions(sub)">
                                 <span>

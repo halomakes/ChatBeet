@@ -1,0 +1,35 @@
+<div class="container">
+    <div *ngIf="user" class="wide">
+        <img [src]="user.avatarUrl" alt="avatar">
+        <div>
+            <h2 style="margin:0">ChatBeet Identity</h2>
+            <div>
+                <div>User ID: <code>{{user.user.id}}</code></div>
+                <div>Registered At: <code>{{user.user.createdAt}}</code></div>
+            </div>
+        </div>
+        <div>
+            <h2 style="margin:0">Discord Identity</h2>
+            <div>
+                {{user.user.displayName}}
+                <div>User ID: <code>{{user.user.discord?.id}}</code></div>
+            </div>
+        </div>
+        <div *ngIf="user.user.irc?.nick">
+            <h2 style="margin:0">IRC Identity</h2>
+            <div>
+                <div>Nick: <code>{{user.user.irc?.nick}}</code></div>
+            </div>
+        </div>
+        <mat-divider style="margin-top:16px;margin-bottom:16px"></mat-divider>
+        <h1>Preferences</h1>
+        <div *ngFor="let preference of preferences">
+            <b>{{types[preference.preference]}}:</b>&nbsp;<span>{{preference.value}}</span>
+        </div>
+    </div>
+</div>
+<div class="fab">
+    <button mat-fab color="accent" aria-label="Change a preference" (click)="change()">
+        <mat-icon>tune</mat-icon>
+    </button>
+</div>
