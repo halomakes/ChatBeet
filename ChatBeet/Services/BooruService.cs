@@ -1,166 +1,150 @@
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
 using ChatBeet.Configuration;
-using ChatBeet.Data;
 using ChatBeet.Data.Entities;
 using ChatBeet.Utilities;
-using GravyBot;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using ChatBeet.Notifications;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-namespace ChatBeet.Services
+namespace ChatBeet.Services;
+
+public class BooruService
 {
-    public class BooruService
+    private readonly IMemoryCache _cache;
+    private readonly Gelbooru _gelbooru;
+    private readonly ChatBeetConfiguration.BooruConfiguration _booruConfig;
+    private readonly IBooruRepository _context;
+    private readonly IMediator _messageQueue;
+    private readonly HttpClient _httpClient;
+
+    public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, IBooruRepository context, IMediator messageQueue, HttpClient httpClient)
     {
-        private readonly IMemoryCache cache;
-        private readonly Gelbooru gelbooru;
-        private readonly ChatBeetConfiguration.BooruConfiguration booruConfig;
-        private readonly BooruContext context;
-        private readonly MessageQueueService messageQueue;
-        private readonly HttpClient httpClient;
-
-        public BooruService(IOptions<ChatBeetConfiguration> options, IMemoryCache cache, Gelbooru gelbooru, BooruContext context, MessageQueueService messageQueue, HttpClient httpClient)
-        {
-            this.cache = cache;
-            this.gelbooru = gelbooru;
-            booruConfig = options.Value.Booru;
-            this.context = context;
-            this.messageQueue = messageQueue;
-            this.httpClient = httpClient;
-        }
-
-        [Obsolete("Remove with IRC")]
-        public Task<string> GetRandomPostFormattedAsync(bool? safeContentOnly, string requestor, params string[] tags) => GetRandomPostFormattedAsync(safeContentOnly, requestor, tags.AsEnumerable());
-
-        [Obsolete("Remove with IRC")]
-        public async Task<string> GetRandomPostFormattedAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
-        {
-            var result = await GetRandomPostAsync(safeContentOnly, requestor, tags);
-            if (result is MediaSearchResult media)
-                return $"{media.ImageUrl} ({media.Rating}) - {string.Join(", ", media.Tags)}";
-            return default;
-        }
-
-        public Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, string requestor, params string[] tags) => GetRandomPostAsync(safeContentOnly, requestor, tags.AsEnumerable());
-
-        public async Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, string requestor, IEnumerable<string> tags = null)
-        {
-            var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:general" : "-rating:general") : string.Empty;
-            var globalBlacklist = Negate(booruConfig.BlacklistedTags);
-            var userBlacklist = string.IsNullOrEmpty(requestor)
-                ? new List<string>()
-                : Negate(await GetBlacklistedTags(requestor));
-
-            var allTags = tags.Concat(globalBlacklist).Concat(userBlacklist).Append(filter);
-
-            var results = await cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-
-                return gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
-            });
-
-            return PickImage(results);
-
-            MediaSearchResult? PickImage(IEnumerable<SearchResult> searchResults)
-            {
-                if (searchResults?.Any() ?? false)
-                {
-                    var img = searchResults.PickRandom();
-                    var rng = new Random();
-                    var resultTags = img.Tags
-                        .Select(t => (MatchesInput: tags.Contains(t), Tag: t))
-                        .OrderByDescending(p => p.MatchesInput)
-                        .ThenBy(p => rng.Next())
-                        .Select(p => p.Tag)
-                        .Take(10)
-                        .OrderBy(t => rng.Next());
-                    return new(img.FileUrl, img.PostUrl, img.Rating, resultTags);
-                }
-                return default;
-            }
-        }
-
-        public IEnumerable<string> GetGlobalBlacklistedTags() => booruConfig.BlacklistedTags;
-
-        public async Task<IEnumerable<string>> GetBlacklistedTags(string nick) => await cache.GetOrCreateAsync(GetCacheEntry(nick), entry =>
-        {
-            entry.SlidingExpiration = TimeSpan.FromMinutes(15);
-
-            return context.Blacklists.AsNoTracking()
-                .Where(b => b.Nick == nick)
-                .Select(b => b.Tag)
-                .ToListAsync();
-        });
-
-        public async Task BlacklistTags(string nick, IEnumerable<string> tags)
-        {
-            var existingTags = await context.Blacklists.AsQueryable()
-                .Where(t => t.Nick == nick)
-                .Where(t => tags.Contains(t.Tag))
-                .ToListAsync();
-
-            var tagsToAdd = tags
-                .Where(t => !existingTags.Any(et => et.Tag == t))
-                .Select(t => new BooruBlacklist
-                {
-                    Nick = nick,
-                    Tag = t
-                });
-
-            context.Blacklists.AddRange(tagsToAdd);
-            await context.SaveChangesAsync();
-            ClearCache(nick);
-        }
-
-        public async Task WhitelistTags(string nick, IEnumerable<string> tags)
-        {
-            context.Blacklists.RemoveRange(context.Blacklists.AsQueryable().Where(b => b.Nick == nick && tags.Contains(b.Tag)));
-
-            await context.SaveChangesAsync();
-            ClearCache(nick);
-        }
-
-        public async Task<IEnumerable<string>> GetTagsAsync(string query) => await cache.GetOrCreateAsync($"booru:tags:{query}", async entry =>
-        {
-            entry.SlidingExpiration = TimeSpan.FromHours(1);
-            var response = await httpClient.GetFromJsonAsync<TagResponse>($"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&limit=25&name_pattern={query}%");
-            return response.Tag.Select(t => t.Name).ToList();
-        });
-
-        private void ClearCache(string nick) => cache.Remove(GetCacheEntry(nick));
-
-        private static string GetCacheEntry(string nick) => $"boorublacklist:{nick}";
-
-        private static IEnumerable<string> Negate(IEnumerable<string> tags) => tags.Select(t => $"-{t}");
-
-        public async Task RecordTags(string nick, IEnumerable<string> tags)
-        {
-            try
-            {
-                var usableTags = tags.Where(t => !t.StartsWith("-")).Where(t => !t.Contains(":"));
-                var tagEntries = usableTags.Select(t => new TagHistory { Nick = nick, Tag = t });
-                context.TagHistories.AddRange(tagEntries);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                messageQueue.Push(e);
-            }
-        }
-
-        public record struct MediaSearchResult(Uri ImageUrl, Uri PageUrl, Rating Rating, IEnumerable<string> Tags);
-
-        internal record TagResponseEntry(string Name);
-
-        internal record TagResponse(IEnumerable<TagResponseEntry> Tag);
+        _cache = cache;
+        _gelbooru = gelbooru;
+        _booruConfig = options.Value.Booru;
+        _context = context;
+        _messageQueue = messageQueue;
+        _httpClient = httpClient;
     }
 
+    public Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, Guid userId, params string[] tags) => GetRandomPostAsync(safeContentOnly, userId, tags.AsEnumerable());
+
+    public async Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, Guid userId, IEnumerable<string> tags = null)
+    {
+        var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:general" : "-rating:general") : string.Empty;
+        var globalBlacklist = Negate(_booruConfig.BlacklistedTags);
+        var userBlacklist = Negate(await GetBlacklistedTags(userId));
+
+        var allTags = tags.Concat(globalBlacklist).Concat(userBlacklist).Append(filter);
+
+        var results = await _cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+
+            return _gelbooru.GetRandomPostsAsync(20, allTags.ToArray());
+        });
+
+        return PickImage(results);
+
+        MediaSearchResult? PickImage(IEnumerable<SearchResult> searchResults)
+        {
+            if (searchResults?.Any() ?? false)
+            {
+                var img = searchResults.PickRandom();
+                var rng = new Random();
+                var resultTags = img.Tags
+                    .Select(t => (MatchesInput: tags.Contains(t), Tag: t))
+                    .OrderByDescending(p => p.MatchesInput)
+                    .ThenBy(p => rng.Next())
+                    .Select(p => p.Tag)
+                    .Take(10)
+                    .OrderBy(t => rng.Next());
+                return new(img.FileUrl, img.PostUrl, img.Rating, resultTags);
+            }
+
+            return default;
+        }
+    }
+
+    public IEnumerable<string> GetGlobalBlacklistedTags() => _booruConfig.BlacklistedTags;
+
+    public async Task<List<string>> GetBlacklistedTags(Guid userId) => await _cache.GetOrCreateAsync(GetCacheEntry(userId), entry =>
+    {
+        entry.SlidingExpiration = TimeSpan.FromMinutes(15);
+
+        return _context?.BlacklistedTags?.AsNoTracking()
+            .Where(b => b.UserId == userId)
+            .Select(b => b.Tag)
+            .ToListAsync();
+    });
+
+    public async Task BlacklistTags(Guid userId, IEnumerable<string> tags)
+    {
+        var existingTags = await _context.BlacklistedTags.AsQueryable()
+            .Where(t => t.UserId == userId)
+            .Where(t => tags.Contains(t.Tag))
+            .ToListAsync();
+
+        var tagsToAdd = tags
+            .Where(t => !existingTags.Any(et => et.Tag == t))
+            .Select(t => new BlacklistedTag
+            {
+                UserId = userId,
+                Tag = t
+            });
+
+        _context.BlacklistedTags.AddRange(tagsToAdd);
+        await _context.SaveChangesAsync();
+        ClearCache(userId);
+    }
+
+    public async Task WhitelistTags(Guid userId, IEnumerable<string> tags)
+    {
+        _context.BlacklistedTags.RemoveRange(_context.BlacklistedTags.AsQueryable().Where(b => b.UserId == userId && tags.Contains(b.Tag)));
+
+        await _context.SaveChangesAsync();
+        ClearCache(userId);
+    }
+
+    public async Task<IEnumerable<string>> GetTagsAsync(string query) => await _cache.GetOrCreateAsync($"booru:tags:{query}", async entry =>
+    {
+        entry.SlidingExpiration = TimeSpan.FromHours(1);
+        var response = await _httpClient.GetFromJsonAsync<TagResponse>($"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&limit=25&name_pattern={query}%");
+        return response.Tag.Select(t => t.Name).ToList();
+    });
+
+    private void ClearCache(Guid userId) => _cache.Remove(GetCacheEntry(userId));
+
+    private static string GetCacheEntry(Guid userId) => $"boorublacklist:{userId}";
+
+    private static IEnumerable<string> Negate(IEnumerable<string> tags) => tags.Select(t => $"-{t}");
+
+    public async Task RecordTags(Guid userId, IEnumerable<string> tags)
+    {
+        try
+        {
+            var usableTags = tags.Where(t => !t.StartsWith("-")).Where(t => !t.Contains(":"));
+            var tagEntries = usableTags.Select(t => new TagHistory { UserId = userId, Tag = t });
+            _context.TagHistories.AddRange(tagEntries);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            await _messageQueue.Publish(new BackendExceptionNotification(e));
+        }
+    }
+
+    public record struct MediaSearchResult(Uri ImageUrl, Uri PageUrl, Rating Rating, IEnumerable<string> Tags);
+
+    internal record TagResponseEntry(string Name);
+
+    internal record TagResponse(IEnumerable<TagResponseEntry> Tag);
 }

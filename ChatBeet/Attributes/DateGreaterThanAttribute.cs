@@ -1,41 +1,38 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace ChatBeet.Attributes
+namespace ChatBeet.Attributes;
+
+[AttributeUsage(AttributeTargets.Property)]
+public class DateGreaterThanAttribute : ValidationAttribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class DateGreaterThanAttribute : ValidationAttribute
+    public DateGreaterThanAttribute(string dateToCompareToFieldName)
     {
-        public DateGreaterThanAttribute(string dateToCompareToFieldName)
+        DateToCompareToFieldName = dateToCompareToFieldName;
+    }
+
+    private string DateToCompareToFieldName { get; set; }
+
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        var laterDate = (DateTime)value;
+        var referencedProperty = validationContext.ObjectType.GetProperty(DateToCompareToFieldName);
+
+        var earlierDate = (DateTime)referencedProperty.GetValue(validationContext.ObjectInstance, null);
+
+        if (laterDate > earlierDate)
         {
-            DateToCompareToFieldName = dateToCompareToFieldName;
+            return ValidationResult.Success;
+        }
+        else
+        {
+            return new ValidationResult($"{validationContext.DisplayName} must be after {GetDisplayName(referencedProperty)}.");
         }
 
-        private string DateToCompareToFieldName { get; set; }
-
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        string GetDisplayName(PropertyInfo pi)
         {
-            var laterDate = (DateTime)value;
-            var referencedProperty = validationContext.ObjectType.GetProperty(DateToCompareToFieldName);
-
-            var earlierDate = (DateTime)referencedProperty.GetValue(validationContext.ObjectInstance, null);
-
-            if (laterDate > earlierDate)
-            {
-                return ValidationResult.Success;
-            }
-            else
-            {
-                return new ValidationResult($"{validationContext.DisplayName} must be after {GetDisplayName(referencedProperty)}.");
-            }
-
-            string GetDisplayName(PropertyInfo pi)
-            {
-                var attrib = pi.GetCustomAttributes<DisplayAttribute>().SingleOrDefault();
-                return attrib?.Name ?? pi.Name;
-            }
+            var attrib = pi.GetCustomAttributes<DisplayAttribute>().SingleOrDefault();
+            return attrib?.Name ?? pi.Name;
         }
     }
 }

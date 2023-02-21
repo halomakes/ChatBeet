@@ -3,7 +3,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using Humanizer;
 using Microsoft.Extensions.Options;
-using System;
 using System.Threading.Tasks;
 
 namespace ChatBeet.Services;
@@ -11,7 +10,7 @@ public class DiscordLogService
 {
     private readonly DiscordClient _client;
     private readonly DiscordBotConfiguration _config;
-    private static DiscordChannel logChannel;
+    private static DiscordChannel _logChannel;
 
     public DiscordLogService(DiscordClient client, IOptions<DiscordBotConfiguration> options)
     {
@@ -21,15 +20,15 @@ public class DiscordLogService
 
     public async Task LogError(string message, Exception exception)
     {
-        if (logChannel is null)
+        if (_logChannel is null)
         {
             try
             {
-                logChannel = await _client.GetChannelAsync(_config.LogChannel);
+                _logChannel = await _client.GetChannelAsync(_config.LogChannel);
             }
             catch { }
         }
-        if (logChannel is not null)
+        if (_logChannel is not null)
         {
             try
             {
@@ -48,11 +47,11 @@ public class DiscordLogService
                     message += $"{Environment.NewLine}{Formatter.BlockCode(trace.Truncate(1950))}";
                 }
 
-                await _client.SendMessageAsync(logChannel, message);
+                await _client.SendMessageAsync(_logChannel, message);
 
                 if (exception is not null)
                 {
-                    await _client.SendMessageAsync(logChannel, Formatter.BlockCode(exception.StackTrace.Truncate(1990)));
+                    await _client.SendMessageAsync(_logChannel, Formatter.BlockCode(exception.StackTrace.Truncate(1990)));
                 }
             }
             catch (Exception e)

@@ -1,63 +1,16 @@
 ﻿@page "/Account/Login"
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model ChatBeet.Pages.Account.LoginModel
 @{
     ViewBag.Title = "Log In";
 }
 
 <h1>Log In</h1>
-@if (!string.IsNullOrEmpty(Model.ValidationMessage))
-{
-    <p class="text-danger">@Model.ValidationMessage</p>
-}
-@if (string.IsNullOrEmpty(Model?.LoginInfo?.Nick))
-{
-    <form asp-page="/Account/Login" method="post">
-        <div class="form-group">
-            <label asp-for="LoginInfo.Nick"></label>
-            <input asp-for="LoginInfo.Nick" class="form-control" autofocus />
-            <span class="text-danger" asp-validation-for="LoginInfo.Nick"></span>
-        </div>
-        <input asp-for="ReturnUrl" type="hidden" />
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-}
-else
-{
-    <form asp-page="/Account/Login" method="post">
-        <p>You have been PM'd a login token.  Please copy it and paste below.</p>
-        <div class="form-group">
-            <label asp-for="LoginInfo.Nick"></label>
-            <input asp-for="LoginInfo.Nick" class="form-control" disabled />
-            <span class="text-danger" asp-validation-for="LoginInfo.Nick"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="LoginInfo.AuthToken"></label>
-            <input asp-for="LoginInfo.AuthToken" class="form-control" autofocus />
-            <span class="text-danger" asp-validation-for="LoginInfo.AuthToken"></span>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" asp-for="LoginInfo.Persist" checked>
-            <label class="form-check-label" asp-for="LoginInfo.Persist"></label>
-        </div>
-        <input asp-for="LoginInfo.Nick" type="hidden" />
-        <input asp-for="ReturnUrl" type="hidden" />
-        <button type="submit" class="btn btn-primary mt-2">Submit</button>
-        <script type="text/javascript">
-            function ready(fn) {
-              if (document.readyState !== 'loading') {
-                fn();
-              } else {
-                document.addEventListener('DOMContentLoaded', fn);
-              }
-            }
+<div>
+    <h2>Log in with Discord</h2>
+    <form asp-controller="Login" asp-action="DiscordLogin" method="post">
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl"/>
 
-            ready(() => {
-                if(window.location.hash){
-                    const input = document.getElementById('@Html.IdFor(m => m.LoginInfo.AuthToken)');
-                    input.value = window.location.hash.substring(1);
-                    input.form.submit();
-                }
-            });
-        </script>
+        <button class="btn btn-lg btn-success m-1" type="submit">Connect using Discord</button>
     </form>
-}
+</div>

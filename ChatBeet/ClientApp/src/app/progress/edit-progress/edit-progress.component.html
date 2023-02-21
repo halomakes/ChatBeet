@@ -1,0 +1,58 @@
+<h1 mat-dialog-title>
+    <span *ngIf="data?.key; else create">Edit span {{data?.key}}</span>
+    <ng-template #create>Create span</ng-template>
+</h1>
+<form [formGroup]="form" mat-dialog-content>
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>Key</mat-label>
+        <input matInput placeholder="patience" required formControlName="key">
+        <mat-hint>Key that users will enter to trigger your command</mat-hint>
+        <mat-error *ngIf="form.get('key')?.hasError('required')">Key is required</mat-error>
+        <mat-error *ngIf="form.get('key')?.hasError('pattern')">Key must contain only letters, digits, and hyphens and
+            cannot begin or end with a hyphen</mat-error>
+        <mat-error *ngIf="form.get('key')?.hasError('maxlength')">Key cannot exceed 30 characters</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>Template</mat-label>
+        <input matInput placeholder="This custom range is {percentage} complete." required formControlName="template">
+        <mat-error *ngIf="form.get('template')?.hasError('required')">Template is required</mat-error>
+        <mat-error *ngIf="form.get('template')?.hasError('pattern')">Template must contain a &#123;percentage&#125;,
+            &#123;elapsed&#125;, or
+            &#123;remaining&#125; token</mat-error>
+        <mat-error *ngIf="form.get('template')?.hasError('maxlength')">Template cannot exceed 200 characters</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>Before Range Message</mat-label>
+        <input matInput placeholder="Range has not started yet." formControlName="beforeRangeMessage">
+        <mat-hint>Message to display if period has not yet begun - will show 0% instead if not specified</mat-hint>
+        <mat-error *ngIf="form.get('beforeRangeMessage')?.hasError('maxlength')">Before Range Message cannot exceed 200
+            characters</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>After Range Message</mat-label>
+        <input matInput placeholder="Range has ended." formControlName="afterRangeMessage">
+        <mat-hint>Message to display if period has already ended - will show 100% instead if not specified</mat-hint>
+        <mat-error *ngIf="form.get('afterRangeMessage')?.hasError('maxlength')">After Range Message cannot exceed 200
+            characters</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>Start Time</mat-label>
+        <input matInput required formControlName="startDate" type="datetime-local">
+        <mat-error *ngIf="form.get('startDate')?.hasError('required')">Start Time is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>End Time</mat-label>
+        <input matInput required formControlName="endDate" type="datetime-local">
+        <mat-error *ngIf="form.get('endDate')?.hasError('required')">Start Time is required</mat-error>
+    </mat-form-field>
+    <mat-error *ngIf="isTimeError()">End Time must be after Start Time</mat-error>
+</form>
+<div mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button (click)="save()">Save</button>
+</div>

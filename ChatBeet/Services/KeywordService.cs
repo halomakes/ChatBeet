@@ -1,109 +1,92 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Data.Entities;
+﻿using ChatBeet.Data.Entities;
 using ChatBeet.Models;
-using GravyIrc.Messages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using Microsoft.EntityFrameworkCore;
 
-namespace ChatBeet.Services
+namespace ChatBeet.Services;
+
+public class KeywordService
 {
-    public class KeywordService
+    private readonly IKeywordsRepository _db;
+    private readonly IMemoryCache _cache;
+
+    public static DateTime StatsLastUpdated { get; private set; }
+
+    public KeywordService(IKeywordsRepository db, IMemoryCache cache)
     {
-        private readonly KeywordContext db;
-        private readonly IMemoryCache cache;
+        _db = db;
+        _cache = cache;
+    }
 
-        public static DateTime StatsLastUpdated { get; private set; }
+    public Task<List<Keyword>> GetKeywordsAsync() => _cache.GetOrCreateAsync("keywords", async entry =>
+    {
+        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+        return await _db.Keywords.AsQueryable().ToListAsync();
+    });
 
-        public KeywordService(KeywordContext db, IMemoryCache cache)
-        {
-            this.db = db;
-            this.cache = cache;
-        }
+    public async Task<Keyword> GetKeywordAsync(Guid id)
+    {
+        var keywords = await GetKeywordsAsync();
+        return keywords.FirstOrDefault(k => k.Id == id);
+    }
 
-        public Task<List<Keyword>> GetKeywordsAsync() => cache.GetOrCreateAsync("keywords", async entry =>
-        {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-            return await db.Keywords.AsQueryable().ToListAsync();
-        });
+    public Task<KeywordStat> GetKeywordStatAsync(Guid id) => _cache.GetOrCreateAsync($"keywords:stats:{id}", async entry =>
+    {
+        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
-        public Task RecordKeywordEntryAsync(Keyword keyword, PrivateMessage message) => RecordKeywordEntryAsync(keyword.Id, message);
-
-        public async Task RecordKeywordEntryAsync(int keywordId, PrivateMessage message)
-        {
-            var record = new KeywordRecord
+        var keyword = await GetKeywordAsync(id);
+        var stats = await _db.Hits
+            .Include(h => h.User)
+            .AsQueryable()
+            .Where(r => r.KeywordId == keyword.Id)
+            .GroupBy(r => r.UserId)
+            .OrderByDescending(g => g.Count())
+            .Select(g => new KeywordStat.UserKeywordStat
             {
-                KeywordId = keywordId,
-                Message = message.Message,
-                Nick = message.From,
-                Time = message.DateReceived
-            };
-            db.Records.Add(record);
-            await db.SaveChangesAsync();
-        }
+                User = g.First().User,
+                Hits = g.Count(),
+                Excerpt = g.Min(gp => gp.Message)
+            })
+            .ToListAsync();
 
-        public async Task<Keyword> GetKeywordAsync(int id)
+        return new KeywordStat
         {
-            var keywords = await GetKeywordsAsync();
-            return keywords.FirstOrDefault(k => k.Id == id);
-        }
+            Keyword = keyword,
+            Stats = stats
+        };
+    });
 
-        public Task<KeywordStat> GetKeywordStatAsync(int id) => cache.GetOrCreateAsync($"keywords:stats:{id}", async entry =>
-        {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+    public Task<IEnumerable<KeywordStat>> GetKeywordStatsAsync() => _cache.GetOrCreateAsync("keyword:stats", async entry =>
+    {
+        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+        StatsLastUpdated = DateTime.UtcNow;
 
-            var keyword = await GetKeywordAsync(id);
-            var stats = await db.Records
-                .AsQueryable()
-                .Where(r => r.KeywordId == keyword.Id)
-                .GroupBy(r => r.Nick)
-                .OrderByDescending(g => g.Count())
-                .Select(g => new KeywordStat.UserKeywordStat
+        var keywords = await GetKeywordsAsync();
+        var allStats = await _db.Hits
+            .Include(h => h.User)
+            .AsQueryable()
+            .GroupBy(r => new { r.KeywordId, r.UserId })
+            .OrderByDescending(g => g.Count())
+            .Select(g => new
+            {
+                g.Key.KeywordId,
+                Stats = new KeywordStat.UserKeywordStat
                 {
-                    Nick = g.Key,
+                    User = g.First().User,
                     Hits = g.Count(),
                     Excerpt = g.Min(gp => gp.Message)
-                })
-                .ToListAsync();
-
-            return new KeywordStat
-            {
-                Keyword = keyword,
-                Stats = stats
-            };
-        });
-
-        public Task<IEnumerable<KeywordStat>> GetKeywordStatsAsync() => cache.GetOrCreateAsync("keyword:stats", async entry =>
+                }
+            })
+            .ToListAsync();
+        return keywords.Select(keyword => new KeywordStat
         {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-            StatsLastUpdated = DateTime.UtcNow;
-
-            var keywords = await GetKeywordsAsync();
-            var allStats = await db.Records
-                .AsQueryable()
-                .GroupBy(r => new { r.KeywordId, r.Nick })
-                .OrderByDescending(g => g.Count())
-                .Select(g => new
-                {
-                    g.Key.KeywordId,
-                    Stats = new KeywordStat.UserKeywordStat
-                    {
-                        Nick = g.Key.Nick,
-                        Hits = g.Count(),
-                        Excerpt = g.Min(gp => gp.Message)
-                    }
-                })
-                .ToListAsync();
-            return keywords.Select(keyword => new KeywordStat
-            {
-                Keyword = keyword,
-                Stats = allStats
-                    .Where(s => s.KeywordId == keyword.Id)
-                    .Select(s => s.Stats)
-            });
+            Keyword = keyword,
+            Stats = allStats
+                .Where(s => s.KeywordId == keyword.Id)
+                .Select(s => s.Stats)
         });
-    }
+    });
 }

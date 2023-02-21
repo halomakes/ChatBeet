@@ -227,3 +227,7 @@ ChatBeet.Server/dtella.db
 ChatBeet/db/
 
 ChatBeet/wwwroot/README.md
+
+ChatBeet/ClientApp/.angular/
+
+ChatBeet.Migration/db/

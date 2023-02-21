@@ -1,0 +1,59 @@
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.navbar-avatar {
+  $size: 32px;
+  width: $size;
+  height: $size;
+  border-radius: $size/2;
+}
+
+.menu-item-image {
+  $size: 24px;
+  width: $size;
+  height: $size;
+  border-radius: $size/2;
+  margin-right: 16px;
+}
+
+.guild-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+}
+
+.guild-option.active {
+  font-weight: bold;
+}
+
+.user-detail {
+  padding: 12px;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: -8px;
+  background-color: transparentize(black, 0.8);
+
+  & > .navbar-avatar {
+    $size: 64px;
+    width: $size;
+    height: $size;
+    border-radius: $size/2;
+    margin-bottom: 12px;
+  }
+
+  & > .username {
+    font-size: 18px;
+    & > :not(.discriminator) {
+      font-weight: 500;
+    }
+    & > .discriminator {
+      font-weight: 100;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+  }
+}

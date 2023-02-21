@@ -6,47 +6,54 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Controllers
+namespace ChatBeet.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[ResponseCache(Duration = 300)]
+public class PreferencesController : Controller
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [ResponseCache(Duration = 300)]
-    public class PreferencesController : Controller
+    private readonly UserPreferencesService _prefsService;
+    private readonly WebIdentityService _webIdentity;
+
+    public PreferencesController(UserPreferencesService prefsService, WebIdentityService webIdentity)
     {
-        private readonly UserPreferencesService prefsService;
+        _prefsService = prefsService;
+        _webIdentity = webIdentity;
+    }
 
-        public PreferencesController(UserPreferencesService prefsService)
+    private async Task<User> GetCurrentUserAsync() => await _webIdentity.GetCurrentUserAsync();
+
+    /// <summary>
+    /// Get all set preferences
+    /// </summary>
+    [HttpGet, Authorize]
+    public async Task<IEnumerable<UserPreferenceSetting>> GetPreferences() => await _prefsService.Get((await GetCurrentUserAsync()).Id);
+
+    /// <summary>
+    /// Get an individual preference
+    /// </summary>
+    /// <param name="preference">Preference to get</param>
+    [HttpGet("{preference}"), Authorize]
+    public async Task<string> GetPreference([FromRoute] UserPreference preference) => await _prefsService.Get((await GetCurrentUserAsync()).Id, preference);
+
+    /// <summary>
+    /// Set a preference
+    /// </summary>
+    /// <param name="change">Values to set</param>
+    [HttpPut, Authorize]
+    public async Task<ActionResult<string>> SetPreference([FromBody] PreferenceChangeRequest change)
+    {
+        var validationMessage = _prefsService.GetValidation(change.Preference, change.Value);
+        if (!string.IsNullOrEmpty(validationMessage))
+            return BadRequest(validationMessage);
+        var populatedChange = new PreferenceChange
         {
-            this.prefsService = prefsService;
-        }
-
-        /// <summary>
-        /// Get all set preferences
-        /// </summary>
-        [HttpGet, Authorize]
-        public async Task<IEnumerable<UserPreferenceSetting>> GetPreferences() => await prefsService.Get(User?.Identity?.Name);
-
-        /// <summary>
-        /// Get an individual preference
-        /// </summary>
-        /// <param name="preference">Preference to get</param>
-        [HttpGet("{preference}"), Authorize]
-        public async Task<string> GetPreference([FromRoute] UserPreference preference) => await prefsService.Get(User?.Identity?.Name, preference);
-
-        /// <summary>
-        /// Set a preference
-        /// </summary>
-        /// <param name="change">Values to set</param>
-        [HttpPut, Authorize]
-        public async Task<ActionResult<string>> SetPreference([FromBody] PreferenceChange change)
-        {
-            change.Nick = User?.Identity?.Name;
-            if (string.IsNullOrEmpty(change.Nick))
-                return Unauthorized("You do not have access to user preferences.");
-
-            var normalized = await prefsService.Set(change);
-
-            return Ok(normalized);
-        }
+            User = await GetCurrentUserAsync(),
+            Preference = change.Preference,
+            Value = change.Value
+        };
+        var normalized = await _prefsService.Set(populatedChange);
+        return Json(normalized);
     }
 }

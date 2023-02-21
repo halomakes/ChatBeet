@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -31,7 +29,7 @@ public class MemeService
     private async Task<List<string>> GetImagesAsync(string query) => await _cache.GetOrCreateAsync($"memes:{query}", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
-        var content = await _client.GetFromJsonAsync<ResponseWrapper>($"/api/posts?query=sort:random {query}", new JsonSerializerOptions()
+        var content = await _client.GetFromJsonAsync<ResponseWrapper>($"/api/posts?query=rating:safe sort:random {query}", new JsonSerializerOptions()
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase

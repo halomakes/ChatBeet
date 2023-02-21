@@ -2,27 +2,26 @@
 using IF.Lastfm.Core.Objects;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Services
+namespace ChatBeet.Services;
+
+public class LastFmService
 {
-    public class LastFmService
+    private readonly LastfmClient _client;
+
+    public LastFmService(LastfmClient client)
     {
-        private readonly LastfmClient client;
+        _client = client;
+    }
 
-        public LastFmService(LastfmClient client)
-        {
-            this.client = client;
-        }
+    public async Task<LastTrack> GetTrackInfo(string track, string artist)
+    {
+        var response = await _client.Track.GetInfoAsync(track, artist);
+        return response?.Content;
+    }
 
-        public async Task<LastTrack> GetTrackInfo(string track, string artist)
-        {
-            var response = await client.Track.GetInfoAsync(track, artist);
-            return response?.Content;
-        }
-
-        public async Task<LastArtist> GetArtistInfo(string artist)
-        {
-            var response = await client.Artist.GetInfoAsync(artist);
-            return response?.Content;
-        }
+    public async Task<LastArtist> GetArtistInfo(string artist)
+    {
+        var response = await _client.Artist.GetInfoAsync(artist);
+        return response?.Content;
     }
 }

@@ -1,0 +1,9 @@
+<div class="container">
+    <h1 class="wide">The High Ground</h1>
+    <div class="high-ground" *ngIf="ground; else unclaimed">
+        <img src="/img/high_ground.webp" />
+        <span class="ground-label person">{{ground.user.displayName}}</span>
+        <span class="ground-label channel">{{guild?.name}}</span>
+    </div>
+    <ng-template #unclaimed>The high ground is unclaimed.</ng-template>
+</div>

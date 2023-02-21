@@ -1,28 +1,20 @@
-using ChatBeet.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 
-namespace ChatBeet.Pages.Account
+namespace ChatBeet.Pages.Account;
+
+public class LogoutModel : PageModel
 {
-    public class LogoutModel : PageModel
+    public async Task<IActionResult> OnGet()
     {
-        private readonly LogonService logonService;
-
-        public LogoutModel(LogonService logonService)
+        if (User?.Identity?.IsAuthenticated ?? false)
         {
-            this.logonService = logonService;
+            await HttpContext.SignOutAsync();
+            return RedirectToPage("/Account/Logout");
         }
 
-        public async Task<IActionResult> OnGet()
-        {
-            if (User?.Identity?.IsAuthenticated ?? false)
-            {
-                await logonService.LogoutAsync();
-                return RedirectToPage("/Account/Logout");
-            }
-
-            return Page();
-        }
+        return Page();
     }
 }

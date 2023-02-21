@@ -1,0 +1,2 @@
+<mat-progress-bar mode="determinate" [value]="completion.percentage" *ngIf="mode != 'text' && completion"></mat-progress-bar>
+<span *ngIf="mode != 'bar' && completion">{{ completion.message }}</span>

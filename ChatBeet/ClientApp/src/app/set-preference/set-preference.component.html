@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>Set a Preference</h1>
+<div mat-dialog-content>
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>Preference</mat-label>
+        <mat-select [(ngModel)]="selectedType">
+            <mat-option *ngFor="let type of types" [value]="type">{{preferenceType[type]}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="input">
+        <mat-label>Value</mat-label>
+        <input matInput required [(ngModel)]="newValue">
+    </mat-form-field>
+    <mat-error *ngIf="validationMessage">{{validationMessage}}</mat-error>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button (click)="save()">Save</button>
+</div>

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBeet", "ChatBeet\ChatBe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SentimentAnalysis", "SentimentAnalysis\SentimentAnalysis.csproj", "{0AC4AE19-07C0-4E11-B34A-C55F33622636}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatBeet.Migration", "ChatBeet.Migration\ChatBeet.Migration.csproj", "{8B4FA0A2-BC9E-4343-BAFC-5A4125033405}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0AC4AE19-07C0-4E11-B34A-C55F33622636}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AC4AE19-07C0-4E11-B34A-C55F33622636}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AC4AE19-07C0-4E11-B34A-C55F33622636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B4FA0A2-BC9E-4343-BAFC-5A4125033405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B4FA0A2-BC9E-4343-BAFC-5A4125033405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B4FA0A2-BC9E-4343-BAFC-5A4125033405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B4FA0A2-BC9E-4343-BAFC-5A4125033405}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

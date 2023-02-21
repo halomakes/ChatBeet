@@ -1,0 +1,28 @@
+.high-ground {
+    position: relative;
+  
+    & > img {
+      width: 100%;
+    }
+  
+    & > .ground-label {
+      font-family: Impact, sans-serif;
+      text-transform: uppercase;
+      color: white;
+      text-shadow: 0 0 8px black;
+      font-size: 3rem;
+      position: absolute;
+  
+      &.person {
+        right: 27%;
+        top: 30%;
+        transform: translate(50%, -50%);
+      }
+  
+      &.channel {
+        left: 22%;
+        top: 45%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }

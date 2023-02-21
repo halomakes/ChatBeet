@@ -1,107 +1,109 @@
-﻿using ChatBeet.Data;
-using ChatBeet.Data.Entities;
-using ChatBeet.Utilities;
+﻿using ChatBeet.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ChatBeet.Data;
+using ChatBeet.Models;
 
 namespace ChatBeet.Services;
+
 public class SuspicionService
 {
-    private readonly SuspicionContext _ctx;
-    private readonly IrcMigrationService _irc;
-    private readonly TimeSpan ActivePeriod = DateTime.Now.AddYears(2) - DateTime.Now;
+    private readonly ISuspicionRepository _ctx;
+    private readonly TimeSpan _activePeriod = DateTime.Now.AddYears(2) - DateTime.Now;
 
-    public SuspicionService(SuspicionContext ctx, IrcMigrationService irc)
+    public SuspicionService(ISuspicionRepository ctx)
     {
         _ctx = ctx;
-        _irc = irc;
     }
 
-    public DateTime ActiveWindowStart => DateTime.Now - ActivePeriod;
+    public DateTime ActiveWindowStart => DateTime.Now - _activePeriod;
 
-    public async Task<IEnumerable<Suspicion>> GetActiveSuspicionsAsync()
+    public async Task<IEnumerable<SuspicionReport>> GetActiveSuspicionsAsync(ulong guildId)
     {
-        var suspicions = await ActiveSuspicions.ToListAsync();
-        await MergeIrcNicksAsync(suspicions);
+        var suspicions = await ActiveSuspicions
+            .Where(s => s.GuildId == guildId)
+            .ToListAsync();
         return suspicions;
     }
 
-    public async Task<IEnumerable<Suspicion>> GetSuspicionsAsync()
+    public async Task<IEnumerable<SuspicionReport>> GetSuspicionsAsync(ulong guildId)
     {
-        var suspicions = await _ctx.Suspicions.ToListAsync();
-        await MergeIrcNicksAsync(suspicions);
+        var suspicions = await _ctx.Suspicions
+            .Include(s => s.Suspect)
+            .Where(s => s.GuildId == guildId)
+            .ToListAsync();
         return suspicions;
     }
 
-    async Task MergeIrcNicksAsync(List<Suspicion> suspicions)
-    {
-        var links = await _irc.GetLinksAsync();
-        
-        foreach (var suspicion in suspicions)
-        {
-            suspicion.Reporter = GetInternalId(suspicion.Reporter);
-            suspicion.Suspect = GetInternalId(suspicion.Suspect);
-        }
-
-        string GetInternalId(string username)
-        {
-            var (success, partialUsername, discriminator) = username.ParseUsername();
-            if (!success)
-                return username;
-            var match = links.FirstOrDefault(l => l.Username.ToLower() == partialUsername.ToLower() && l.Discriminator == discriminator);
-            if (match is null)
-                return username;
-            return match.Nick;
-        }
-    }
-
-    private IQueryable<Suspicion> ActiveSuspicions => _ctx.Suspicions
+    private IQueryable<SuspicionReport> ActiveSuspicions => _ctx.Suspicions
+        .Include(s => s.Suspect)
         .AsNoTracking()
         .AsQueryable()
-        .Where(s => s.TimeReported >= ActiveWindowStart);
+        .Where(s => s.CreatedAt >= ActiveWindowStart);
 
-    public async Task<int> GetSuspicionLevelAsync(string suspect)
-    {
-        var internalId = await _irc.GetInternalUsernameAsync(suspect.Trim());
-        return (await GetActiveSuspicionsAsync())
-            .Count(s => s.Suspect.ToLower() == internalId.ToLower());
-    }
+    public async Task<int> GetSuspicionLevelAsync(ulong guildId, Guid suspectId) =>
+        (await GetActiveSuspicionsAsync(guildId))
+        .Count(s => s.SuspectId == suspectId);
 
-    public async Task<bool> HasRecentlyReportedAsync(string suspect, string reporter, TimeSpan debounceWindow = default)
+    public async Task<bool> HasRecentlyReportedAsync(ulong guildId, Guid suspect, Guid reporter, TimeSpan debounceWindow = default)
     {
         if (debounceWindow == default)
             debounceWindow = TimeSpan.FromMinutes(2);
 
-        var internalSuspect = await _irc.GetInternalUsernameAsync(suspect.Trim());
-        var internalReporter = await _irc.GetInternalUsernameAsync(reporter.Trim());
-
         var lastReport = await _ctx.Suspicions
             .AsQueryable()
-            .Where(s => s.Reporter.ToLower() == internalReporter.ToLower())
-            .Where(s => s.Suspect.ToLower() == internalSuspect.ToLower())
-            .OrderByDescending(s => s.TimeReported)
+            .AsNoTracking()
+            .Where(s => s.GuildId == guildId)
+            .Where(s => s.ReporterId == reporter)
+            .Where(s => s.SuspectId == suspect)
+            .OrderByDescending(s => s.CreatedAt)
             .FirstOrDefaultAsync();
 
-        return lastReport != default && (DateTime.Now - lastReport.TimeReported) < debounceWindow;
+        return lastReport != default && (DateTime.Now - lastReport.CreatedAt) < debounceWindow;
     }
 
-    public async Task ReportSuspiciousActivityAsync(string suspect, string reporter, bool bypassDebounceCheck = false)
+    public async Task ReportSuspiciousActivityAsync(ulong guildId, Guid suspect, Guid reporter, bool bypassDebounceCheck = false)
     {
-        if (bypassDebounceCheck || !await HasRecentlyReportedAsync(suspect, reporter))
+        if (bypassDebounceCheck || !await HasRecentlyReportedAsync(guildId, suspect, reporter))
         {
-            var internalSuspect = await _irc.GetInternalUsernameAsync(suspect.Trim());
-            var internalReporter = await _irc.GetInternalUsernameAsync(reporter.Trim());
-
-            _ctx.Suspicions.Add(new Suspicion
+            _ctx.Suspicions.Add(new SuspicionReport
             {
-                Reporter = internalReporter,
-                Suspect = internalSuspect,
-                TimeReported = DateTime.Now
+                GuildId = guildId,
+                ReporterId = reporter,
+                SuspectId = suspect,
+                CreatedAt = DateTime.Now
             });
             await _ctx.SaveChangesAsync();
         }
+    }
+
+    public async Task<IEnumerable<SuspicionRank>> GetSuspicionLevels(ulong guildId)
+    {
+        var mostSuspicious = await _ctx.Suspicions
+            .Include(s => s.Suspect)
+            .ThenInclude(s => s!.Preferences)
+            .Where(s => s.GuildId == guildId)
+            .GroupBy(s => s.Suspect!.Id)
+            .Select(g => new
+            {
+                User = g.First().Suspect,
+                Active = g.Count(grp => grp.CreatedAt >= ActiveWindowStart),
+                Total = g.Count()
+            })
+            .OrderByDescending(t => t.Active)
+            .ToListAsync();
+
+        return mostSuspicious.Select(s =>
+        {
+            var pref = s.User!.Preferences!.FirstOrDefault(p => p.Preference == UserPreference.GearColor);
+            return new SuspicionRank
+            {
+                User = s.User,
+                Level = s.Active,
+                LifetimeLevel = s.Total,
+                Color = pref?.Value
+            };
+        }).ToList();
     }
 }

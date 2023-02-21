@@ -11,4 +11,6 @@ public class DiscordBotConfiguration
     public ulong LogChannel { get; set; }
 
     public Dictionary<string, ulong> Channels { get; set; }
+    
+    public Uri InvitationLink { get; set; }
 }

@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 namespace ChatBeet.Services;
 public class GraphicsService
 {
-    private readonly string WebRootPath;
+    private readonly string _webRootPath;
 
     public GraphicsService(IWebHostEnvironment environment)
     {
-        WebRootPath = environment.WebRootPath;
+        _webRootPath = environment.WebRootPath;
     }
 
     public async Task<Stream> BuildHighGroundImageAsync(string anakin, string obiWan)
     {
-        using var image = await Image.LoadAsync(Path.Join(WebRootPath, "img/high_ground.webp"));
+        using var image = await Image.LoadAsync(Path.Join(_webRootPath, "img/high_ground.webp"));
         var fontCollection = new FontCollection();
-        var fontFamily = fontCollection.Add(Path.Join(WebRootPath, "font/impact.woff2"));
+        var fontFamily = fontCollection.Add(Path.Join(_webRootPath, "font/impact.woff2"));
         var font = fontFamily.CreateFont(100);
         var fill = Brushes.Solid(Color.White);
         var outline = Pens.Solid(Color.Black, 3);

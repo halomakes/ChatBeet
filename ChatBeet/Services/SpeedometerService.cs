@@ -1,25 +1,26 @@
 ﻿using ChatBeet.Utilities;
-using GravyBot;
-using System;
-using System.Linq;
+using System.Collections.Generic;
 
-namespace ChatBeet.Services
+namespace ChatBeet.Services;
+
+public class SpeedometerService
 {
-    public class SpeedometerService
+    private static readonly Dictionary<ulong, SlidingBuffer<DateTime>> History = new();
+    private const int MaxMessages = 500;
+
+    public static void RecordMessage(ulong channelId)
     {
-        private readonly MessageQueueService messageQueue;
+        if (!History.ContainsKey(channelId))
+            History[channelId] = new SlidingBuffer<DateTime>(MaxMessages);
 
-        public SpeedometerService(MessageQueueService messageQueue)
-        {
-            this.messageQueue = messageQueue;
-        }
+        History[channelId].Add(DateTime.Now);
+    }
 
-        public int GetRecentMessageCount(string channelName, TimeSpan timeSpan)
-        {
-            var deadline = DateTime.Now - timeSpan;
-            return messageQueue.GetChatLog()
-                .Where(m => m.To.EqualsIgnoreCase(channelName))
-                .Count(m => m.DateReceived >= deadline);
-        }
+    public static int GetRecentMessageCount(ulong channel, TimeSpan timeSpan)
+    {
+        var deadline = DateTime.Now - timeSpan;
+        return !History.ContainsKey(channel) 
+            ? 0 
+            : History[channel].Count(d => d >= deadline);
     }
 }

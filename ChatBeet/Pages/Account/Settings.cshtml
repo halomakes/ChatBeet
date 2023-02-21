@@ -2,12 +2,11 @@
 @model ChatBeet.Pages.Account.SettingsModel
 @using ChatBeet.Data.Entities;
 @using ChatBeet.Utilities;
-@using ChatBeet.Attributes;
 @{
     ViewBag.Title = "Settings";
 }
 
-<h1>Preferences for <span class="text-secondary">@Model.Nick</span></h1>
+<h1>Preferences for <span class="text-secondary">@Model.User.DisplayName()</span></h1>
 <h2>Personalizations</h2>
 @if (Model.Settings.Any())
 {
@@ -37,7 +36,7 @@ else
             }
             @foreach (var e in Enum.GetValues(typeof(UserPreference)).Cast<UserPreference>())
             {
-                var label = EnumerationExtensions.GetAttribute<ParameterAttribute, UserPreference>(e).DisplayName;
+                var label = EnumerationExtensions.GetAttribute<Attributes.ParameterAttribute, UserPreference>(e).DisplayName;
                 <option value="@e">@label</option>
             }
         </select>
@@ -64,14 +63,14 @@ else
     <p>No tags blacklisted globally.</p>
 }
 <h3>Personal Blacklist</h3>
-@if (Model.BlacklistedTags.Any())
+@if (Model?.BlacklistedTags?.Any() ?? false)
 {
     <ul id="tagList">
         @foreach (var t in Model.BlacklistedTags)
         {
             <li>
                 <div class="d-inline-flex align-content-center">
-                    <span>@t.Replace("_", " ")</span>
+                    <span>@t?.Replace("_", " ")</span>
                     <a onclick="removeFromWhitelist('@t.Replace("'","\"")', this)" role="button">
                         <i class="material-icons">delete</i>
                     </a>

@@ -3,24 +3,60 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ChatBeet.Data
+namespace ChatBeet.Data;
+
+public interface IBooruRepository : IApplicationRepository
 {
-    public class BooruContext : DbContext
+    DbSet<BlacklistedTag> BlacklistedTags { get; }
+    DbSet<TagHistory> TagHistories { get; }
+    Task<List<TopTag>> GetTopTags();
+}
+
+public partial class CbDbContext : IBooruRepository
+{
+    public virtual DbSet<BlacklistedTag> BlacklistedTags { get; set; } = null!;
+    public virtual DbSet<TagHistory> TagHistories { get; set; } = null!;
+    public virtual DbSet<TopTag> TopTags { get; set; } = null!;
+
+    public Task<List<TopTag>> GetTopTags() => TopTags
+        .FromSql($"select max(tag) as tag, user_id, max(total) as total from (select t.tag, t.user_id, count(*) as total from booru.tag_history t group by t.tag, t.user_id order by total desc) i group by i.user_id order by max(i.total) desc limit 10")
+        .Include(t => t.User)
+        .ToListAsync();
+
+    private void ConfigureBooru(ModelBuilder modelBuilder)
     {
-        public BooruContext(DbContextOptions<BooruContext> optsBuilder) : base(optsBuilder) { }
-
-        public virtual DbSet<BooruBlacklist> Blacklists { get; set; }
-        public virtual DbSet<TagHistory> TagHistories { get; set; }
-        public virtual DbSet<TopTag> TopTags { get; set; }
-
-        public Task<List<TopTag>> GetTopTags() => TopTags
-            .FromSqlRaw(@"select Tag, Nick, Total from (select t.Id, t.Tag, t.Nick, count(*) as Total from TagHistories t group by t.Tag, t.Nick order by Total desc) i group by i.Nick order by i.Total desc limit 10")
-            .ToListAsync();
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        modelBuilder.Entity<BlacklistedTag>(builder =>
         {
-            modelBuilder.Entity<BooruBlacklist>().HasKey(b => new { b.Nick, b.Tag });
-            modelBuilder.Entity<TopTag>().HasNoKey();
-        }
+            builder.ToTable("blacklisted_tags", "booru");
+            builder.HasKey(b => new { b.UserId, b.Tag });
+            builder.Property(b => b.Tag)
+                .IsRequired()
+                .HasMaxLength(150);
+            builder.HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId);
+        });
+        modelBuilder.Entity<TagHistory>(builder =>
+        {
+            builder.ToTable("tag_history", "booru");
+            builder.HasKey(b => b.Id);
+            builder.Property(b => b.UserId)
+                .IsRequired();
+            builder.Property(b => b.Tag)
+                .IsRequired()
+                .HasMaxLength(150);
+            builder.HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId);
+        });
+        modelBuilder.Entity<TopTag>(builder =>
+        {
+            builder.HasNoKey();
+            builder.Property(x => x.UserId).HasColumnName("user_id");
+            builder.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .HasPrincipalKey(u => u.Id);
+        });
     }
 }

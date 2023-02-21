@@ -1,19 +1,19 @@
-using Microsoft.ML;
 using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.ML;
 
-namespace SampleClassification.Model
+namespace SentimentAnalysis
 {
     public class SentimentModel
     {
-        private static Lazy<PredictionEngine<SentimentInput, SentimentAnalysis>> PredictionEngine = new Lazy<PredictionEngine<SentimentInput, SentimentAnalysis>>(CreatePredictionEngine);
+        private static Lazy<PredictionEngine<SentimentInput, SentimentAnalysis>> _predictionEngine = new Lazy<PredictionEngine<SentimentInput, SentimentAnalysis>>(CreatePredictionEngine);
 
         // For more info on consuming ML.NET models, visit https://aka.ms/mlnet-consume
         // Method for consuming model in your app
         public static SentimentAnalysis Predict(SentimentInput input)
         {
-            SentimentAnalysis result = PredictionEngine.Value.Predict(input);
+            SentimentAnalysis result = _predictionEngine.Value.Predict(input);
             return result;
         }
 
