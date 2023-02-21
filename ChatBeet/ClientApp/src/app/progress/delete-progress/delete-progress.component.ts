@@ -19,10 +19,14 @@ export class DeleteProgressComponent {
   public delete = (): void => {
     if (this.data) {
       this.service.deleteSpan(this.data.guildId, this.data.key).subscribe(() => {
-        this.snackbar.open('Span deleted.');
+        this.snackbar.open('Span deleted.', undefined, {
+          duration: 5000
+        });
         this.dialogRef.close();
       }, err => {
-        this.snackbar.open('Something went wrong.');
+        this.snackbar.open('Something went wrong.', undefined, {
+          duration: 5000
+        });
         this.dialogRef.close();
       });
     } else {

@@ -58,22 +58,32 @@ export class EditProgressComponent implements OnInit {
       this.form.disable();
       if (this.data?.key) {
         this.service.updateSpan(span).subscribe(() => {
-          this.snackbar.open('Span updated.');
+          this.snackbar.open('Span updated.', undefined, {
+            duration: 5000
+          });
           this.dialogRef.close();
         }, err => {
-          this.snackbar.open('Something went wrong.');
+          this.snackbar.open('Something went wrong.', undefined, {
+            duration: 5000
+          });
           this.form.enable();
         });
       } else {
         this.service.createSpan(span).subscribe(() => {
-          this.snackbar.open('Span created.');
+          this.snackbar.open('Span created.', undefined, {
+            duration: 5000
+          });
           this.dialogRef.close();
         }, err => {
           console.log(err);
           if (err instanceof HttpErrorResponse && err.status == 409) {
-            this.snackbar.open('A span already exists with that Key.');
+            this.snackbar.open('A span already exists with that Key.', undefined, {
+              duration: 5000
+            });
           } else {
-            this.snackbar.open('Something went wrong.');
+            this.snackbar.open('Something went wrong.', undefined, {
+              duration: 5000
+            });
           }
           this.form.enable();
         });
