@@ -60,9 +60,22 @@ public class SuspicionCommandModule : ApplicationCommandModule
     [SlashCommand("check", "Check how suspicious a user is")]
     public async Task GetSuspicionLevel(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+            .WithContent(await GetSuspicionResponse(suspect, ctx.Guild.Id)));
+    }
+
+    [ContextMenu(ApplicationCommandType.UserContextMenu, "Check Suspicion")]
+    public async Task GetSuspicionLevel(ContextMenuContext ctx)
+    {
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+            .WithContent(await GetSuspicionResponse(ctx.TargetUser, ctx.Guild.Id)));
+    }
+
+    private async Task<string> GetSuspicionResponse(DiscordUser suspect, ulong guildId)
+    {
         var suspectId = (await _users.GetUserAsync(suspect)).Id;
-        var suspicionLevel = await _db.GetSuspicionLevelAsync(ctx.Guild.Id, suspectId);
-        var maxLevel = (await _db.GetActiveSuspicionsAsync(ctx.Guild.Id)).GroupBy(s => s.SuspectId)
+        var suspicionLevel = await _db.GetSuspicionLevelAsync(guildId, suspectId);
+        var maxLevel = (await _db.GetActiveSuspicionsAsync(guildId)).GroupBy(s => s.SuspectId)
             .Select(s => s.Count())
             .Max();
 
@@ -76,16 +89,15 @@ public class SuspicionCommandModule : ApplicationCommandModule
             comment = $" {subjectPhrase} {descriptor}.";
         }
 
-        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is {suspicionLevel}.{comment}"));
+        return $"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is {suspicionLevel}.{comment}";
 
         static string GetSubjectPhrase(string pronounPreference)
         {
             if (string.IsNullOrEmpty(pronounPreference))
                 return "That's";
 
-            return pronounPreference.Equals("they", StringComparison.OrdinalIgnoreCase) 
-                ? $"{pronounPreference.CapitalizeFirst()} are" 
+            return pronounPreference.Equals("they", StringComparison.OrdinalIgnoreCase)
+                ? $"{pronounPreference.CapitalizeFirst()} are"
                 : $"{pronounPreference.CapitalizeFirst()} is";
         }
 
