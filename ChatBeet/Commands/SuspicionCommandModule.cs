@@ -64,13 +64,6 @@ public class SuspicionCommandModule : ApplicationCommandModule
             .WithContent(await GetSuspicionResponse(suspect, ctx.Guild.Id)));
     }
 
-    [ContextMenu(ApplicationCommandType.UserContextMenu, "Check Suspicion")]
-    public async Task GetSuspicionLevel(ContextMenuContext ctx)
-    {
-        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent(await GetSuspicionResponse(ctx.TargetUser, ctx.Guild.Id)));
-    }
-
     private async Task<string> GetSuspicionResponse(DiscordUser suspect, ulong guildId)
     {
         var suspectId = (await _users.GetUserAsync(suspect)).Id;
