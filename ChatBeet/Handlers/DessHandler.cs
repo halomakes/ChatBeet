@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using BooruSharp.Search.Post;
 using ChatBeet.Commands;
 using ChatBeet.Data;
 using ChatBeet.Notifications;
@@ -34,8 +35,7 @@ public partial class DessHandler : INotificationHandler<DiscordNotification<Mess
         var users = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
         var commandModule = new BooruCommandModule(booru, mediator, users);
         var user = await users.GetUserAsync(notification.Event.Author);
-        var (text, embed) = await commandModule.GetResponseContent("akatsuki_kirika", true,
-            user.Id);
+        var (text, embed) = await commandModule.GetResponseContent("akatsuki_kirika", Rating.General ,user.Id);
         var builder = new DiscordMessageBuilder()
             .WithContent(text);
         if (embed is not null)

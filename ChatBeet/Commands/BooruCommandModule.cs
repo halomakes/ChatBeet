@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using BooruSharp.Search.Post;
 using ChatBeet.Commands.Autocomplete;
 using ChatBeet.Data;
 using ChatBeet.Notifications;
 using ChatBeet.Services;
-using ChatBeet.Utilities;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -27,9 +27,9 @@ public class BooruCommandModule : ApplicationCommandModule
     }
 
     [SlashCommand("booru", "Get a random image from gelbooru matching tags")]
-    private async Task GetPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tags, [Option("safe-only", "Turn this off if you're horny")] bool safeOnly = true)
+    private async Task GetPost(InteractionContext ctx, [Option("tags", "List of tags (space-separated)"), Autocomplete(typeof(BooruTagAutocompleteProvider))] string tags, [Option("rating", "Change this if you're horny")] Rating rating = Rating.General)
     {
-        var (text, embed) = await GetResponseContent(tags, safeOnly, (await _users.GetUserAsync(ctx.User)).Id);
+        var (text, embed) = await GetResponseContent(tags, rating, (await _users.GetUserAsync(ctx.User)).Id);
         var response = new DiscordInteractionResponseBuilder()
             .WithContent(text);
         if (embed is not null)
@@ -39,18 +39,18 @@ public class BooruCommandModule : ApplicationCommandModule
         await _mediator.Publish(new BonkableMessageNotification(message));
     }
 
-    public async Task<(string Content, DiscordEmbed? Embed)> GetResponseContent(string tags, bool safeOnly, Guid id)
+    public async Task<(string Content, DiscordEmbed? Embed)> GetResponseContent(string tags, Rating rating, Guid userId)
     {
         var tagList = tags.ToLower().Split(' ');
         if (tagList.Any())
         {
-            var result = await _booru.GetRandomPostAsync(safeOnly, id, tagList);
+            var result = await _booru.GetRandomPostAsync(rating, userId, tagList);
 
             if (result is { } media)
             {
-                await _booru.RecordTags(id, tagList);
+                await _booru.RecordTags(userId, tagList);
 
-                if (media != default && media is { Rating: < BooruSharp.Search.Post.Rating.Questionable })
+                if (media != default && media is { Rating: < Rating.Questionable })
                 {
                     var embed = new DiscordEmbedBuilder
                     {
@@ -81,5 +81,5 @@ public class BooruCommandModule : ApplicationCommandModule
         .Select(t => queriedTags.Contains(t) ? Formatter.Bold(Formatter.Sanitize(t)) : Formatter.Sanitize(t)));
 
     [SlashCommand("astolfo", "Fill the void in your soul with an Astolfo picture")]
-    public Task GetAstolfo(InteractionContext ctx) => GetPost(ctx, "astolfo_(fate)", true);
+    public Task GetAstolfo(InteractionContext ctx) => GetPost(ctx, "astolfo_(fate)");
 }

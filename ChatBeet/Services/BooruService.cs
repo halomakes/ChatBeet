@@ -35,11 +35,11 @@ public class BooruService
         _httpClient = httpClient;
     }
 
-    public Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, Guid userId, params string[] tags) => GetRandomPostAsync(safeContentOnly, userId, tags.AsEnumerable());
+    public Task<MediaSearchResult?> GetRandomPostAsync(Rating rating, Guid userId, params string[] tags) => GetRandomPostAsync(rating, userId, tags.AsEnumerable());
 
-    public async Task<MediaSearchResult?> GetRandomPostAsync(bool? safeContentOnly, Guid userId, IEnumerable<string> tags = null)
+    public async Task<MediaSearchResult?> GetRandomPostAsync(Rating rating, Guid userId, IEnumerable<string> tags = null)
     {
-        var filter = safeContentOnly.HasValue ? (safeContentOnly.Value ? "rating:general" : "-rating:general") : string.Empty;
+        var filter = $"rating:{rating.ToString().ToLower()}";
         var globalBlacklist = Negate(_booruConfig.BlacklistedTags);
         var userBlacklist = Negate(await GetBlacklistedTags(userId));
 
