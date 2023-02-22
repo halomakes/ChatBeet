@@ -38,9 +38,9 @@ public class KarmaCommandModule : ApplicationCommandModule
     [ContextMenu(ApplicationCommandType.UserContextMenu, "Check Karma")]
     public async Task Check(ContextMenuContext ctx)
     {
-        var level = await _karma.GetLevelAsync(ctx.Guild.Id, ctx.TargetUser.Mention);
+        var level = await _karma.GetLevelAsync(ctx.Guild.Id, Formatter.Mention(ctx.TargetUser));
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            .WithContent($"{ctx.TargetUser.Mention.ToPossessive()} karma is {level}."));
+            .WithContent($"{Formatter.Mention(ctx.TargetUser).ToPossessive()} karma is {level}."));
     }
 
     [SlashCommand("increment", "Increase a karma level")]
