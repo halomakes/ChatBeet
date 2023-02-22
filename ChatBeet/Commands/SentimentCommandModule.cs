@@ -12,16 +12,18 @@ namespace ChatBeet.Commands;
 public class SentimentCommandModule : ApplicationCommandModule
     {
     private readonly NegativeResponseService _negativeResponseService;
+    private readonly DiscordClient _client;
 
-    public SentimentCommandModule(NegativeResponseService negativeResponseService)
+    public SentimentCommandModule(NegativeResponseService negativeResponseService, DiscordClient client)
     {
         _negativeResponseService = negativeResponseService;
+        _client = client;
     }
 
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Analyze Sentiment")]
     public async Task Kern(ContextMenuContext ctx)
     {
-        if (ctx.TargetMessage.Author.IsCurrent)
+        if (ctx.TargetMessage.Author.Equals(_client.CurrentUser))
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(_negativeResponseService.GetResponseString()));

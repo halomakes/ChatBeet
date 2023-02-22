@@ -14,16 +14,18 @@ public partial class MessageTransformCommandModule : ApplicationCommandModule
     public const string Prefix = "message-replace-";
     
     private readonly NegativeResponseService _negativeResponseService;
+    private readonly DiscordClient _client;
 
-    public MessageTransformCommandModule(NegativeResponseService negativeResponseService)
+    public MessageTransformCommandModule(NegativeResponseService negativeResponseService, DiscordClient client)
     {
         _negativeResponseService = negativeResponseService;
+        _client = client;
     }
 
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Replace Text")]
     public async Task PromptReplacement(ContextMenuContext ctx)
     {
-        if (ctx.TargetMessage.Author.IsCurrent)
+        if (ctx.TargetMessage.Author.Equals(_client.CurrentUser))
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(_negativeResponseService.GetResponseString()));
@@ -48,7 +50,7 @@ public partial class MessageTransformCommandModule : ApplicationCommandModule
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Kern")]
     public async Task Kern(ContextMenuContext ctx)
     {
-        if (ctx.TargetMessage.Author.IsCurrent)
+        if (ctx.TargetMessage.Author.Equals(_client.CurrentUser))
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(_negativeResponseService.GetResponseString()));
@@ -64,7 +66,7 @@ public partial class MessageTransformCommandModule : ApplicationCommandModule
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Mock")]
     public async Task Mock(ContextMenuContext ctx)
     {
-        if (ctx.TargetMessage.Author.IsCurrent)
+        if (ctx.TargetMessage.Author.Equals(_client.CurrentUser))
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(_negativeResponseService.GetResponseString()));
