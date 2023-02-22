@@ -62,11 +62,11 @@ public class BooruService
                 var rng = new Random();
                 var resultTags = img.Tags
                     .Select(t => (MatchesInput: tags.Contains(t), Tag: t))
-                    .OrderByDescending(p => p.MatchesInput)
-                    .ThenBy(p => rng.Next())
+                    .OrderByDescending(p => p.MatchesInput ? 1 : 0)
+                    .ThenBy(_ => rng.Next())
                     .Select(p => p.Tag)
                     .Take(10)
-                    .OrderBy(t => rng.Next());
+                    .ToList();
                 return new(img.FileUrl, img.PostUrl, img.Rating, resultTags);
             }
 

@@ -50,7 +50,7 @@ public class BooruCommandModule : ApplicationCommandModule
             {
                 await _booru.RecordTags(id, tagList);
 
-                if (media != default && media is { Rating: < BooruSharp.Search.Post.Rating.Explicit })
+                if (media != default && media is { Rating: < BooruSharp.Search.Post.Rating.Questionable })
                 {
                     var embed = new DiscordEmbedBuilder
                     {
