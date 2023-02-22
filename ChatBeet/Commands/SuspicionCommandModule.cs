@@ -15,23 +15,21 @@ public class SuspicionCommandModule : ApplicationCommandModule
 {
     private readonly SuspicionService _db;
     private readonly UserPreferencesService _prefsService;
-    private readonly DiscordClient _client;
     private readonly NegativeResponseService _negativeResponseService;
     private readonly IUsersRepository _users;
 
-    public SuspicionCommandModule(SuspicionService db, UserPreferencesService prefsService, DiscordClient client, NegativeResponseService negativeResponseService, IUsersRepository users)
+    public SuspicionCommandModule(SuspicionService db, UserPreferencesService prefsService, NegativeResponseService negativeResponseService, IUsersRepository users)
     {
         _db = db;
         _prefsService = prefsService;
         _negativeResponseService = negativeResponseService;
         _users = users;
-        _client = client;
     }
 
     [SlashCommand("report", "Report a user as being suspicious")]
     public async Task IncreaseSuspicion(InteractionContext ctx, [Option("suspect", "Person who is being a sussy baka")] DiscordUser suspect)
     {
-        if (suspect.Equals(_client.CurrentUser))
+        if (suspect.IsCurrent)
         {
             await _negativeResponseService.Respond(ctx);
         }
