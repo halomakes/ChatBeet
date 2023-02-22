@@ -24,15 +24,9 @@ public class BotKarmaReactHandler : INotificationHandler<KarmaChangeNotification
         if (notification.Subject.Equals(username, StringComparison.OrdinalIgnoreCase))
         {
             if (notification.NewValue > notification.OldValue)
-            {
-                await notification.TriggeringMessage.RespondAsync("yee");
                 await notification.TriggeringMessage.CreateReactionAsync(DiscordEmoji.FromUnicode("😃"));
-            }
             else
-            {
-                await notification.TriggeringMessage.RespondAsync("fak");
                 await notification.TriggeringMessage.CreateReactionAsync(DiscordEmoji.FromUnicode("😭"));
-            }
         }
     }
 
