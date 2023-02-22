@@ -21,7 +21,7 @@ public class PreferenceLookupCommandModule : ApplicationCommandModule
     }
     private async Task GetPronouns(BaseContext ctx, DiscordUser user)
     {
-        if (user == ctx.Client.CurrentUser)
+        if (user.IsCurrent)
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent($"Just refer to {Formatter.Mention(user)} as 'best bot'.")
