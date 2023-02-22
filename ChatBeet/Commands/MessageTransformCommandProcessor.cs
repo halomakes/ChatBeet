@@ -11,6 +11,8 @@ namespace ChatBeet.Commands;
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
 public partial class MessageTransformCommandModule : ApplicationCommandModule
 {
+    public const string Prefix = "message-replace-";
+    
     private readonly NegativeResponseService _negativeResponseService;
     private readonly DiscordClient _client;
 
@@ -20,34 +22,23 @@ public partial class MessageTransformCommandModule : ApplicationCommandModule
         _client = client;
     }
 
-    [ContextMenu(ApplicationCommandType.MessageContextMenu, "Transform")]
-    public async Task TransformMessage(ContextMenuContext ctx)
+    [ContextMenu(ApplicationCommandType.MessageContextMenu, "Replace Text")]
+    public async Task PromptReplacement(ContextMenuContext ctx)
     {
+        if (ctx.TargetMessage.Author.Equals(_client.CurrentUser))
+        {
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                .WithContent(_negativeResponseService.GetResponseString()));
+            return;
+        }
+        
         await ctx.CreateResponseAsync(InteractionResponseType.Modal, new DiscordInteractionResponseBuilder()
-            .WithTitle("Verify Your Account")
-            .WithCustomId($"message-transform-{ctx.TargetMessage.Id}")
-            .AddComponents(new DiscordSelectComponent("replaceType", "Basic", options: new[]
-            {
-                new DiscordSelectComponentOption("Basic", "basic", "Use basic text replacement", true),
-                new DiscordSelectComponentOption("Regular Expressions", "regex", "Use regular expressions in replacement")
-            }))
-            .AddComponents(new TextInputComponent("Text to Replace", "replacePattern", required: false))
-            .AddComponents(new TextInputComponent("Replacement Text", "replaceValue", placeholder: "poop", value: "poop", required: false))
-            .AddComponents(new DiscordSelectComponent("scramble", "Do Not Scramble", options: new[]
-            {
-                new DiscordSelectComponentOption("Do Not Scramble", "false", "Leave the order of words alone", true),
-                new DiscordSelectComponentOption("Scramble Words", "true", "around the Mix order words of")
-            }))
-            .AddComponents(new DiscordSelectComponent("mock", "Do Not Mock", options: new[]
-            {
-                new DiscordSelectComponentOption("Do Not Mock", "false", "Leave the text case alone", true),
-                new DiscordSelectComponentOption("Mock", "true", "rAndOmiZE tHe cAsE Of tHE mESsaGe tExT")
-            }))
-            .AddComponents(new DiscordSelectComponent("kern", "Do Not Kern", options: new[]
-            {
-                new DiscordSelectComponentOption("Do Not Kern", "false", "Leave text spacing alone", true),
-                new DiscordSelectComponentOption("Kern Text", "true", "S p a c e  l e t t e r s  a p a r t")
-            }))
+            .WithTitle("Replace Text")
+            .WithCustomId($"{Prefix}{ctx.TargetMessage.Id}")
+            .AddComponents(new TextInputComponent("Text to Replace", "pattern", style: TextInputStyle.Short, required: false))
+            .AddComponents(new TextInputComponent("Replacement Text", "value", style: TextInputStyle.Short, placeholder: "poop", value: "poop", required: false))
+            .AddComponents(new TextInputComponent("Use Regular Expression", "regex", style: TextInputStyle.Short, value:"false", required: false))
+            .AddComponents(new TextInputComponent("Ignore Case", "ignoreCase", style: TextInputStyle.Short, value:"false", required: false))
             .WithContent($@"Fill out the fields below to specify how to modify this message
 {Formatter.BlockCode(ctx.TargetMessage.Content)}")
         );

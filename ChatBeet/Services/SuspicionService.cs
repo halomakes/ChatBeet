@@ -52,7 +52,6 @@ public class SuspicionService
             debounceWindow = TimeSpan.FromMinutes(2);
 
         var lastReport = await _ctx.Suspicions
-            .AsQueryable()
             .AsNoTracking()
             .Where(s => s.GuildId == guildId)
             .Where(s => s.ReporterId == reporter)
@@ -72,7 +71,7 @@ public class SuspicionService
                 GuildId = guildId,
                 ReporterId = reporter,
                 SuspectId = suspect,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             });
             await _ctx.SaveChangesAsync();
         }
