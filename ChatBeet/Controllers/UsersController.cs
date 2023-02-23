@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController : Controller
@@ -30,6 +29,7 @@ public class UsersController : Controller
     }
 
     [HttpGet("@me")]
+    [Authorize]
     public async Task<ActionResult<UserViewModel>> GetCurrentUser()
     {
         var currentUser = await _identity.GetCurrentUserAsync();
