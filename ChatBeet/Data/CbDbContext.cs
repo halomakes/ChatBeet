@@ -4,8 +4,10 @@ namespace ChatBeet.Data;
 
 public partial class CbDbContext : DbContext
 {
-    public CbDbContext(DbContextOptions<CbDbContext> opts) : base(opts) { }
-    
+    public CbDbContext(DbContextOptions<CbDbContext> opts) : base(opts)
+    {
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyUtcDateTimeConverter();
@@ -17,5 +19,6 @@ public partial class CbDbContext : DbContext
         ConfigureSuspicion(modelBuilder);
         ConfigureHighGround(modelBuilder);
         ConfigureKarma(modelBuilder);
+        ConfigureStats(modelBuilder);
     }
 }

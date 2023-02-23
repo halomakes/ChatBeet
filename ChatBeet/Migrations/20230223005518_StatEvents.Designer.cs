@@ -3,6 +3,7 @@ using System;
 using ChatBeet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatBeet.Migrations
 {
     [DbContext(typeof(CbDbContext))]
-    partial class CbDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230223005518_StatEvents")]
+    partial class StatEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -334,18 +337,18 @@ namespace ChatBeet.Migrations
                         .HasColumnName("triggering_user_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_events");
+                        .HasName("pk_stats");
 
                     b.HasIndex("GuildId")
-                        .HasDatabaseName("ix_events_guild_id");
+                        .HasDatabaseName("ix_stats_guild_id");
 
                     b.HasIndex("TargetedUserId")
-                        .HasDatabaseName("ix_events_targeted_user_id");
+                        .HasDatabaseName("ix_stats_targeted_user_id");
 
                     b.HasIndex("TriggeringUserId")
-                        .HasDatabaseName("ix_events_triggering_user_id");
+                        .HasDatabaseName("ix_stats_triggering_user_id");
 
-                    b.ToTable("events", "stats");
+                    b.ToTable("stats", "events");
                 });
 
             modelBuilder.Entity("ChatBeet.Data.Entities.SuspicionReport", b =>
@@ -610,19 +613,19 @@ namespace ChatBeet.Migrations
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_events_guilds_guild_id");
+                        .HasConstraintName("fk_stats_guilds_guild_id");
 
                     b.HasOne("ChatBeet.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("TargetedUserId")
-                        .HasConstraintName("fk_events_users_user_id");
+                        .HasConstraintName("fk_stats_users_user_id");
 
                     b.HasOne("ChatBeet.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("TriggeringUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_events_users_user_id1");
+                        .HasConstraintName("fk_stats_users_user_id1");
                 });
 
             modelBuilder.Entity("ChatBeet.Data.Entities.SuspicionReport", b =>

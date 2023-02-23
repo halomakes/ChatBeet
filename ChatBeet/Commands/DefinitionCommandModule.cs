@@ -74,7 +74,9 @@ public class DefinitionCommandModule : ApplicationCommandModule
             CreatedBy = user.Id,
             Key = key,
             Value = value,
-            GuildId = ctx.Guild.Id
+            GuildId = ctx.Guild.Id,
+            CreatedAt = existingCell?.CreatedAt ?? DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         });
         await _dbContext.SaveChangesAsync();
 
