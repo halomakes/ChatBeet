@@ -1,0 +1,11 @@
+.message {
+    $spacing: 16px;
+    margin-top: $spacing;
+    margin-bottom: $spacing;
+
+    mat-card-subtitle {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+    }
+}

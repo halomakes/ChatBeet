@@ -12,7 +12,6 @@ namespace ChatBeet.Controllers;
 
 [Route("api/Guilds/{guildId}/[controller]")]
 [ApiController]
-[Authorize(Policy = InGuildRequirement.Policy)]
 public class QuotesController : Controller
 {
     private readonly IQuoteRepository _quotes;
@@ -23,6 +22,7 @@ public class QuotesController : Controller
     }
 
     [HttpGet]
+    [Authorize(Policy = InGuildRequirement.Policy)]
     public async Task<ActionResult<IEnumerable<Quote>>> GetQuotes([FromRoute] ulong guildId, CancellationToken cancellationToken)
     {
         var quotes = await _quotes.Quotes

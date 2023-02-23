@@ -4,6 +4,7 @@ import { catchError, map, Observable, of, startWith, tap } from 'rxjs';
 import { User } from './common/user';
 import { CurrentUserModel } from "./common/CurrentUserModel";
 import { Guild } from "./common/Guild";
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,12 @@ export class IdentityService {
   private static currentGuild?: Guild;
   private static isLoggedIn?: boolean | null = null;
   private static guildChanges: EventEmitter<Guild | undefined> = new EventEmitter<Guild | undefined>();
+  private static routeGuildId?: string;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private route: ActivatedRoute) {
     this.loadStoredGuild();
+    if (IdentityService.routeGuildId == undefined)
+      this.route.queryParams.subscribe(p => IdentityService.routeGuildId = p.guild || '')
   }
 
   public getUser = (): Observable<User | undefined> => this.getCurrentUser().pipe(
@@ -62,8 +66,12 @@ export class IdentityService {
         IdentityService.currentUser = r;
         IdentityService.isLoggedIn = true;
         console.log('Logged in as', r);
-        if (!this.selectedGuild && r.guilds.length) {
-          this.selectedGuild = r.guilds[0];
+        if (r.guilds.length) {
+          if (IdentityService.routeGuildId != undefined && IdentityService.routeGuildId !== '') {
+            this.selectedGuild = r.guilds.find(g => g.id === IdentityService.routeGuildId) || r.guilds[0];
+          } else if (!this.selectedGuild) {
+            this.selectedGuild = r.guilds[0];
+          }
         }
       }),
       catchError(() => {

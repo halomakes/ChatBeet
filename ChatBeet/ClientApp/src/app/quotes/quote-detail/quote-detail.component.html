@@ -1,0 +1,21 @@
+<div class="container">
+    <h1 class="display-4" *ngIf="slug">{{slug}}</h1>
+    <mat-spinner diameter="24" *ngIf="!quote"></mat-spinner>
+    <div *ngIf="quote">
+        <p class="mat-caption">Snipped by {{quote.savedBy?.displayName}} from #{{quote.channelName}} at
+            {{quote.createdAt | date:'medium'}}</p>
+        <mat-card class="message" *ngFor="let message of messages">
+            <mat-card-subtitle>
+                <span>{{message.author?.displayName}}</span>
+                <span>{{message.createdAt | date:'medium'}}</span>
+            </mat-card-subtitle>
+            <mat-card-content>
+                <app-discord-content [content]="message.content"></app-discord-content>
+            </mat-card-content>
+            <mat-divider inset *ngIf="message.embeds"></mat-divider>
+            <mat-card-footer *ngIf="message.embeds">
+                [Message contained {{message.embeds}} {{message.embeds == 1 ? 'embed' : 'embeds'}}.]
+            </mat-card-footer>
+        </mat-card>
+    </div>
+</div>

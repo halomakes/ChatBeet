@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { concatMap, of, tap } from 'rxjs';
 import { IdentityService } from 'src/app/identity.service';
 import { Quote } from '../quote';
@@ -19,7 +20,7 @@ export class QuoteListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator?: MatPaginator;
   @ViewChild(MatSort) sort?: MatSort;
 
-  constructor(private service: QuoteService, private identity: IdentityService) {
+  constructor(private service: QuoteService, private identity: IdentityService, private router: Router) {
     this.dataSource = new MatTableDataSource();
   }
 
@@ -28,5 +29,13 @@ export class QuoteListComponent implements OnInit {
       concatMap(guild => guild?.id ? this.service.getQuotes(guild?.id) : of([])),
       tap(quotes => this.dataSource.data = quotes)
     ).subscribe();
+  }
+
+  public viewQuote = (quote: Quote): void => {
+    this.router.navigate(['quotes', quote.slug], {
+      queryParams: {
+        guild: this.identity.selectedGuild?.id
+      }
+    })
   }
 }

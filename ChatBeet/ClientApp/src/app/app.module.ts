@@ -47,6 +47,8 @@ import { CommandListComponent } from './command-list/command-list.component';
 import { PreferencesComponent } from './preferences/preferences.component';
 import { SetPreferenceComponent } from './set-preference/set-preference.component';
 import { QuoteListComponent } from './quotes/quote-list/quote-list.component';
+import { QuoteDetailComponent } from './quotes/quote-detail/quote-detail.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -70,7 +72,8 @@ const MaterialComponents = [
   MatNativeDateModule,
   MatSnackBarModule,
   MatExpansionModule,
-  MatSelectModule
+  MatSelectModule,
+  MatProgressSpinnerModule
 ]
 
 @NgModule({
@@ -93,7 +96,8 @@ const MaterialComponents = [
     CommandListComponent,
     PreferencesComponent,
     SetPreferenceComponent,
-    QuoteListComponent
+    QuoteListComponent,
+    QuoteDetailComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -110,6 +114,7 @@ const MaterialComponents = [
       { path: 'commands', component: CommandListComponent },
       { path: 'preferences', component: PreferencesComponent },
       { path: 'quotes', component: QuoteListComponent },
+      { path: 'quotes/:slug', component: QuoteDetailComponent },
       { path: '**', component: HomeComponent }
     ]),
     BrowserAnimationsModule,

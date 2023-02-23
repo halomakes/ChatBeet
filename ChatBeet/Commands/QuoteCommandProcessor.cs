@@ -69,6 +69,7 @@ public partial class QuoteCommandProcessor : ApplicationCommandModule
             {
                 Author = messageUsers.First(u => u.Discord!.Id == m.Author.Id),
                 Embeds = m.Embeds.Count,
+                Attachments = m.Attachments.Count,
                 Content = m.Content,
                 CreatedAt = m.Timestamp.DateTime
             }).ToList()
