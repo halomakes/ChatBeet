@@ -25,7 +25,7 @@ public partial class QuoteCommandProcessor : ApplicationCommandModule
         _users = users;
     }
 
-    [GeneratedRegex(@"^[\w\d]+(?:-[\w\d]+)?$")]
+    [GeneratedRegex(@"^[\w\d]+(?:-[\w\d]+)+?$")]
     private partial Regex SlugRgx();
 
     [SlashCommand("quote", "Store recent messages as a quote")]
