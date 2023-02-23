@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatestWith, concatMap, tap } from 'rxjs';
+import { combineLatestWith, concatMap, forkJoin, tap } from 'rxjs';
+import { distinct } from 'src/app/common/distinct';
 import { IdentityService } from 'src/app/identity.service';
 import { Quote } from '../quote';
 import { QuoteMessage } from '../quote-message';
@@ -24,7 +25,14 @@ export class QuoteDetailComponent implements OnInit {
       combineLatestWith(this.route.queryParams),
       concatMap(([routeParams, queryParams]) => this.service.getQuote(queryParams.guild || this.identity.selectedGuild?.id, routeParams.slug)),
       tap(r => this.messages = r.messages!.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())),
-      tap(r => this.quote = r)
+      tap(r => this.quote = r),
+      concatMap(r => forkJoin(r.messages!
+        .map(m => m.authorId)
+        .filter(distinct)
+        .map(id => this.identity.getUserColor(id).pipe(
+          tap(color => this.messages?.filter(m => m.authorId == color.userId).forEach(m => m.color = color.color))
+        )
+        )))
     ).subscribe();
   }
 }

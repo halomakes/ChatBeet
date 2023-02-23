@@ -4,7 +4,7 @@
     <div *ngIf="quote">
         <p class="mat-caption">Snipped by {{quote.savedBy?.displayName}} from #{{quote.channelName}} at
             {{quote.createdAt | date:'medium'}}</p>
-        <mat-card class="message" *ngFor="let message of messages">
+        <mat-card class="message" *ngFor="let message of messages" [style.--gradient-color]="message.color">
             <mat-card-subtitle>
                 <span>{{message.author?.displayName}}</span>
                 <span>{{message.createdAt | date:'medium'}}</span>

@@ -5,6 +5,8 @@ import { User } from './common/user';
 import { CurrentUserModel } from "./common/CurrentUserModel";
 import { Guild } from "./common/Guild";
 import { ActivatedRoute } from '@angular/router';
+import { UserId } from './common/user-id';
+import { UserColor } from './common/user-color';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +17,8 @@ export class IdentityService {
   private static isLoggedIn?: boolean | null = null;
   private static guildChanges: EventEmitter<Guild | undefined> = new EventEmitter<Guild | undefined>();
   private static routeGuildId?: string;
+  private static colors: { [index: string]: string } = {};
+  private static readonly defaultColor = '#424242';
 
   constructor(private http: HttpClient, private route: ActivatedRoute) {
     this.loadStoredGuild();
@@ -79,4 +83,13 @@ export class IdentityService {
         return of(undefined)
       })
     )
+
+
+  public getUserColor = (userId: UserId): Observable<UserColor> => IdentityService.colors[userId]
+    ? of({ userId, color: IdentityService.colors[userId] })
+    : this.http.get<string>(`/api/users/${userId}/color`).pipe(
+      map(color => color || IdentityService.defaultColor),
+      tap(color => IdentityService.colors[userId] = color),
+      map(color => ({ userId, color }))
+    );
 }

@@ -7,6 +7,7 @@ export class QuoteMessage {
     public authorId: UserId;
     public embeds: number;
     public attachments: number;
+    public color: string = '#424242';
 
     public author: User;
 
