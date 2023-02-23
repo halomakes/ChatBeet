@@ -149,7 +149,6 @@ void ConfigureDatabases(WebApplicationBuilder builder)
 
     builder.Services.AddScoped<IUsersRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IBooruRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IKeywordsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IDefinitionsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IProgressRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IHighGroundRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
@@ -185,7 +184,6 @@ void AddAuthentication(WebApplicationBuilder builder)
 void AddInternalServices(WebApplicationBuilder builder)
 {
     builder.Services.AddScoped<UserPreferencesService>();
-    builder.Services.AddScoped<KeywordService>();
     builder.Services.AddScoped<NegativeResponseService>();
     builder.Services.AddScoped<GoogleSearchService>();
     builder.Services.AddScoped<LinkPreviewService>();

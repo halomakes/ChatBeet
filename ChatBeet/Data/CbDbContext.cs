@@ -13,7 +13,6 @@ public partial class CbDbContext : DbContext
         modelBuilder.ApplyUtcDateTimeConverter();
         ConfigureUsers(modelBuilder);
         ConfigureBooru(modelBuilder);
-        ConfigureKeywords(modelBuilder);
         ConfigureDefinitions(modelBuilder);
         ConfigureProgress(modelBuilder);
         ConfigureSuspicion(modelBuilder);
