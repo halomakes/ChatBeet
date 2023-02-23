@@ -34,7 +34,7 @@ public class QuotesController : Controller
     }
 
     [HttpGet("{slug}")]
-    public async Task<ActionResult<IEnumerable<Quote>>> GetQuotes([FromRoute] ulong guildId, [FromRoute] string slug, CancellationToken cancellationToken)
+    public async Task<ActionResult<Quote>> GetQuotes([FromRoute] ulong guildId, [FromRoute] string slug, CancellationToken cancellationToken)
     {
         var quote = await _quotes.Quotes
             .AsNoTracking()
@@ -44,5 +44,18 @@ public class QuotesController : Controller
             .Where(q => q.GuildId == guildId && q.Slug == slug)
             .FirstOrDefaultAsync(cancellationToken);
         return quote is null ? NotFound() : Ok(quote);
+    }
+    
+    [HttpGet("{slug}/Messages")]
+    public async Task<ActionResult<IEnumerable<QuoteMessage>>> GetQuoteMessages([FromRoute] ulong guildId, [FromRoute] string slug, CancellationToken cancellationToken)
+    {
+        var quote = await _quotes.Quotes
+            .AsNoTracking()
+            .Include(q => q.SavedBy)
+            .Include(q => q.Messages)!
+            .ThenInclude(q => q.Author)
+            .Where(q => q.GuildId == guildId && q.Slug == slug)
+            .FirstOrDefaultAsync(cancellationToken);
+        return quote is null ? NotFound() : Ok(quote.Messages);
     }
 }

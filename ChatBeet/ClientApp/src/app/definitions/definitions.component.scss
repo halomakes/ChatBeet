@@ -19,21 +19,6 @@ td.mat-column-expandedDetail {
     background-color: transparentize(black, 0.9);
 }
 
-tr:not(.example-detail-row) {
-    cursor: pointer;
-    &:hover {
-        background: transparentize(black, 0.85);
-    }
-    &:active {
-        background: transparentize(black, 0.9);
-    }
-
-    @media screen and (max-width: 600px) {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
 .expand-detail {
     overflow-y: hidden;
 }

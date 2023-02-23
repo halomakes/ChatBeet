@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { concatMap, of, tap } from 'rxjs';
 import { IdentityService } from '../identity.service';
-import { KarmaLevel, KarmaLevels } from './karma';
+import { KarmaLevel } from './karma';
 import { KarmaService } from './karma.service';
 
 @Component({

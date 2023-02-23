@@ -46,6 +46,7 @@ import { DeleteProgressComponent } from './progress/delete-progress/delete-progr
 import { CommandListComponent } from './command-list/command-list.component';
 import { PreferencesComponent } from './preferences/preferences.component';
 import { SetPreferenceComponent } from './set-preference/set-preference.component';
+import { QuoteListComponent } from './quotes/quote-list/quote-list.component';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -91,7 +92,8 @@ const MaterialComponents = [
     DeleteProgressComponent,
     CommandListComponent,
     PreferencesComponent,
-    SetPreferenceComponent
+    SetPreferenceComponent,
+    QuoteListComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -107,6 +109,7 @@ const MaterialComponents = [
       { path: 'progress', component: ProgressListComponent },
       { path: 'commands', component: CommandListComponent },
       { path: 'preferences', component: PreferencesComponent },
+      { path: 'quotes', component: QuoteListComponent },
       { path: '**', component: HomeComponent }
     ]),
     BrowserAnimationsModule,
