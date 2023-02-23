@@ -42,6 +42,8 @@ public partial class CbDbContext : IQuoteRepository
                     .HasForeignKey(m => m.AuthorId)
                     .HasPrincipalKey(u => u.Id);
             });
+            builder.Navigation(b => b.Messages)
+                .AutoInclude(false);
         });
     }
 }

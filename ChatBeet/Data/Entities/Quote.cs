@@ -10,6 +10,6 @@ public class Quote
     public DateTime CreatedAt { get; set; }
     public required string ChannelName { get; set; }
 
-    public virtual ICollection<QuoteMessage> Messages { get; set; } = null!;
+    public virtual ICollection<QuoteMessage>? Messages { get; set; }
     public virtual User? SavedBy { get; set; }
 }

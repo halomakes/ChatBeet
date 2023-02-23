@@ -65,7 +65,7 @@ public partial class QuoteCommandProcessor : ApplicationCommandModule
             ChannelName = ctx.Channel.Name,
             SavedById = user.Id,
             CreatedAt = DateTime.UtcNow,
-            Messages = messages.Select(m => new QuoteMessage
+            Messages = messages.OrderBy(m => m.Timestamp).Select(m => new QuoteMessage
             {
                 Author = messageUsers.First(u => u.Discord!.Id == m.Author.Id),
                 Embeds = m.Embeds.Count,
