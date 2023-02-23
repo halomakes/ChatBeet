@@ -10,6 +10,7 @@ import { MentionService } from './mention.service';
 })
 export class DiscordContentComponent implements OnChanges {
   @Input() content?: string;
+  @Input() showEmbeds: boolean = false;
   public htmlContent?: string;
   private static users: { [key: string]: string } = {};
   private static channels: { [key: string]: string } = {};
@@ -27,6 +28,7 @@ export class DiscordContentComponent implements OnChanges {
       return;
     }
     this.htmlContent = toHTML(content, {
+      embed: this.showEmbeds,
       discordCallback: {
         user: (node: any) => this.loadUser(node.id),
         channel: (node: any) => this.loadChannel(node.id),

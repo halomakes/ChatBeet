@@ -32,6 +32,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { KarmaComponent } from './karma/karma.component';
@@ -48,7 +50,6 @@ import { PreferencesComponent } from './preferences/preferences.component';
 import { SetPreferenceComponent } from './set-preference/set-preference.component';
 import { QuoteListComponent } from './quotes/quote-list/quote-list.component';
 import { QuoteDetailComponent } from './quotes/quote-detail/quote-detail.component';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -73,7 +74,8 @@ const MaterialComponents = [
   MatSnackBarModule,
   MatExpansionModule,
   MatSelectModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
+  MatTooltipModule
 ]
 
 @NgModule({

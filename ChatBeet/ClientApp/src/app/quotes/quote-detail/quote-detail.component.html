@@ -10,11 +10,12 @@
                 <span>{{message.createdAt | date:'medium'}}</span>
             </mat-card-subtitle>
             <mat-card-content>
-                <app-discord-content [content]="message.content"></app-discord-content>
+                <app-discord-content [content]="message.content" [showEmbeds]="true"></app-discord-content>
             </mat-card-content>
-            <mat-divider inset *ngIf="message.embeds"></mat-divider>
-            <mat-card-footer *ngIf="message.embeds">
-                [Message contained {{message.embeds}} {{message.embeds == 1 ? 'embed' : 'embeds'}}.]
+            <mat-divider inset *ngIf="message.embeds || message.attachments"></mat-divider>
+            <mat-card-footer *ngIf="message.embeds || message.attachments">
+                <mat-icon *ngIf="message.attachments" [matTooltip]="message.attachmentText()">attachment</mat-icon>
+                <mat-icon *ngIf="message.embeds" [matTooltip]="message.embedText()">image</mat-icon>
             </mat-card-footer>
         </mat-card>
     </div>

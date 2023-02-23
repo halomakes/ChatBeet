@@ -8,4 +8,15 @@
         justify-content: space-between;
         font-size: 12px;
     }
+    mat-card-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 8px;
+        padding-top: 4px;
+
+        mat-icon {
+            font-size: 18px;
+            opacity: 0.65;
+        }
+    }
 }
