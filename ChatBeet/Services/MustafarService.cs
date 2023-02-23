@@ -14,11 +14,16 @@ public class MustafarService
     private static readonly Dictionary<(ulong UserId, ulong GuildId), DateTime> InvocationHistory = new();
     private readonly IHighGroundRepository _repository;
     private readonly IUsersRepository _users;
+    private readonly IStatsRepository _stats;
 
-    public MustafarService(IHighGroundRepository repository, IUsersRepository users)
+    public const string JumpEventType = "high_ground:jump";
+    public const string TripEventType = "high_ground:trip";
+
+    public MustafarService(IHighGroundRepository repository, IUsersRepository users, IStatsRepository stats)
     {
         _repository = repository;
         _users = users;
+        _stats = stats;
     }
 
     private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(5);
@@ -42,6 +47,14 @@ public class MustafarService
                 UserId = user.Id
             });
             await _repository.SaveChangesAsync();
+            _stats.StatEvents.Add(new()
+            {
+                GuildId = guildId,
+                TriggeringUserId = user.Id,
+                EventType = JumpEventType,
+                OccurredAt = DateTime.UtcNow,
+            });
+            await _stats.SaveChangesAsync();
             return new(null, user);
         }
 
@@ -49,6 +62,14 @@ public class MustafarService
         {
             _repository.Claims.Remove(existingStake);
             await _repository.SaveChangesAsync();
+            _stats.StatEvents.Add(new()
+            {
+                GuildId = guildId,
+                TriggeringUserId = user.Id,
+                EventType = TripEventType,
+                OccurredAt = DateTime.UtcNow,
+            });
+            await _stats.SaveChangesAsync();
             throw new StumbleException();
         }
 
@@ -56,6 +77,15 @@ public class MustafarService
         existingStake.UserId = user.Id;
         existingStake.UpdatedAt = DateTime.Now;
         await _repository.SaveChangesAsync();
+        _stats.StatEvents.Add(new()
+        {
+            GuildId = guildId,
+            TriggeringUserId = user.Id,
+            TargetedUserId = existingStake.UserId,
+            EventType = JumpEventType,
+            OccurredAt = DateTime.UtcNow,
+        });
+        await _stats.SaveChangesAsync();
 
         return new(oldUser, user);
     }

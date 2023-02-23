@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatBeet.Handlers;
 
-public class KeywordStatCollectorHandler : INotificationHandler<DiscordNotification<MessageCreateEventArgs>>
+public class KeywordStatCollectorHandler : INotificationHandler<DiscordNotification<MessageCreateEventArgs>>, INotificationHandler<BonkNotification>
 {
     private readonly IServiceScopeFactory _scopeFactory;
 
@@ -18,6 +18,7 @@ public class KeywordStatCollectorHandler : INotificationHandler<DiscordNotificat
     public const string BruhKeywordType = "keyword:bruh";
     public const string RipKeywordType = "keyword:rip";
     public const string YeetKeywordType = "keyword:yeet";
+    public const string BonkType = "bonk";
 
     private const int SurroundingChars = 20;
 
@@ -69,6 +70,24 @@ public class KeywordStatCollectorHandler : INotificationHandler<DiscordNotificat
             };
         });
         statsRepo.StatEvents.AddRange(entries);
+        await statsRepo.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task Handle(BonkNotification notification, CancellationToken cancellationToken)
+    {
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        var usersRepo = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
+        var statsRepo = scope.ServiceProvider.GetRequiredService<IStatsRepository>();
+        var bonker = await usersRepo.GetUserAsync(notification.Bonker, cancellationToken);
+        var bonkee = await usersRepo.GetUserAsync(notification.Bonkee, cancellationToken);
+        statsRepo.StatEvents.Add(new()
+        {
+            GuildId = notification.GuildId,
+            TriggeringUserId = bonker.Id,
+            TargetedUserId = bonkee.Id,
+            OccurredAt = DateTime.UtcNow,
+            EventType = BonkType
+        });
         await statsRepo.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
+using ChatBeet.Notifications;
 using ChatBeet.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using MediatR;
 
 namespace ChatBeet.Commands;
 
@@ -11,11 +13,13 @@ public class BonkCommandModule : ApplicationCommandModule
 {
     private readonly DiscordClient _client;
     private readonly MemeService _memes;
+    private readonly IMediator _mediator;
 
-    public BonkCommandModule(DiscordClient client, MemeService memes)
+    public BonkCommandModule(DiscordClient client, MemeService memes, IMediator mediator)
     {
         _client = client;
         _memes = memes;
+        _mediator = mediator;
     }
 
     [SlashCommand("bonk", "Call someone out for being horni")]
@@ -26,6 +30,7 @@ public class BonkCommandModule : ApplicationCommandModule
         );
         await BonkReactAsync(user, ctx.Channel);
         await EmbedImageAsync(await ctx.GetOriginalResponseAsync());
+        await _mediator.Publish(new BonkNotification(ctx.Guild.Id, ctx.User, user));
     }
 
     [ContextMenu(ApplicationCommandType.UserContextMenu, "Bonk")]
@@ -36,6 +41,7 @@ public class BonkCommandModule : ApplicationCommandModule
         );
         await BonkReactAsync(ctx.TargetUser, ctx.Channel);
         await EmbedImageAsync(await ctx.GetOriginalResponseAsync());
+        await _mediator.Publish(new BonkNotification(ctx.Guild.Id, ctx.User, ctx.TargetUser));
     }
 
     private async Task EmbedImageAsync(DiscordMessage message)
