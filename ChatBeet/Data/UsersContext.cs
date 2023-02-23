@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using ChatBeet.Data.Entities;
 using ChatBeet.Utilities;
@@ -12,7 +13,7 @@ public interface IUsersRepository : IApplicationRepository
     DbSet<Guild> Guilds { get; }
     DbSet<UserPreferenceSetting> UserPreferences { get; }
     Task<User> GetUserAsync(string ircNick);
-    Task<User> GetUserAsync(DiscordUser user);
+    Task<User> GetUserAsync(DiscordUser user, CancellationToken cancellationToken = default);
 }
 
 public partial class CbDbContext : IUsersRepository
@@ -21,10 +22,10 @@ public partial class CbDbContext : IUsersRepository
     public virtual DbSet<Guild> Guilds { get; set; } = null!;
     public virtual DbSet<UserPreferenceSetting> UserPreferences { get; set; } = null!;
     
-    public async Task<User> GetUserAsync(DiscordUser user)
+    public async Task<User> GetUserAsync(DiscordUser user, CancellationToken cancellationToken = default)
     {
-        var internalUser = await Users.FirstOrDefaultAsync(l => l.Discord!.Id == user.Id);
-        return internalUser ?? await CreateUser(user);
+        var internalUser = await Users.FirstOrDefaultAsync(l => l.Discord!.Id == user.Id, cancellationToken);
+        return internalUser ?? await CreateUser(user, cancellationToken);
     }
 
     public async Task<User> GetUserAsync(string ircNick)
@@ -35,7 +36,7 @@ public partial class CbDbContext : IUsersRepository
         throw new ArgumentException("Pass in the DiscordUser please");
     }
 
-    private async Task<User> CreateUser(DiscordUser user)
+    private async Task<User> CreateUser(DiscordUser user, CancellationToken cancellationToken = default)
     {
         var created = Users.Add(new()
         {
@@ -47,7 +48,7 @@ public partial class CbDbContext : IUsersRepository
                 Name = user.Username
             }
         });
-        await SaveChangesAsync();
+        await SaveChangesAsync(cancellationToken);
         return created.Entity;
     }
 

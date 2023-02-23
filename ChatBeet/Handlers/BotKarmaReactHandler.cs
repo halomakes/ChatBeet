@@ -20,6 +20,8 @@ public class BotKarmaReactHandler : INotificationHandler<KarmaChangeNotification
 
     public async Task Handle(KarmaChangeNotification notification, CancellationToken cancellationToken)
     {
+        if (notification.TriggeringMessage is null)
+            return;
         var username = GetUsername();
         if (notification.Subject.Equals(username, StringComparison.OrdinalIgnoreCase))
         {

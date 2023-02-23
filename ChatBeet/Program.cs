@@ -5,8 +5,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using BooruSharp.Booru;
 using ChatBeet.Authorization;
 using ChatBeet.Configuration;
@@ -149,12 +147,13 @@ void ConfigureDatabases(WebApplicationBuilder builder)
 
     builder.Services.AddScoped<IUsersRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IBooruRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IKeywordsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IDefinitionsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IProgressRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IHighGroundRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IKarmaRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<ISuspicionRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    builder.Services.AddScoped<IStatsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    builder.Services.AddScoped<IQuoteRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
 }
 
 void AddAuthentication(WebApplicationBuilder builder)
@@ -184,7 +183,6 @@ void AddAuthentication(WebApplicationBuilder builder)
 void AddInternalServices(WebApplicationBuilder builder)
 {
     builder.Services.AddScoped<UserPreferencesService>();
-    builder.Services.AddScoped<KeywordService>();
     builder.Services.AddScoped<NegativeResponseService>();
     builder.Services.AddScoped<GoogleSearchService>();
     builder.Services.AddScoped<LinkPreviewService>();

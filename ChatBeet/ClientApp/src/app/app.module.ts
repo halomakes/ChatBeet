@@ -32,6 +32,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { KarmaComponent } from './karma/karma.component';
@@ -46,6 +48,8 @@ import { DeleteProgressComponent } from './progress/delete-progress/delete-progr
 import { CommandListComponent } from './command-list/command-list.component';
 import { PreferencesComponent } from './preferences/preferences.component';
 import { SetPreferenceComponent } from './set-preference/set-preference.component';
+import { QuoteListComponent } from './quotes/quote-list/quote-list.component';
+import { QuoteDetailComponent } from './quotes/quote-detail/quote-detail.component';
 
 const MaterialComponents = [
   MatToolbarModule,
@@ -69,7 +73,9 @@ const MaterialComponents = [
   MatNativeDateModule,
   MatSnackBarModule,
   MatExpansionModule,
-  MatSelectModule
+  MatSelectModule,
+  MatProgressSpinnerModule,
+  MatTooltipModule
 ]
 
 @NgModule({
@@ -91,7 +97,9 @@ const MaterialComponents = [
     DeleteProgressComponent,
     CommandListComponent,
     PreferencesComponent,
-    SetPreferenceComponent
+    SetPreferenceComponent,
+    QuoteListComponent,
+    QuoteDetailComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -107,6 +115,8 @@ const MaterialComponents = [
       { path: 'progress', component: ProgressListComponent },
       { path: 'commands', component: CommandListComponent },
       { path: 'preferences', component: PreferencesComponent },
+      { path: 'quotes', component: QuoteListComponent },
+      { path: 'quotes/:slug', component: QuoteDetailComponent },
       { path: '**', component: HomeComponent }
     ]),
     BrowserAnimationsModule,

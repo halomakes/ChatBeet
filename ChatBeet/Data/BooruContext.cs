@@ -19,7 +19,6 @@ public partial class CbDbContext : IBooruRepository
     public virtual DbSet<TopTag> TopTags { get; set; } = null!;
 
     public Task<List<TopTag>> GetTopTags() => TopTags
-        .FromSql($"select max(tag) as tag, user_id, max(total) as total from (select t.tag, t.user_id, count(*) as total from booru.tag_history t group by t.tag, t.user_id order by total desc) i group by i.user_id order by max(i.total) desc limit 10")
         .Include(t => t.User)
         .ToListAsync();
 
@@ -51,7 +50,9 @@ public partial class CbDbContext : IBooruRepository
         });
         modelBuilder.Entity<TopTag>(builder =>
         {
-            builder.HasNoKey();
+            builder.HasNoKey()
+                .ToSqlQuery(@"select max(tag) as tag, user_id, max(total) as total from (select t.tag, t.user_id, count(*) as total 
+from booru.tag_history t group by t.tag, t.user_id order by total desc) i group by i.user_id order by max(i.total) desc limit 10");
             builder.Property(x => x.UserId).HasColumnName("user_id");
             builder.HasOne(t => t.User)
                 .WithMany()

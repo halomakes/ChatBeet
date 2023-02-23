@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using ChatBeet.Data;
 using ChatBeet.Exceptions;
 using ChatBeet.Services;
 using DSharpPlus;
@@ -12,7 +13,7 @@ public class HighGroundCommandModule : ApplicationCommandModule
 {
     private readonly MustafarService _mustafar;
     private readonly GraphicsService _graphics;
-
+    
     public HighGroundCommandModule(GraphicsService graphics, MustafarService mustafar)
     {
         _graphics = graphics;

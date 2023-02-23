@@ -3,6 +3,7 @@ using System;
 using ChatBeet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatBeet.Migrations
 {
     [DbContext(typeof(CbDbContext))]
-    partial class CbDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230223005658_StatEventTableName")]
+    partial class StatEventTableName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,6 +187,80 @@ namespace ChatBeet.Migrations
                     b.ToTable("karma", "interactions");
                 });
 
+            modelBuilder.Entity("ChatBeet.Data.Entities.Keyword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Regex")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("regex");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.HasKey("Id")
+                        .HasName("pk_keywords");
+
+                    b.HasIndex("GuildId")
+                        .HasDatabaseName("ix_keywords_guild_id");
+
+                    b.ToTable("keywords", "stats");
+                });
+
+            modelBuilder.Entity("ChatBeet.Data.Entities.KeywordHit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("current_timestamp");
+
+                    b.Property<Guid>("KeywordId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("keyword_id");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("message");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_keyword_hits");
+
+                    b.HasIndex("KeywordId")
+                        .HasDatabaseName("ix_keyword_hits_keyword_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_keyword_hits_user_id");
+
+                    b.ToTable("keyword_hits", "stats");
+                });
+
             modelBuilder.Entity("ChatBeet.Data.Entities.ProgressSpan", b =>
                 {
                     b.Property<string>("Key")
@@ -223,42 +300,6 @@ namespace ChatBeet.Migrations
                         .HasName("pk_progress_spans");
 
                     b.ToTable("progress_spans", "interactions");
-                });
-
-            modelBuilder.Entity("ChatBeet.Data.Entities.Quote", b =>
-                {
-                    b.Property<decimal>("GuildId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id");
-
-                    b.Property<string>("Slug")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("slug");
-
-                    b.Property<string>("ChannelName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("channel_name");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("current_timestamp");
-
-                    b.Property<Guid>("SavedById")
-                        .HasColumnType("uuid")
-                        .HasColumnName("saved_by_id");
-
-                    b.HasKey("GuildId", "Slug")
-                        .HasName("pk_quotes");
-
-                    b.HasIndex("SavedById")
-                        .HasDatabaseName("ix_quotes_saved_by_id");
-
-                    b.ToTable("quotes", "interactions");
                 });
 
             modelBuilder.Entity("ChatBeet.Data.Entities.StatEvent", b =>
@@ -397,9 +438,7 @@ namespace ChatBeet.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_top_tags_user_id");
 
-                    b.ToTable((string)null);
-
-                    b.ToSqlQuery("select max(tag) as tag, user_id, max(total) as total from (select t.tag, t.user_id, count(*) as total \r\nfrom booru.tag_history t group by t.tag, t.user_id order by total desc) i group by i.user_id order by max(i.total) desc limit 10");
+                    b.ToTable("top_tags", (string)null);
                 });
 
             modelBuilder.Entity("ChatBeet.Data.Entities.User", b =>
@@ -536,85 +575,35 @@ namespace ChatBeet.Migrations
                     b.Navigation("Voter");
                 });
 
-            modelBuilder.Entity("ChatBeet.Data.Entities.Quote", b =>
+            modelBuilder.Entity("ChatBeet.Data.Entities.Keyword", b =>
                 {
-                    b.HasOne("ChatBeet.Data.Entities.Guild", null)
+                    b.HasOne("ChatBeet.Data.Entities.Guild", "Guild")
                         .WithMany()
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_quotes_guilds_guild_id");
+                        .HasConstraintName("fk_keywords_guilds_guild_id");
 
-                    b.HasOne("ChatBeet.Data.Entities.User", "SavedBy")
-                        .WithMany()
-                        .HasForeignKey("SavedById")
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("ChatBeet.Data.Entities.KeywordHit", b =>
+                {
+                    b.HasOne("ChatBeet.Data.Entities.Keyword", null)
+                        .WithMany("Hits")
+                        .HasForeignKey("KeywordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_quotes_users_saved_by_id");
+                        .HasConstraintName("fk_keyword_hits_keywords_keyword_id");
 
-                    b.OwnsMany("ChatBeet.Data.Entities.QuoteMessage", "Messages", b1 =>
-                        {
-                            b1.Property<decimal>("QuoteGuildId")
-                                .HasColumnType("numeric(20,0)")
-                                .HasColumnName("quote_guild_id");
+                    b.HasOne("ChatBeet.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_keyword_hits_users_user_id");
 
-                            b1.Property<string>("QuoteSlug")
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("quote_slug");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
-                                .HasColumnName("id");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
-
-                            b1.Property<int>("Attachments")
-                                .HasColumnType("integer")
-                                .HasColumnName("attachments");
-
-                            b1.Property<Guid>("AuthorId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("author_id");
-
-                            b1.Property<string>("Content")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("content");
-
-                            b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at");
-
-                            b1.Property<int>("Embeds")
-                                .HasColumnType("integer")
-                                .HasColumnName("embeds");
-
-                            b1.HasKey("QuoteGuildId", "QuoteSlug", "Id")
-                                .HasName("pk_quote_message");
-
-                            b1.HasIndex("AuthorId")
-                                .HasDatabaseName("ix_quote_message_author_id");
-
-                            b1.ToTable("quote_message", "interactions");
-
-                            b1.HasOne("ChatBeet.Data.Entities.User", "Author")
-                                .WithMany()
-                                .HasForeignKey("AuthorId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired()
-                                .HasConstraintName("fk_quote_message_users_author_id");
-
-                            b1.WithOwner()
-                                .HasForeignKey("QuoteGuildId", "QuoteSlug")
-                                .HasConstraintName("fk_quote_message_quotes_quote_temp_id");
-
-                            b1.Navigation("Author");
-                        });
-
-                    b.Navigation("Messages");
-
-                    b.Navigation("SavedBy");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ChatBeet.Data.Entities.StatEvent", b =>
@@ -759,6 +748,11 @@ namespace ChatBeet.Migrations
                         .HasConstraintName("fk_user_preferences_users_user_id");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ChatBeet.Data.Entities.Keyword", b =>
+                {
+                    b.Navigation("Hits");
                 });
 
             modelBuilder.Entity("ChatBeet.Data.Entities.User", b =>

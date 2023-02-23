@@ -1,0 +1,36 @@
+<div class="container">
+    <h1 class="wide">Quotes</h1>
+    <div class="mat-elevation-z8 wide" *ngIf="dataSource.data">
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="createdAt" matSortDirection="desc">
+            <ng-container matColumnDef="createdAt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Created At </th>
+                <td mat-cell *matCellDef="let row">{{ row.createdAt | date:'short' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="channelName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Channel Name </th>
+                <td mat-cell *matCellDef="let row"> #{{row.channelName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="savedBy">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Saved By </th>
+                <td mat-cell *matCellDef="let row"> {{row?.savedBy?.displayName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="slug">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+                <td mat-cell *matCellDef="let row"> {{row.slug}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="viewQuote(row)">
+            </tr>
+
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4">No quotes found.</td>
+            </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page of items"></mat-paginator>
+    </div>
+</div>

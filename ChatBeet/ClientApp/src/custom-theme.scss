@@ -146,3 +146,22 @@ body {
 .text-accent {
   color: mat.get-color-from-palette($chatbeet-accent, 500);
 }
+
+tr.clickable-row {
+  cursor: pointer;
+  &:hover {
+    background: transparentize(black, 0.85);
+  }
+  &:active {
+    background: transparentize(black, 0.9);
+  }
+
+  @media screen and (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+a {
+  color: darken(white, 0.05);
+}

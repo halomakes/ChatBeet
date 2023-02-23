@@ -3,6 +3,7 @@ using System;
 using ChatBeet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatBeet.Migrations
 {
     [DbContext(typeof(CbDbContext))]
-    partial class CbDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230223014035_Quotes")]
+    partial class Quotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -397,9 +400,7 @@ namespace ChatBeet.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_top_tags_user_id");
 
-                    b.ToTable((string)null);
-
-                    b.ToSqlQuery("select max(tag) as tag, user_id, max(total) as total from (select t.tag, t.user_id, count(*) as total \r\nfrom booru.tag_history t group by t.tag, t.user_id order by total desc) i group by i.user_id order by max(i.total) desc limit 10");
+                    b.ToTable("top_tags", (string)null);
                 });
 
             modelBuilder.Entity("ChatBeet.Data.Entities.User", b =>
@@ -568,10 +569,6 @@ namespace ChatBeet.Migrations
                                 .HasColumnName("id");
 
                             NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
-
-                            b1.Property<int>("Attachments")
-                                .HasColumnType("integer")
-                                .HasColumnName("attachments");
 
                             b1.Property<Guid>("AuthorId")
                                 .HasColumnType("uuid")

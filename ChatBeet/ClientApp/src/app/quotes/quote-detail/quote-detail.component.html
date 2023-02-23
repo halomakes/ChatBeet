@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="wide">
+        <a mat-button routerLink=".."><mat-icon>arrow_back</mat-icon> Back to Quotes</a>
+    </div>
+    <h1 class="display-4" *ngIf="slug">{{slug}}</h1>
+    <mat-spinner diameter="24" *ngIf="!quote"></mat-spinner>
+    <p class="mat-caption" *ngIf="quote">Snipped by {{quote.savedBy?.displayName}} from #{{quote.channelName}} at
+        {{quote.createdAt | date:'medium'}}</p>
+    <div *ngIf="quote">
+        <mat-card class="message" *ngFor="let message of messages" [style.--gradient-color]="message.color">
+            <mat-card-subtitle>
+                <span>{{message.author?.displayName}}</span>
+                <span>{{message.createdAt | date:'medium'}}</span>
+            </mat-card-subtitle>
+            <mat-card-content>
+                <app-discord-content [content]="message.content" [showEmbeds]="true"></app-discord-content>
+            </mat-card-content>
+            <mat-divider inset *ngIf="message.embeds || message.attachments"></mat-divider>
+            <mat-card-footer *ngIf="message.embeds || message.attachments">
+                <mat-icon *ngIf="message.attachments" [matTooltip]="message.attachmentText()">attachment</mat-icon>
+                <mat-icon *ngIf="message.embeds" [matTooltip]="message.embedText()">image</mat-icon>
+            </mat-card-footer>
+        </mat-card>
+    </div>
+</div>
