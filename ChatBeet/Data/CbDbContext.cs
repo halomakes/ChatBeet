@@ -19,5 +19,6 @@ public partial class CbDbContext : DbContext
         ConfigureHighGround(modelBuilder);
         ConfigureKarma(modelBuilder);
         ConfigureStats(modelBuilder);
+        ConfigureQuotes(modelBuilder);
     }
 }

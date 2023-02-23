@@ -5,8 +5,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using BooruSharp.Booru;
 using ChatBeet.Authorization;
 using ChatBeet.Configuration;
@@ -155,6 +153,7 @@ void ConfigureDatabases(WebApplicationBuilder builder)
     builder.Services.AddScoped<IKarmaRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<ISuspicionRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
     builder.Services.AddScoped<IStatsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    builder.Services.AddScoped<IQuoteRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
 }
 
 void AddAuthentication(WebApplicationBuilder builder)

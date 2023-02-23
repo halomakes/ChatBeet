@@ -3,6 +3,7 @@ using System;
 using ChatBeet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatBeet.Migrations
 {
     [DbContext(typeof(CbDbContext))]
-    partial class CbDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230223014035_Quotes")]
+    partial class Quotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -552,10 +555,20 @@ namespace ChatBeet.Migrations
 
                     b.OwnsMany("ChatBeet.Data.Entities.QuoteMessage", "Messages", b1 =>
                         {
-                            b1.Property<decimal>("Id")
-                                .ValueGeneratedOnAdd()
+                            b1.Property<decimal>("QuoteGuildId")
                                 .HasColumnType("numeric(20,0)")
+                                .HasColumnName("quote_guild_id");
+
+                            b1.Property<string>("QuoteSlug")
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("quote_slug");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer")
                                 .HasColumnName("id");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<Guid>("AuthorId")
                                 .HasColumnType("uuid")
@@ -574,23 +587,11 @@ namespace ChatBeet.Migrations
                                 .HasColumnType("integer")
                                 .HasColumnName("embeds");
 
-                            b1.Property<decimal>("QuoteGuildId")
-                                .HasColumnType("numeric(20,0)")
-                                .HasColumnName("quote_guild_id");
-
-                            b1.Property<string>("QuoteSlug")
-                                .IsRequired()
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("quote_slug");
-
-                            b1.HasKey("Id")
+                            b1.HasKey("QuoteGuildId", "QuoteSlug", "Id")
                                 .HasName("pk_quote_message");
 
                             b1.HasIndex("AuthorId")
                                 .HasDatabaseName("ix_quote_message_author_id");
-
-                            b1.HasIndex("QuoteGuildId", "QuoteSlug")
-                                .HasDatabaseName("ix_quote_message_quote_guild_id_quote_slug");
 
                             b1.ToTable("quote_message", "interactions");
 
