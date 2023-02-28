@@ -23,7 +23,7 @@ public class WhipReactHandler : INotificationHandler<DiscordNotification<Message
     {
         if (notification.Event.Message.Author.Id != GetUserId() || notification.Event.User.Id == GetUserId() || notification.Event.Emoji.Name != WhipCommandModule.Emoji)
             return;
-        if (!WhipCommandModule.CanUpdate(notification.Event.Message))
+        if (!WhipCommandModule.CanUpdate(notification.Event.Message, notification.Event.User))
             return;
 
         await WhipCommandModule.UpdateComparison(notification.Event.Channel.Id, notification.Event.User);

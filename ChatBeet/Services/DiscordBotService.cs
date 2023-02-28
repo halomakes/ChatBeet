@@ -43,7 +43,7 @@ public class DiscordBotService : BackgroundService
         _client.UseInteractivity(new InteractivityConfiguration()
         {
             PollBehaviour = PollBehaviour.KeepEmojis,
-            Timeout = TimeSpan.FromSeconds(30)
+            Timeout = TimeSpan.FromSeconds(30),
         });
         var commands = _client.UseSlashCommands(new SlashCommandsConfiguration
         {
@@ -92,7 +92,8 @@ public class DiscordBotService : BackgroundService
         commands.RegisterCommands<UrbanDictionaryCommandModule>();
         commands.RegisterCommands<YoutubeCommandModule>();
         commands.RegisterCommands<KarmaCommandModule>();
-        commands.RegisterCommands<QuoteCommandProcessor>();
+        commands.RegisterCommands<QuoteCommandModule>();
+        commands.RegisterCommands<PollCommandModule>();
         await _client.ConnectAsync();
         await base.StartAsync(cancellationToken);
     }
@@ -117,13 +118,13 @@ public class DiscordBotService : BackgroundService
 
     private async Task PublishMessage<TEvent>(DiscordClient sender, TEvent @event) where TEvent : DiscordEventArgs
     {
-        await PublishMessage(new DiscordNotification<TEvent>(@event));
+        await PublishMessage(new DiscordNotification<TEvent>(@event, sender));
     }
     
     private async Task PublishMessage<T>(T @event)
     {
         await using var scope = _services.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Publish(@event);
+        mediator.Publish(@event);
     }
 }

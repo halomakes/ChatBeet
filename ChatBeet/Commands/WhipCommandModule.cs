@@ -27,7 +27,7 @@ public class WhipCommandModule : ApplicationCommandModule
         _client = client;
     }
 
-    public static bool CanUpdate(DiscordMessage message) => LastPosts.Any(p => p.Value.Id == message.Id && IsPostInWindow(p.Value));
+    public static bool CanUpdate(DiscordMessage message, DiscordUser user) => LastPosts.Any(p => p.Value.Id == message.Id && IsPostInWindow(p.Value) && !HasUserAlready(message.Channel.Id, user));
 
     [SlashCommand("epeen", "Compare lengths to determine who wins an argument")]
     public async Task WhipOut(InteractionContext ctx)
