@@ -49,7 +49,7 @@ public class UrbanDictionaryCommandModule : ApplicationCommandModule
         {
             //multiple
             var pages = results.Select(r => new Page(BuildContent(r))).ToList();
-            var message = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
                 .WithContent("Mulitple results found.")
                 .AsEphemeral());
             await ctx.Channel.SendPaginatedMessageAsync(ctx.Member, pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.DeleteButtons);

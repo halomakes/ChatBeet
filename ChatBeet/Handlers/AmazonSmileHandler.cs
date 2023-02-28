@@ -31,11 +31,11 @@ public partial class AmazonSmileHandler : INotificationHandler<DiscordNotificati
     /// <summary>
     /// Changes domain to smile.amazon.com and strips any tracking info from query
     /// </summary>
-    private static string ModifyUri(string original)
+    private static string? ModifyUri(string? original)
     {
         try
         {
-            var originalBuilder = new UriBuilder(original);
+            var originalBuilder = new UriBuilder(original!);
             return new UriBuilder
             {
                 Host = "smile.amazon.com",

@@ -2,7 +2,6 @@ using ChatBeet.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using ChatBeet.Notifications;
@@ -13,17 +12,14 @@ namespace ChatBeet.Pages;
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 public class ErrorModel : PageModel
 {
-    public string RequestId { get; set; }
+    public string? RequestId { get; set; }
     private readonly IMediator _service;
     private readonly DiscordLogService _discord;
 
     public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
-    private readonly ILogger<ErrorModel> _logger;
-
-    public ErrorModel(ILogger<ErrorModel> logger, IMediator service, DiscordLogService discord)
+    public ErrorModel(IMediator service, DiscordLogService discord)
     {
-        _logger = logger;
         _service = service;
         _discord = discord;
     }

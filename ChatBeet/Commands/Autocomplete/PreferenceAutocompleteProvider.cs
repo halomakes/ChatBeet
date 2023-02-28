@@ -49,6 +49,8 @@ public class PreferenceAutocompleteProvider : IAutocompleteProvider
     private IEnumerable<string> SearchEnumOptions<TEnum>(AutocompleteContext ctx) where TEnum : struct, Enum
     {
         var currentInput = ctx.FocusedOption.Value as string;
+        if (currentInput is null)
+            return Array.Empty<string>();
         return Enum.GetNames<TEnum>()
             .Select(c => new
             {

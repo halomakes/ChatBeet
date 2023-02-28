@@ -35,7 +35,7 @@ public class PreferencesController : Controller
     /// </summary>
     /// <param name="preference">Preference to get</param>
     [HttpGet("{preference}"), Authorize]
-    public async Task<string> GetPreference([FromRoute] UserPreference preference) => await _prefsService.Get((await GetCurrentUserAsync()).Id, preference);
+    public async Task<ActionResult<string>> GetPreference([FromRoute] UserPreference preference) => Ok(await _prefsService.Get((await GetCurrentUserAsync()).Id, preference));
 
     /// <summary>
     /// Set a preference

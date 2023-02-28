@@ -1,6 +1,4 @@
-using System.Threading.Tasks;
 using ChatBeet.Data.Entities;
-using ChatBeet.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatBeet.Data;

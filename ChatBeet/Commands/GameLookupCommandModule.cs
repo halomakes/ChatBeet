@@ -46,7 +46,7 @@ search ""{mediaName.Replace("\"", string.Empty)}"";";
             }
             if (game.Platforms?.Values?.Any() ?? false)
             {
-                var platforms = string.Join(", ", game.Platforms.Values?.Select(p => p.Abbreviation));
+                var platforms = string.Join(", ", game.Platforms.Values?.Select(p => p.Abbreviation) ?? Array.Empty<string>());
                 messageBuilder.Append($" [{platforms}]");
             }
             var rating = game.AgeRatings?.Values?.FirstOrDefault(r => r.Category == AgeRatingCategory.ESRB);
@@ -61,7 +61,7 @@ search ""{mediaName.Replace("\"", string.Empty)}"";";
             }
             if (game.Genres?.Values?.Any() ?? false)
             {
-                var platforms = string.Join(", ", game.Genres.Values?.Select(g => g.Name));
+                var platforms = string.Join(", ", game.Genres.Values?.Select(g => g.Name) ?? Array.Empty<string>());
                 messageBuilder.Append($" • {platforms}");
             }
             messageBuilder.Append($" • {game.Url}");

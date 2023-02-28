@@ -15,7 +15,7 @@ public partial class DownloadCompleteHandler : INotificationHandler<DownloadComp
 {
     private readonly DiscordBotConfiguration _discordConfig;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private static DiscordChannel _notifyChannel;
+    private static DiscordChannel? _notifyChannel;
 
     public DownloadCompleteHandler(IOptions<DiscordBotConfiguration> discordConfig, IServiceScopeFactory serviceScopeFactory)
     {

@@ -7,13 +7,6 @@ namespace ChatBeet.Controllers;
 [ApiController]
 public class SpeedometerController : ControllerBase
 {
-    private readonly SpeedometerService _service;
-
-    public SpeedometerController(SpeedometerService service)
-    {
-        _service = service;
-    }
-
     /// <summary>
     /// Get the current message rate in a channel
     /// </summary>

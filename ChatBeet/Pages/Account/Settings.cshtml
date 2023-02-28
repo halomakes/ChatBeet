@@ -6,9 +6,9 @@
     ViewBag.Title = "Settings";
 }
 
-<h1>Preferences for <span class="text-secondary">@Model.User.DisplayName()</span></h1>
+<h1>Preferences for <span class="text-secondary">@Model.User?.DisplayName()</span></h1>
 <h2>Personalizations</h2>
-@if (Model.Settings.Any())
+@if (Model.Settings?.Any() ?? false)
 {
     @foreach (var s in Model.Settings)
     {
@@ -24,8 +24,8 @@ else
 }
 <div>
     <form class="form-inline my-2" asp-page="/Account/Settings" method="post">
-        <label class="sr-only" asp-for="Preference.Preference"></label>
-        <select class="custom-select mr-2" asp-for="Preference.Preference">
+        <label class="sr-only" asp-for="Preference!.Preference"></label>
+        <select class="custom-select mr-2" asp-for="Preference!.Preference">
             @if (Model.Preference?.Preference.HasValue ?? false)
             {
                 <option disabled></option>
@@ -40,8 +40,8 @@ else
                 <option value="@e">@label</option>
             }
         </select>
-        <label class="sr-only" asp-for="Preference.Value"></label>
-        <input class="form-control flex-grow-1 mr-2" asp-for="Preference.Value">
+        <label class="sr-only" asp-for="Preference!.Value"></label>
+        <input class="form-control flex-grow-1 mr-2" asp-for="Preference!.Value">
         <button type="submit" class="btn btn-primary">Set</button>
     </form>
     <div asp-validation-summary="All"></div>
@@ -49,7 +49,7 @@ else
 <hr class="my-4" />
 <h2>Booru Tag Blacklist</h2>
 <h3>Global Blacklist</h3>
-@if (Model.GlobalTags.Any())
+@if (Model.GlobalTags?.Any() ?? false)
 {
     <ul>
         @foreach (var t in Model.GlobalTags)
@@ -70,7 +70,7 @@ else
         {
             <li>
                 <div class="d-inline-flex align-content-center">
-                    <span>@t?.Replace("_", " ")</span>
+                    <span>@t.Replace("_", " ")</span>
                     <a onclick="removeFromWhitelist('@t.Replace("'","\"")', this)" role="button">
                         <i class="material-icons">delete</i>
                     </a>

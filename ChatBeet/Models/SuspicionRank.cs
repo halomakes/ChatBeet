@@ -10,7 +10,7 @@ public class SuspicionRank
     /// <summary>
     /// Nick of user
     /// </summary>
-    public User User { get; set; }
+    public required User User { get; set; }
 
     /// <summary>
     /// Current suspicion level

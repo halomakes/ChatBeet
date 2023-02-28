@@ -6,11 +6,11 @@ namespace ChatBeet.Pages.Account;
 
 public class LoginModel : PageModel
 {
-    [BindProperty] public string ReturnUrl { get; set; }
+    [BindProperty] public string? ReturnUrl { get; set; }
 
-    public IActionResult OnGet(string returnUrl = default, [FromQuery(Name = "n")] string nick = default)
+    public IActionResult OnGet(string? returnUrl = default, [FromQuery(Name = "n")] string? nick = default)
     {
-        if (User?.Identity?.IsAuthenticated ?? false)
+        if (User.Identity?.IsAuthenticated ?? false)
         {
             return Redirect(returnUrl ?? "/Account/Success");
         }

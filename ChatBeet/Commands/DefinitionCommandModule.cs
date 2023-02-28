@@ -26,7 +26,7 @@ public class DefinitionCommandModule : ApplicationCommandModule
         _users = users;
     }
 
-    [SlashCommand("who-def", "Check who set a peasant definition")]
+    [SlashCommand("who-def", "Check who set a definition")]
     public async Task GetAuthor(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
         var cell = await _dbContext.Definitions
@@ -41,7 +41,7 @@ public class DefinitionCommandModule : ApplicationCommandModule
             await NotFound(ctx, key);
     }
 
-    [SlashCommand("recall", "Get the value of a peasant definition")]
+    [SlashCommand("recall", "Get the value of a definition")]
     public async Task GetCell(InteractionContext ctx, [Option("key", "Key of the entry to look up"), Autocomplete(typeof(MemoryCellAutocompleteProvider))] string key)
     {
         var cell = await _dbContext.Definitions.FirstOrDefaultAsync(c => c.GuildId == ctx.Guild.Id && c.Key.ToLower() == key.ToLower());
@@ -56,7 +56,7 @@ public class DefinitionCommandModule : ApplicationCommandModule
             await NotFound(ctx, key);
     }
 
-    [SlashCommand("remember", "Create or replace a peasant definition")]
+    [SlashCommand("remember", "Create or replace a definition")]
     public async Task SetCell(InteractionContext ctx, [Option("key", "Key of the entry to set")] string key, [Option("value", "Value to store")] string value)
     {
         var existingCell = await _dbContext.Definitions

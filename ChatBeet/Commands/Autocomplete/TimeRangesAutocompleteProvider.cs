@@ -21,7 +21,6 @@ public class TimeRangesAutocompleteProvider : IAutocompleteProvider
         {
             var cells = await dbContext.Spans
                 .Where(r => r.GuildId == ctx.Guild.Id)
-                .Where(r => r.Key != null)
                 .OrderBy(r => r.Key)
                 .Take(MaxResults)
                 .ToListAsync();
@@ -32,7 +31,6 @@ public class TimeRangesAutocompleteProvider : IAutocompleteProvider
             var asLower = currentValue.ToLower();
             var cells = await dbContext.Spans
                 .Where(r => r.GuildId == ctx.Guild.Id)
-                .Where(r => r.Key != null)
                 .Select(c => new
                 {
                     Item = c,

@@ -13,23 +13,21 @@ public class DateGreaterThanAttribute : ValidationAttribute
 
     private string DateToCompareToFieldName { get; set; }
 
-    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
     {
-        var laterDate = (DateTime)value;
+        if (value is not DateTime laterDate)
+            return ValidationResult.Success!;
+
         var referencedProperty = validationContext.ObjectType.GetProperty(DateToCompareToFieldName);
 
-        var earlierDate = (DateTime)referencedProperty.GetValue(validationContext.ObjectInstance, null);
+        if (referencedProperty!.GetValue(validationContext.ObjectInstance, null) is not DateTime earlierDate)
+            return ValidationResult.Success!;
 
-        if (laterDate > earlierDate)
-        {
-            return ValidationResult.Success;
-        }
-        else
-        {
-            return new ValidationResult($"{validationContext.DisplayName} must be after {GetDisplayName(referencedProperty)}.");
-        }
+        return laterDate > earlierDate 
+            ? ValidationResult.Success! 
+            : new ValidationResult($"{validationContext.DisplayName} must be after {GetDisplayName(referencedProperty)}.");
 
-        string GetDisplayName(PropertyInfo pi)
+        string GetDisplayName(MemberInfo pi)
         {
             var attrib = pi.GetCustomAttributes<DisplayAttribute>().SingleOrDefault();
             return attrib?.Name ?? pi.Name;

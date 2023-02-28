@@ -30,6 +30,6 @@ public class DefUpdatedHandler : INotificationHandler<DefinitionChange>
         if (string.IsNullOrEmpty(notification.OldValue))
             return;
         await discord.SendMessageAsync(_channel,
-            $"Previous value was {Formatter.Bold(notification.OldValue)}, set by {notification.OldUser.Mention()}.");
+            $"Previous value was {Formatter.Bold(notification.OldValue)}, set by {notification.OldUser?.Mention()}.");
     }
 }

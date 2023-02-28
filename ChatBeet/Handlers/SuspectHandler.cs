@@ -43,8 +43,8 @@ public partial class SuspectHandler : INotificationHandler<DiscordNotification<M
         }
         else
         {
-            var internalSuspect = await usersRepo.GetUserAsync(suspect);
-            var internalReporter = await usersRepo.GetUserAsync(notification.Event.Author);
+            var internalSuspect = await usersRepo.GetUserAsync(suspect, cancellationToken);
+            var internalReporter = await usersRepo.GetUserAsync(notification.Event.Author, cancellationToken);
             if (await service.HasRecentlyReportedAsync(notification.Event.Guild.Id, internalSuspect.Id, internalReporter.Id))
             {
                 await notification.Event.Message.RespondAsync("You must wait at least 2 minutes each time you raise suspicion against a user.");
@@ -55,7 +55,7 @@ public partial class SuspectHandler : INotificationHandler<DiscordNotification<M
 
                 var suspicionLevel = await service.GetSuspicionLevelAsync(notification.Event.Guild.Id, internalSuspect.Id);
 
-                await notification.Event.Message.RespondAsync($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is now {suspicionLevel}.");
+                await notification.Event.Message.RespondAsync($"{Formatter.Mention(suspect)}{suspect.Username.GetPossessiveSuffix()} suspicion level is now {suspicionLevel}.");
             }
         }
         await notification.Event.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🕵"));

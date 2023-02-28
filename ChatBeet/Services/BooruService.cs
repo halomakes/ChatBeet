@@ -35,15 +35,16 @@ public class BooruService
         _httpClient = httpClient;
     }
 
-    public Task<MediaSearchResult?> GetRandomPostAsync(Rating rating, Guid userId, params string[] tags) => GetRandomPostAsync(rating, userId, tags.AsEnumerable());
+    public Task<MediaSearchResult?> GetRandomPostAsync(Rating rating, Guid userId, params string[] tags) => GetRandomPostAsync(rating, userId, tags as IReadOnlyCollection<string>);
 
-    public async Task<MediaSearchResult?> GetRandomPostAsync(Rating rating, Guid userId, IEnumerable<string> tags = null)
+    public async Task<MediaSearchResult?> GetRandomPostAsync(Rating rating, Guid userId, IReadOnlyCollection<string>? tags = null)
     {
+        tags ??= Array.Empty<string>();
         var filter = $"rating:{rating.ToString().ToLower()}";
         var globalBlacklist = Negate(_booruConfig.BlacklistedTags);
         var userBlacklist = Negate(await GetBlacklistedTags(userId));
 
-        var allTags = tags.Concat(globalBlacklist).Concat(userBlacklist).Append(filter);
+        var allTags = tags.Concat(globalBlacklist).Concat(userBlacklist).Append(filter).ToList();
 
         var results = await _cache.GetOrCreateAsync($"booru:{string.Join("|", allTags.OrderBy(t => t))}", entry =>
         {
@@ -54,7 +55,7 @@ public class BooruService
 
         return PickImage(results);
 
-        MediaSearchResult? PickImage(IEnumerable<SearchResult> searchResults)
+        MediaSearchResult? PickImage(IReadOnlyCollection<SearchResult>? searchResults)
         {
             if (searchResults?.Any() ?? false)
             {
@@ -76,15 +77,15 @@ public class BooruService
 
     public IEnumerable<string> GetGlobalBlacklistedTags() => _booruConfig.BlacklistedTags;
 
-    public async Task<List<string>> GetBlacklistedTags(Guid userId) => await _cache.GetOrCreateAsync(GetCacheEntry(userId), entry =>
+    public async Task<List<string>> GetBlacklistedTags(Guid userId) => (await _cache.GetOrCreateAsync(GetCacheEntry(userId), entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromMinutes(15);
 
-        return _context?.BlacklistedTags?.AsNoTracking()
+        return _context.BlacklistedTags.AsNoTracking()
             .Where(b => b.UserId == userId)
             .Select(b => b.Tag)
             .ToListAsync();
-    });
+    }))!;
 
     public async Task BlacklistTags(Guid userId, IEnumerable<string> tags)
     {
@@ -114,12 +115,12 @@ public class BooruService
         ClearCache(userId);
     }
 
-    public async Task<IEnumerable<string>> GetTagsAsync(string query) => await _cache.GetOrCreateAsync($"booru:tags:{query}", async entry =>
+    public async Task<IEnumerable<string>> GetTagsAsync(string query) => (await _cache.GetOrCreateAsync($"booru:tags:{query}", async entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromHours(1);
         var response = await _httpClient.GetFromJsonAsync<TagResponse>($"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&limit=25&name_pattern={query}%");
-        return response.Tag.Select(t => t.Name).ToList();
-    });
+        return response!.Tag.Select(t => t.Name).ToList();
+    }))!;
 
     private void ClearCache(Guid userId) => _cache.Remove(GetCacheEntry(userId));
 

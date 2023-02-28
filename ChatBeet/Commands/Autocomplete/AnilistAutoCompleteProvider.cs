@@ -41,12 +41,12 @@ public class AnilistAutoCompleteProvider : IAutocompleteProvider
                         .Take(MaxResults)
                         .Select(BuildChoice);
                 }
-            });
+            }) ?? Array.Empty<DiscordAutoCompleteChoice>();
         }
         return Enumerable.Empty<DiscordAutoCompleteChoice>();
     }
 
     private DiscordAutoCompleteChoice BuildChoice(IMediaSearchResult media) => new((media.EnglishTitle ?? media.RomajiTitle ?? media.NativeTitle)?.Truncate(95), media.Id.ToString());
 
-    private DiscordAutoCompleteChoice BuildChoice(ICharacterSearchResult @char) => new($"{@char.FirstName} {@char.LastName}"?.Truncate(95), @char.Id.ToString());
+    private DiscordAutoCompleteChoice BuildChoice(ICharacterSearchResult @char) => new($"{@char.FirstName} {@char.LastName}".Truncate(95), @char.Id.ToString());
 }

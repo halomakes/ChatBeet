@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChatBeet.Data;
-using ChatBeet.Models;
 using ChatBeet.Services;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;

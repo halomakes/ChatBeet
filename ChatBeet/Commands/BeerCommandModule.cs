@@ -30,7 +30,7 @@ public class BeerCommandModule : ApplicationCommandModule
 
         if (results?.Response?.Beers?.Items?.Any() ?? false)
         {
-            var beer = results.Response.Beers.Items.FirstOrDefault();
+            var beer = results.Response.Beers.Items.First();
             var text = @$"{Formatter.Bold(beer.Beer.BeerName)}{(beer.Beer.InProduction > 0 ? string.Empty : " (Out of Production)")} from {beer.Brewery.BreweryName}
 {beer.Beer.BeerDescription}";
 

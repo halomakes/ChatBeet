@@ -7,7 +7,7 @@ namespace ChatBeet.Controllers;
 public class LoginController : Controller
 {
     [HttpPost("Discord")]
-    public Task<IActionResult> DiscordLogin([FromForm] string returnUrl)
+    public Task<IActionResult> DiscordLogin([FromForm] string? returnUrl)
     {
         return Task.FromResult<IActionResult>(Challenge(new AuthenticationProperties { RedirectUri = returnUrl ?? "/" }, "Discord"));
     }

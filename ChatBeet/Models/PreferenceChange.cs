@@ -9,7 +9,7 @@ public class PreferenceChange : INotification
     [Required]
     public UserPreference? Preference { get; set; }
 
-    public string Value { get; set; }
+    public required string? Value { get; set; }
 
-    public User User { get; set; }
+    public required User User { get; set; }
 }

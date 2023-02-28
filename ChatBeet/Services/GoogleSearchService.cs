@@ -29,7 +29,7 @@ public class GoogleSearchService
                 return new GoogleResult
                 {
                     Uri = feelingLuckyUri,
-                    RedirectUri = page.Headers.Location,
+                    RedirectUri = page.Headers.Location!,
                     Body = await page.Content.ReadAsStringAsync()
                 };
             });
@@ -53,7 +53,7 @@ public class GoogleSearchService
     private struct GoogleResult
     {
         public Uri Uri;
-        public string Body;
-        public Uri RedirectUri;
+        public string? Body;
+        public Uri? RedirectUri;
     }
 }

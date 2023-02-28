@@ -33,8 +33,8 @@ public class UsersController : Controller
     public async Task<ActionResult<UserViewModel>> GetCurrentUser()
     {
         var currentUser = await _identity.GetCurrentUserAsync();
-        if (currentUser?.Discord?.Id is null)
-            return Ok(new UserViewModel(currentUser!, Enumerable.Empty<GuildViewModel>(), null));
+        if (currentUser.Discord?.Id is null)
+            return Ok(new UserViewModel(currentUser, Enumerable.Empty<GuildViewModel>(), null));
         var memberships = await Task.WhenAll(_guilds.GetGuilds().Select(async g => (Guild: g, Members: await _guilds.GetMembersAsync(g))));
         var discordUser = await _discord.GetUserAsync(currentUser.Discord.Id.Value);
         return Ok(new UserViewModel(

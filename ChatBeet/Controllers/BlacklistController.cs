@@ -1,5 +1,4 @@
 ﻿using ChatBeet.Services;
-using ChatBeet.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;

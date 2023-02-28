@@ -12,13 +12,13 @@ using Microsoft.Extensions.Configuration;
 namespace ChatBeet.Commands;
 
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
-public partial class QuoteCommandProcessor : ApplicationCommandModule
+public partial class QuoteCommandModule : ApplicationCommandModule
 {
     private readonly IQuoteRepository _repository;
     private readonly IConfiguration _configuration;
     private readonly IUsersRepository _users;
 
-    public QuoteCommandProcessor(IQuoteRepository repository, IConfiguration configuration, IUsersRepository users)
+    public QuoteCommandModule(IQuoteRepository repository, IConfiguration configuration, IUsersRepository users)
     {
         _repository = repository;
         _configuration = configuration;

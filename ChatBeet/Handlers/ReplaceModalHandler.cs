@@ -7,19 +7,11 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatBeet.Handlers;
 
-public class ReplaceMessageHandler : INotificationHandler<DiscordNotification<ModalSubmitEventArgs>>
+public class ReplaceModalHandler : INotificationHandler<DiscordNotification<ModalSubmitEventArgs>>
 {
-    private readonly IServiceScopeFactory _scopeFactory;
-
-    public ReplaceMessageHandler(IServiceScopeFactory scopeFactory)
-    {
-        _scopeFactory = scopeFactory;
-    }
-
     public async Task Handle(DiscordNotification<ModalSubmitEventArgs> notification, CancellationToken cancellationToken)
     {
         if (!notification.Event.Interaction.Data.CustomId.StartsWith(MessageTransformCommandModule.Prefix))

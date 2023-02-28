@@ -18,6 +18,6 @@ public class ComplimentService
     {
         var result = await _client.GetAsync("https://complimentr.com/api");
         var content = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(await result.Content.ReadAsStreamAsync());
-        return content["compliment"];
+        return content!["compliment"];
     }
 }

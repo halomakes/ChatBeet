@@ -21,7 +21,6 @@ public class MemoryCellAutocompleteProvider : IAutocompleteProvider
         {
             var cells = await dbContext.Definitions
                 .Where(r => r.GuildId == ctx.Guild.Id)
-                .Where(r => r.Key != null)
                 .OrderBy(r => r.Key)
                 .Take(MaxResults)
                 .ToListAsync();
@@ -32,13 +31,12 @@ public class MemoryCellAutocompleteProvider : IAutocompleteProvider
             var asLower = currentValue.ToLower();
             var cells = await dbContext.Definitions
                 .Where(r => r.GuildId == ctx.Guild.Id)
-                .Where(r => r.Key != null)
                 .Select(c => new
                 {
                     Item = c,
                     Rating = (c.Key.ToLower().StartsWith(asLower) ? 5 : 0)
                              + (c.Key.ToLower().Contains(asLower) ? 4 : 0)
-                             + (c.Value.ToLower().StartsWith(asLower) ? 2 : 0)
+                             + (c.Value!.ToLower().StartsWith(asLower) ? 2 : 0)
                              + (c.Value.ToLower().Contains(asLower) ? 1 : 0)
                 })
                 .Where(r => r.Rating > 0)

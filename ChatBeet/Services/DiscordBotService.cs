@@ -43,16 +43,16 @@ public class DiscordBotService : BackgroundService
         _client.UseInteractivity(new InteractivityConfiguration()
         {
             PollBehaviour = PollBehaviour.KeepEmojis,
-            Timeout = TimeSpan.FromSeconds(30)
+            Timeout = TimeSpan.FromSeconds(30),
         });
         var commands = _client.UseSlashCommands(new SlashCommandsConfiguration
         {
             Services = _services
         });
-        commands.SlashCommandErrored += async (e, x) => await LogError("Slash command failed", x.Exception);
-        commands.AutocompleteErrored += async (e, x) => await LogError("Autocomplete failed", x.Exception);
-        commands.ContextMenuErrored += async (e, x) => await LogError("Context menu failed", x.Exception);
-        _client.ClientErrored += (e, x) =>
+        commands.SlashCommandErrored += async (_, x) => await LogError("Slash command failed", x.Exception);
+        commands.AutocompleteErrored += async (_, x) => await LogError("Autocomplete failed", x.Exception);
+        commands.ContextMenuErrored += async (_, x) => await LogError("Context menu failed", x.Exception);
+        _client.ClientErrored += (_, x) =>
         {
             _logger.LogError(x.Exception, "Discord client error");
             return Task.CompletedTask;
@@ -92,7 +92,8 @@ public class DiscordBotService : BackgroundService
         commands.RegisterCommands<UrbanDictionaryCommandModule>();
         commands.RegisterCommands<YoutubeCommandModule>();
         commands.RegisterCommands<KarmaCommandModule>();
-        commands.RegisterCommands<QuoteCommandProcessor>();
+        commands.RegisterCommands<QuoteCommandModule>();
+        commands.RegisterCommands<PollCommandModule>();
         await _client.ConnectAsync();
         await base.StartAsync(cancellationToken);
     }
@@ -117,13 +118,17 @@ public class DiscordBotService : BackgroundService
 
     private async Task PublishMessage<TEvent>(DiscordClient sender, TEvent @event) where TEvent : DiscordEventArgs
     {
-        await PublishMessage(new DiscordNotification<TEvent>(@event));
+        await PublishMessage(new DiscordNotification<TEvent>(@event, sender));
     }
     
     private async Task PublishMessage<T>(T @event)
     {
+        if (@event is null)
+            return;
         await using var scope = _services.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Publish(@event);
+#pragma warning disable CS4014
+        mediator.Publish(@event);
+#pragma warning restore CS4014
     }
 }

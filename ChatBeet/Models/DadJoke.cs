@@ -2,7 +2,7 @@
 
 public class DadJoke
 {
-    public string Id { get; set; }
-    public string Joke { get; set; }
+    public required string Id { get; set; }
+    public required string Joke { get; set; }
     public int Status { get; set; }
 }

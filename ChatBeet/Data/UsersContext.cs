@@ -30,7 +30,7 @@ public partial class CbDbContext : IUsersRepository
 
     public async Task<User> GetUserAsync(string ircNick)
     {
-        var (success, partialUsername, discriminator) = ircNick.ParseUsername();
+        var (success, _, _) = ircNick.ParseUsername();
         if (!success)
             return await Users.FirstOrDefaultAsync(u => u.Irc!.Nick!.ToLower() == ircNick.ToLower()) ?? throw new ArgumentException("Pass in the DiscordUser please");
         throw new ArgumentException("Pass in the DiscordUser please");

@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using ChatBeet.Data;
 using ChatBeet.Exceptions;
 using ChatBeet.Services;
 using DSharpPlus;

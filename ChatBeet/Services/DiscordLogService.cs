@@ -10,7 +10,7 @@ public class DiscordLogService
 {
     private readonly DiscordClient _client;
     private readonly DiscordBotConfiguration _config;
-    private static DiscordChannel _logChannel;
+    private static DiscordChannel? _logChannel;
 
     public DiscordLogService(DiscordClient client, IOptions<DiscordBotConfiguration> options)
     {
@@ -18,7 +18,7 @@ public class DiscordLogService
         _config = options.Value;
     }
 
-    public async Task LogError(string message, Exception exception)
+    public async Task LogError(string message, Exception? exception)
     {
         if (_logChannel is null)
         {
@@ -26,7 +26,10 @@ public class DiscordLogService
             {
                 _logChannel = await _client.GetChannelAsync(_config.LogChannel);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
         if (_logChannel is not null)
         {

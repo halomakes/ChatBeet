@@ -74,8 +74,8 @@ public partial class DefinitionLookupHandler : INotificationHandler<DiscordNotif
     private class PreparedResponse
     {
         public ulong MessageId { get; init; }
-        public string Key { get; init; }
-        public string Definition { get; init; }
+        public required string Key { get; init; }
+        public required string Definition { get; init; }
         public bool Used { get; set; }
     }
 
