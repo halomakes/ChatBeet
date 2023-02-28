@@ -30,7 +30,7 @@ public class MustafarService
 
     public async Task<HighGroundChangeNotification> ClaimAsync(ulong guildId, DiscordUser claimant)
     {
-        if (InvocationHistory.TryGetValue((claimant.Id, guildId), out var lastActivation) && (DateTime.Now - lastActivation) < Timeout)
+        if (InvocationHistory.TryGetValue((claimant.Id, guildId), out var lastActivation) && DateTime.Now - lastActivation < Timeout)
             throw new WimpyLegsException(lastActivation + Timeout);
         InvocationHistory[(claimant.Id, guildId)] = DateTime.Now;
 

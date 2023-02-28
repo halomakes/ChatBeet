@@ -79,7 +79,7 @@ public class BirthdayCommandModule : ApplicationCommandModule
         var dateMappings = allPrefs
             .Where(p => p.Preference == UserPreference.DateOfBirth)
             .Where(p => DateTime.TryParse(p.Value, out _))
-            .Select(p => (Date: GetNormalized(DateTime.Parse(p.Value)), p.User))
+            .Select(p => (Date: GetNormalized(DateTime.Parse(p.Value!)), p.User))
             .ToList();
         var doubleYear = dateMappings.Union(dateMappings.Select(m => (Date: m.Date.AddYears(1), m.User)));
         var upcoming = doubleYear.Where(m => m.Date >= today).OrderBy(m => m.Date).Take(5).DistinctBy(m => m.User?.Id);

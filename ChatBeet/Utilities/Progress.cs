@@ -5,8 +5,6 @@ namespace ChatBeet.Utilities;
 
 public static class Progress
 {
-    public const int BarLength = 25;
-
     public static string GetCompletionDescription(DateTime now, DateTime start, DateTime end, string periodDescription)
     {
         var ratio = GetRatio(now, start, end);
@@ -45,7 +43,7 @@ public static class Progress
         _ => percentage
     };
 
-    private static string FormatTemplate(double ratio, string template, Dictionary<string, string> templateValues = default)
+    private static string FormatTemplate(double ratio, string template, Dictionary<string, string>? templateValues = default)
     {
         var percentage = GetFormattedPercentage(ratio);
         var filledTemplate = template.Replace(@"{percentage}", percentage);
@@ -62,16 +60,5 @@ public static class Progress
         var percentage = ratio * 100;
         var percentageDesc = $"{percentage:F}%";
         return percentageDesc;
-    }
-
-    public static double GetPercentage(DateTime start, DateTime end)
-    {
-        var now = DateTime.Now;
-        if (now > end)
-            return 100;
-        else if (now < start)
-            return 0;
-        else
-            return ForceRange((now - start) * 100 / (end - start));
     }
 }

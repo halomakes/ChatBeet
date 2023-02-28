@@ -35,7 +35,7 @@ public class AnilistCommandModule : ApplicationCommandModule
 
         if (media is not null)
         {
-            var description = media.Description?.Split(Environment.NewLine).FirstOrDefault().RemoveSpoilers().Truncate(250);
+            var description = media.Description?.Split(Environment.NewLine).FirstOrDefault()?.RemoveSpoilers().Truncate(250);
 
             var embed = new DiscordEmbedBuilder
             {
@@ -77,7 +77,6 @@ public class AnilistCommandModule : ApplicationCommandModule
 
         if (character is not null)
         {
-            var description = character.Description?.Split(Environment.NewLine).FirstOrDefault().RemoveSpoilers().Truncate(250);
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = character.LargeImageUrl,

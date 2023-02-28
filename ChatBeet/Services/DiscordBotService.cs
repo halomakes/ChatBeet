@@ -49,10 +49,10 @@ public class DiscordBotService : BackgroundService
         {
             Services = _services
         });
-        commands.SlashCommandErrored += async (e, x) => await LogError("Slash command failed", x.Exception);
-        commands.AutocompleteErrored += async (e, x) => await LogError("Autocomplete failed", x.Exception);
-        commands.ContextMenuErrored += async (e, x) => await LogError("Context menu failed", x.Exception);
-        _client.ClientErrored += (e, x) =>
+        commands.SlashCommandErrored += async (_, x) => await LogError("Slash command failed", x.Exception);
+        commands.AutocompleteErrored += async (_, x) => await LogError("Autocomplete failed", x.Exception);
+        commands.ContextMenuErrored += async (_, x) => await LogError("Context menu failed", x.Exception);
+        _client.ClientErrored += (_, x) =>
         {
             _logger.LogError(x.Exception, "Discord client error");
             return Task.CompletedTask;
@@ -123,8 +123,12 @@ public class DiscordBotService : BackgroundService
     
     private async Task PublishMessage<T>(T @event)
     {
+        if (@event is null)
+            return;
         await using var scope = _services.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+#pragma warning disable CS4014
         mediator.Publish(@event);
+#pragma warning restore CS4014
     }
 }

@@ -38,9 +38,8 @@ public class SentimentCommandModule : ApplicationCommandModule
         var positiveScore = predictionResult.Score.LastOrDefault();
         var rating = Ratings.OrderBy(s => Math.Abs(s.rating - positiveScore)).FirstOrDefault();
 
-        var isPositive = double.TryParse(predictionResult.Prediction, out var r) && r > 0.5;
         var scores = predictionResult.Score
-            .Select(s => (fscore: s, rank: Convert.ToInt32(100 - (Math.Abs(1F - s) * 100))))
+            .Select(s => (fscore: s, rank: Convert.ToInt32(100 - Math.Abs(1F - s) * 100)))
             .Select(pair => pair.fscore.ToString("F"));
         var rank = scores.LastOrDefault();
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()

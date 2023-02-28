@@ -1,8 +1,8 @@
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ChatBeet.Data;
 using ChatBeet.Data.Entities;
-using DSharpPlus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,24 +11,23 @@ namespace ChatBeet.Services;
 public class WebIdentityService
 {
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly DiscordClient _discordClient;
     private readonly IUsersRepository _usersRepository;
 
-    public WebIdentityService(IHttpContextAccessor contextAccessor, DiscordClient discordClient, IUsersRepository usersRepository)
+    public WebIdentityService(IHttpContextAccessor contextAccessor, IUsersRepository usersRepository)
     {
         _contextAccessor = contextAccessor;
-        _discordClient = discordClient;
         _usersRepository = usersRepository;
     }
 
     public async Task<User> GetCurrentUserAsync()
     {
         var user = _contextAccessor.HttpContext?.User;
-        if (!user?.Identity?.IsAuthenticated ?? false)
-            return null;
+        if (!user?.Identity!.IsAuthenticated ?? false)
+            throw new AuthenticationException();
 
-        var id = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var discordId = ulong.Parse(id);
+        var id = user!.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (!ulong.TryParse(id, out var discordId))
+            throw new AuthenticationException();
         var existingUser = await _usersRepository.Users.FirstOrDefaultAsync(u => u.Discord!.Id == discordId);
         return existingUser ?? await CreateCurrentUserAsync(user);
     }

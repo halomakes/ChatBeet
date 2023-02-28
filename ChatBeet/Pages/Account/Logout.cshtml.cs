@@ -9,7 +9,7 @@ public class LogoutModel : PageModel
 {
     public async Task<IActionResult> OnGet()
     {
-        if (User?.Identity?.IsAuthenticated ?? false)
+        if (User.Identity?.IsAuthenticated ?? false)
         {
             await HttpContext.SignOutAsync();
             return RedirectToPage("/Account/Logout");

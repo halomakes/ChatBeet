@@ -26,7 +26,7 @@ public class MemeService
 
     public async Task<string> GetRandomImageAsync(string query) => (await GetImagesAsync(query)).PickRandom();
 
-    private async Task<List<string>> GetImagesAsync(string query) => await _cache.GetOrCreateAsync($"memes:{query}", async entry =>
+    private async Task<List<string>> GetImagesAsync(string query) => (await _cache.GetOrCreateAsync($"memes:{query}", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
         var content = await _client.GetFromJsonAsync<ResponseWrapper>($"/api/posts?query=rating:safe sort:random {query}", new JsonSerializerOptions()
@@ -34,8 +34,8 @@ public class MemeService
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
-        return content.Results.Select(r => $"{_client.BaseAddress}/{r.ContentUrl}").ToList();
-    });
+        return content!.Results.Select(r => $"{_client.BaseAddress}/{r.ContentUrl}").ToList();
+    }))!;
 
     internal record ResponseWrapper(List<Result> Results);
 

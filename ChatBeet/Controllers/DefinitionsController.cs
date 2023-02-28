@@ -38,7 +38,7 @@ public class DefinitionsController : ControllerBase
             Key = key.Trim(),
             GuildId = guildId,
             NewValue = value.Trim(),
-            NewUser = (await _identity.GetCurrentUserAsync())!
+            NewUser = await _identity.GetCurrentUserAsync()
         };
         if (oldDef == default)
         {

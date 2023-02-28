@@ -73,9 +73,9 @@ static void Configure(WebApplication app)
     app.MapFallbackToFile("index.html");
 }
 
-void RegisterServices(WebApplicationBuilder builder)
+void RegisterServices(WebApplicationBuilder b)
 {
-    builder.Services.AddControllers()
+    b.Services.AddControllers()
         .AddJsonOptions(opts =>
         {
             opts.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
@@ -92,42 +92,42 @@ void RegisterServices(WebApplicationBuilder builder)
                 }
             };
         });
-    builder.Services.AddRazorPages();
-    builder.Services.AddMemoryCache();
-    builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-    builder.Services.AddHttpContextAccessor();
+    b.Services.AddRazorPages();
+    b.Services.AddMemoryCache();
+    b.Services.AddMediatR(Assembly.GetExecutingAssembly());
+    b.Services.AddHttpContextAccessor();
 
-    builder.Services.Configure<ChatBeetConfiguration>(builder.Configuration.GetSection("Rules"));
-    builder.Services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.All; });
+    b.Services.Configure<ChatBeetConfiguration>(b.Configuration.GetSection("Rules"));
+    b.Services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.All; });
 
-    AddHttpClients(builder);
-    AddAuthentication(builder);
-    AddThirdPartyProviders(builder);
-    AddInternalServices(builder);
-    ConfigureDatabases(builder);
-    AddDiscordBot(builder);
-    ConfigureSwagger(builder);
+    AddHttpClients(b);
+    AddAuthentication(b);
+    AddThirdPartyProviders(b);
+    AddInternalServices(b);
+    ConfigureDatabases(b);
+    AddDiscordBot(b);
+    ConfigureSwagger(b);
 
-    builder.Services.AddWebOptimizer(pipeline => { pipeline.CompileScssFiles(); });
+    b.Services.AddWebOptimizer(pipeline => { pipeline.CompileScssFiles(); });
 }
 
-void AddDiscordBot(WebApplicationBuilder builder)
+void AddDiscordBot(WebApplicationBuilder b)
 {
-    builder.Services.Configure<DiscordConfiguration>(c =>
+    b.Services.Configure<DiscordConfiguration>(c =>
     {
-        c.Token = builder.Configuration.GetValue<string>("Discord:Token");
+        c.Token = b.Configuration.GetValue<string>("Discord:Token");
         c.TokenType = TokenType.Bot;
         c.Intents = DiscordIntents.MessageContents | DiscordIntents.Guilds | DiscordIntents.AllUnprivileged;
     });
-    builder.Services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
-    builder.Services.AddHostedService<DiscordBotService>();
-    builder.Services.Configure<DiscordBotConfiguration>(builder.Configuration.GetSection("Discord"));
-    builder.Services.AddTransient<DiscordLogService>();
+    b.Services.AddSingleton<DiscordClient>(ctx => new(ctx.GetRequiredService<IOptions<DiscordConfiguration>>().Value));
+    b.Services.AddHostedService<DiscordBotService>();
+    b.Services.Configure<DiscordBotConfiguration>(b.Configuration.GetSection("Discord"));
+    b.Services.AddTransient<DiscordLogService>();
 }
 
-void ConfigureSwagger(WebApplicationBuilder builder)
+void ConfigureSwagger(WebApplicationBuilder b)
 {
-    builder.Services.AddSwaggerGen(c =>
+    b.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo
         {
@@ -141,32 +141,32 @@ void ConfigureSwagger(WebApplicationBuilder builder)
     });
 }
 
-void ConfigureDatabases(WebApplicationBuilder builder)
+void ConfigureDatabases(WebApplicationBuilder b)
 {
-    builder.Services.AddDbContext<CbDbContext>(opts => opts.UseNpgsql(builder.Configuration.GetConnectionString("ChatBeet")).UseSnakeCaseNamingConvention());
+    b.Services.AddDbContext<CbDbContext>(opts => opts.UseNpgsql(b.Configuration.GetConnectionString("ChatBeet")).UseSnakeCaseNamingConvention());
 
-    builder.Services.AddScoped<IUsersRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IBooruRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IDefinitionsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IProgressRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IHighGroundRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IKarmaRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<ISuspicionRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IStatsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
-    builder.Services.AddScoped<IQuoteRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IUsersRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IBooruRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IDefinitionsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IProgressRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IHighGroundRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IKarmaRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<ISuspicionRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IStatsRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
+    b.Services.AddScoped<IQuoteRepository>(ctx => ctx.GetRequiredService<CbDbContext>());
 }
 
-void AddAuthentication(WebApplicationBuilder builder)
+void AddAuthentication(WebApplicationBuilder b)
 {
-    builder.Services.AddAuthentication(options => { options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; }).AddCookie(options =>
+    b.Services.AddAuthentication(options => { options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; }).AddCookie(options =>
         {
             options.LoginPath = "/Account/Login";
             options.LogoutPath = "/Account/Logout";
         })
         .AddDiscord(options =>
         {
-            options.ClientSecret = builder.Configuration.GetValue<string>("Discord:ClientSecret")!;
-            options.ClientId = builder.Configuration.GetValue<string>("Discord:ClientId")!;
+            options.ClientSecret = b.Configuration.GetValue<string>("Discord:ClientSecret")!;
+            options.ClientId = b.Configuration.GetValue<string>("Discord:ClientId")!;
             options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -176,82 +176,79 @@ void AddAuthentication(WebApplicationBuilder builder)
                     user.GetString("avatar")!.StartsWith("a_") ? "gif" : "png"));
         });
 
-    builder.Services.AddAuthorization(opts => { opts.AddPolicy(InGuildRequirement.Policy, policy => policy.Requirements.Add(new InGuildRequirement())); });
-    builder.Services.AddScoped<IAuthorizationHandler, InGuildHandler>();
+    b.Services.AddAuthorization(opts => { opts.AddPolicy(InGuildRequirement.Policy, policy => policy.Requirements.Add(new InGuildRequirement())); });
+    b.Services.AddScoped<IAuthorizationHandler, InGuildHandler>();
 }
 
-void AddInternalServices(WebApplicationBuilder builder)
+void AddInternalServices(WebApplicationBuilder b)
 {
-    builder.Services.AddScoped<UserPreferencesService>();
-    builder.Services.AddScoped<NegativeResponseService>();
-    builder.Services.AddScoped<GoogleSearchService>();
-    builder.Services.AddScoped<LinkPreviewService>();
-    builder.Services.AddScoped<SpeedometerService>();
-    builder.Services.AddHostedService<ContextInitializer>();
-    builder.Services.AddTransient<GraphicsService>();
-    builder.Services.AddScoped<SuspicionService>();
-    builder.Services.AddScoped<WebIdentityService>();
-    builder.Services.AddScoped<GuildService>();
-    builder.Services.AddScoped<KarmaService>();
-    builder.Services.AddScoped<MustafarService>();
+    b.Services.AddScoped<UserPreferencesService>();
+    b.Services.AddScoped<NegativeResponseService>();
+    b.Services.AddScoped<GoogleSearchService>();
+    b.Services.AddScoped<LinkPreviewService>();
+    b.Services.AddScoped<SpeedometerService>();
+    b.Services.AddHostedService<ContextInitializer>();
+    b.Services.AddTransient<GraphicsService>();
+    b.Services.AddScoped<SuspicionService>();
+    b.Services.AddScoped<WebIdentityService>();
+    b.Services.AddScoped<GuildService>();
+    b.Services.AddScoped<KarmaService>();
+    b.Services.AddScoped<MustafarService>();
 }
 
-void AddHttpClients(WebApplicationBuilder builder)
+void AddHttpClients(WebApplicationBuilder b)
 {
-    builder.Services.AddHttpClient();
-    builder.Services.AddHttpClient("no-redirect").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    b.Services.AddHttpClient();
+    b.Services.AddHttpClient("no-redirect").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
         AllowAutoRedirect = false
     });
-    builder.Services.AddHttpClient("compression").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    b.Services.AddHttpClient("compression").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
         AutomaticDecompression = DecompressionMethods.All
     });
 }
 
-void AddThirdPartyProviders(WebApplicationBuilder builder)
+void AddThirdPartyProviders(WebApplicationBuilder b)
 {
-    builder.Services.AddScoped<ComplimentService>();
-    builder.Services.AddScoped<DadJokeService>();
-    builder.Services.AddScoped<PixivApiClient>();
-    builder.Services.AddScoped<DeviantartService>();
-    builder.Services.AddScoped<AnilistClient>();
-    builder.Services.AddScoped<AnilistService>();
-    builder.Services.AddScoped<TwitterService>();
-    builder.Services.AddScoped<TenorGifService>();
-    builder.Services.AddScoped<Gelbooru>();
-    builder.Services.AddScoped(provider =>
+    b.Services.AddScoped<ComplimentService>();
+    b.Services.AddScoped<DadJokeService>();
+    b.Services.AddScoped<PixivApiClient>();
+    b.Services.AddScoped<AnilistClient>();
+    b.Services.AddScoped<AnilistService>();
+    b.Services.AddScoped<Gelbooru>();
+    b.Services.AddScoped(provider =>
     {
         var config = provider.GetService<IOptions<ChatBeetConfiguration>>()!.Value.LastFm;
         return new LastfmClient(config.ClientId, config.ClientSecret);
     });
-    builder.Services.AddScoped<LastFmService>();
-    builder.Services.AddSingleton(provider =>
+    b.Services.AddScoped<LastFmService>();
+    b.Services.AddSingleton(provider =>
     {
         var config = provider.GetRequiredService<IOptions<ChatBeetConfiguration>>().Value.Igdb;
         return new IGDB.IGDBClient(config.ClientId, config.ClientSecret);
     });
-    builder.Services.AddScoped<BooruService>();
-    builder.Services.AddScoped<MemeService>();
-    builder.Services.AddScoped<UrbanDictionaryApi>();
-    builder.Services.AddScoped<YoutubeClient>();
-    builder.Services.AddScoped(provider =>
+    b.Services.AddScoped<BooruService>();
+    b.Services.AddScoped<MemeService>();
+    b.Services.AddScoped<UrbanDictionaryApi>();
+    b.Services.AddScoped<YoutubeClient>();
+    b.Services.AddScoped(provider =>
     {
         var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
         var opts = Options.Create(config!.Value.Untappd);
         var clientFactory = provider.GetService<IHttpClientFactory>();
         return new UntappdClient(clientFactory!.CreateClient(), opts);
     });
-    builder.Services.AddScoped(provider =>
+    b.Services.AddScoped(provider =>
     {
         var config = provider.GetService<IOptions<ChatBeetConfiguration>>();
         return new SauceNETClient(config!.Value.Sauce);
     });
-    builder.Services.AddScoped(_ => new OpenWeatherMapClient(builder.Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
-    builder.Services.AddSingleton(_ => new WolframAlphaClient(builder.Configuration.GetValue<string>("Rules:Wolfram:AppId")));
-    builder.Services.AddScoped(provider =>
+    b.Services.AddScoped(_ => new OpenWeatherMapClient(b.Configuration.GetValue<string>("Rules:OpenWeatherMap:ApiKey")));
+    b.Services.AddSingleton(_ => new WolframAlphaClient(b.Configuration.GetValue<string>("Rules:Wolfram:AppId")));
+    b.Services.AddScoped(provider =>
     {
         var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
-        return new DogApi.DogApiClient(client, builder.Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
+        return new DogApi.DogApiClient(client, b.Configuration.GetValue<string>("Rules:DogApi:ApiKey"));
     });
 }

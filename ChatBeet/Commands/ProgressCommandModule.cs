@@ -106,7 +106,7 @@ public class ProgressCommandModule : ApplicationCommandModule
     [SlashCommand("decade", "Get progress for the current decade")]
     public async Task GetDecade(InteractionContext ctx)
     {
-        var start = new DateTime(_now.Year - (_now.Year % 10), 1, 1);
+        var start = new DateTime(_now.Year - _now.Year % 10, 1, 1);
         await ProgressResult(ctx, start, start.AddYears(10), $"{Formatter.Bold($"The {start.Year}s")} are");
     }
 
@@ -127,15 +127,15 @@ public class ProgressCommandModule : ApplicationCommandModule
     [SlashCommand("century", "Get progress for the current century")]
     public async Task GetCentury(InteractionContext ctx)
     {
-        var start = new DateTime(_now.Year - (_now.Year % 100), 1, 1);
-        var century = (_now.Year / 100) + 1;
+        var start = new DateTime(_now.Year - _now.Year % 100, 1, 1);
+        var century = _now.Year / 100 + 1;
         await ProgressResult(ctx, start, start.AddYears(100), $"{Formatter.Bold($"The {century.Ordinalize(ChatBeetConfiguration.Culture)} century")} is");
     }
 
     [SlashCommand("millennium", "Get progress for the current millennium")]
     public async Task GetMillennium(InteractionContext ctx)
     {
-        var start = new DateTime(_now.Year - (_now.Year % 1000), 1, 1);
+        var start = new DateTime(_now.Year - _now.Year % 1000, 1, 1);
         await ProgressResult(ctx, start, start.AddYears(1000), $"{Formatter.Bold("This millenium")} is");
     }
 
@@ -150,7 +150,7 @@ public class ProgressCommandModule : ApplicationCommandModule
     {
         // inauguration is January 20 at noon eastern time every 4 years (year after leap year)
         var termYears = 4;
-        var startYear = _now.Year - (_now.Year % termYears) + 1;
+        var startYear = _now.Year - _now.Year % termYears + 1;
         var easternTimeZone = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
         var inauguration = new DateTimeOffset(new DateTime(startYear, 1, 20, 12, 0, 0, DateTimeKind.Unspecified), easternTimeZone.BaseUtcOffset);
         var start = (inauguration > _now ? inauguration.AddYears(-1 * termYears) : inauguration).DateTime;
@@ -221,8 +221,8 @@ public class ProgressCommandModule : ApplicationCommandModule
         else
         {
             var now = DateTime.Now;
-            var start = NormalizeTime(DateTime.Parse(startPref), now);
-            var end = NormalizeTime(DateTime.Parse(endPref), now);
+            var start = NormalizeTime(DateTime.Parse(startPref!), now);
+            var end = NormalizeTime(DateTime.Parse(endPref!), now);
 
             if (end < start)
             {
@@ -247,7 +247,7 @@ public class ProgressCommandModule : ApplicationCommandModule
             }
         }
 
-        static bool IsValidDate(string val) => !string.IsNullOrEmpty(val) && DateTime.TryParse(val, out var _);
+        static bool IsValidDate(string? val) => !string.IsNullOrEmpty(val) && DateTime.TryParse(val, out _);
 
         static DateTime NormalizeTime(DateTime date, DateTime baseline) =>
             new(baseline.Year, baseline.Month, baseline.Day, date.Hour, date.Minute, date.Second);

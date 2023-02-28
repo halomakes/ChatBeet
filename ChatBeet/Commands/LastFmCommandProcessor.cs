@@ -27,10 +27,9 @@ public class LastFmCommandModule : ApplicationCommandModule
         if (artist != null)
         {
             // filter out empty bios
-            bool hasBio = !string.IsNullOrEmpty(artist?.Bio?.Summary) && !artist.Bio.Summary.StartsWith("<a href");
             var content = new StringBuilder();
 
-            if (artist?.Tags?.Any() == true)
+            if (artist.Tags?.Any() == true)
                 content.AppendLine($"{Formatter.Bold("Related tags")}: {string.Join(", ", artist.Tags.Select(t => t.Name))}");
 
             var embed = new DiscordEmbedBuilder()

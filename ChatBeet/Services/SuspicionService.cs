@@ -59,7 +59,7 @@ public class SuspicionService
             .OrderByDescending(s => s.CreatedAt)
             .FirstOrDefaultAsync();
 
-        return lastReport != default && (DateTime.Now - lastReport.CreatedAt) < debounceWindow;
+        return lastReport != default && DateTime.Now - lastReport.CreatedAt < debounceWindow;
     }
 
     public async Task ReportSuspiciousActivityAsync(ulong guildId, Guid suspect, Guid reporter, bool bypassDebounceCheck = false)

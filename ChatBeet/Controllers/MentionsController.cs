@@ -36,12 +36,12 @@ public class MentionsController : Controller
     }));
 
     [HttpGet("Roles/{id}")]
-    public async Task<ActionResult<string>> GetRoleMention(ulong id) => Json(await _cache.GetOrCreateAsync($"mention:role:{id}", async entry =>
+    public async Task<ActionResult<string>> GetRoleMention(ulong id) => Json(await _cache.GetOrCreateAsync($"mention:role:{id}", entry =>
     {
         entry.SlidingExpiration = TimeSpan.FromMinutes(15);
         var role = _discord.Guilds
             .SelectMany(g => g.Value.Roles)
             .FirstOrDefault(p => p.Key == id);
-        return role.Value.Name;
+        return Task.FromResult(role.Value.Name);
     }));
 }

@@ -256,7 +256,7 @@ public class Migrator
     {
         var (success, partialUsername, discriminator) = nick.ParseUsername();
         var existingUser = success
-            ? await ctx.Users.FirstOrDefaultAsync(u => u.Discord!.Name!.ToLower() == partialUsername.ToLower() && u.Discord.Discriminator!.ToLower() == discriminator.ToLower())
+            ? await ctx.Users.FirstOrDefaultAsync(u => u.Discord!.Name!.ToLower() == partialUsername!.ToLower() && u.Discord.Discriminator!.ToLower() == discriminator!.ToLower())
             : await ctx.Users.FirstOrDefaultAsync(u => u.Irc!.Nick!.ToLower() == nick.ToLower());
         if (existingUser is not null)
             return existingUser;

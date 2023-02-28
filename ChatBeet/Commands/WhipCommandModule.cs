@@ -60,7 +60,7 @@ public class WhipCommandModule : ApplicationCommandModule
     public static async Task UpdateComparison(ulong channelId, DiscordUser user)
     {
         var post = LastPosts[channelId];
-        var lines = post.Content.Split(Environment.NewLine, StringSplitOptions.None);
+        var lines = post.Content.Split(Environment.NewLine);
         var header = lines.Take(HeaderLines);
         var comparisons = lines.Skip(HeaderLines).ToList();
         comparisons.Add(GetRow(user));
@@ -81,7 +81,7 @@ This comparison expires {Formatter.Timestamp(DateTime.Now + ComparisonWindow)}.
 
     private static bool IsPostValid(ulong channelId) => LastPosts.TryGetValue(channelId, out var post) && IsPostInWindow(post);
 
-    private static bool IsPostInWindow(DiscordMessage post) => (DateTime.Now - post.CreationTimestamp) <= ComparisonWindow;
+    private static bool IsPostInWindow(DiscordMessage post) => DateTime.Now - post.CreationTimestamp <= ComparisonWindow;
 
     private static bool HasUserAlready(ulong channelId, DiscordUser user) => LastPosts[channelId].Content.Split(Environment.NewLine).Any(l => l.EndsWith($" {Formatter.Mention(user)}"));
 

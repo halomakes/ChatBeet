@@ -8,13 +8,13 @@ namespace ChatBeet.Commands;
 [SlashModuleLifespan(SlashModuleLifespan.Scoped)]
 public class BadBotCommandModule : ApplicationCommandModule
 {
-    private static DateTime? _lastReactionTime = null;
+    private static DateTime? _lastReactionTime;
     private static readonly TimeSpan debounce = TimeSpan.FromSeconds(20);
 
     [SlashCommand("bad-bot", "Hurt ChatBeet's feelings")]
     public async Task BeHurt(InteractionContext ctx)
     {
-        if (!_lastReactionTime.HasValue || (DateTime.Now - _lastReactionTime.Value) > debounce)
+        if (!_lastReactionTime.HasValue || DateTime.Now - _lastReactionTime.Value > debounce)
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(Formatter.Italic("sad bot noises"))
@@ -26,7 +26,7 @@ public class BadBotCommandModule : ApplicationCommandModule
     [SlashCommand("shit-bot", "Hurt ChatBeet's feelings")]
     public async Task BeVeryHurt(InteractionContext ctx)
     {
-        if (!_lastReactionTime.HasValue || (DateTime.Now - _lastReactionTime.Value) > debounce)
+        if (!_lastReactionTime.HasValue || DateTime.Now - _lastReactionTime.Value > debounce)
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
                 .WithContent(Formatter.Italic("very sad bot noises"))

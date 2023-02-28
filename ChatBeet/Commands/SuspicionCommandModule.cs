@@ -52,7 +52,7 @@ public class SuspicionCommandModule : ApplicationCommandModule
                 var suspicionLevel = await _db.GetSuspicionLevelAsync(ctx.Guild.Id, suspectId);
 
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                    .WithContent($"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is now {suspicionLevel}."));
+                    .WithContent($"{Formatter.Mention(suspect)}{suspect.Username.GetPossessiveSuffix()} suspicion level is now {suspicionLevel}."));
             }
         }
     }
@@ -82,9 +82,9 @@ public class SuspicionCommandModule : ApplicationCommandModule
             comment = $" {subjectPhrase} {descriptor}.";
         }
 
-        return $"{Formatter.Mention(suspect)}{suspect.Username.GetPossiveSuffix()} suspicion level is {suspicionLevel}.{comment}";
+        return $"{Formatter.Mention(suspect)}{suspect.Username.GetPossessiveSuffix()} suspicion level is {suspicionLevel}.{comment}";
 
-        static string GetSubjectPhrase(string pronounPreference)
+        static string GetSubjectPhrase(string? pronounPreference)
         {
             if (string.IsNullOrEmpty(pronounPreference))
                 return "That's";

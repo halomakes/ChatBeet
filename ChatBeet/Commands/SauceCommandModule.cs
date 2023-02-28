@@ -16,7 +16,7 @@ public class SauceCommandModule : ApplicationCommandModule
         _sauceClient = sauceClient;
     }
 
-    private async Task FindSauce(BaseContext ctx, string imageUrl)
+    private async Task FindSauce(BaseContext ctx, string? imageUrl)
     {
         var results = await _sauceClient.GetSauceAsync(imageUrl);
         var bestMatches = results?.Results?.OrderByDescending(r => double.TryParse(r.Similarity, out var p) ? p : 0).Take(3).ToList();

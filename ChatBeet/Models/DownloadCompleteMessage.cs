@@ -4,9 +4,9 @@ namespace ChatBeet.Models;
 
 public class DownloadCompleteMessage : INotification
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
-    public string Source { get; set; }
+    public required string Source { get; set; }
 
     public string Sender => Source;
 

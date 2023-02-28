@@ -9,11 +9,11 @@ namespace ChatBeet.Data;
 public static class UtcDateAnnotation
 {
     private const string IsUtcAnnotation = "IsUtc";
-    private static readonly ValueConverter<DateTime, DateTime> UtcConverter = new ValueConverter<DateTime, DateTime>(convertTo => DateTime.SpecifyKind(convertTo, DateTimeKind.Utc), convertFrom => convertFrom);
+    private static readonly ValueConverter<DateTime, DateTime> UtcConverter = new(convertTo => DateTime.SpecifyKind(convertTo, DateTimeKind.Utc), convertFrom => convertFrom);
 
     public static PropertyBuilder<TProperty> IsUtc<TProperty>(this PropertyBuilder<TProperty> builder, bool isUtc = true) => builder.HasAnnotation(IsUtcAnnotation, isUtc);
 
-    public static bool IsUtc(this IMutableProperty property)
+    public static bool IsUtc(this IMutableProperty? property)
     {
         if (property != null && property.PropertyInfo != null)
         {
@@ -23,7 +23,7 @@ public static class UtcDateAnnotation
                 return true;
             }
 
-            return ((bool?)property.FindAnnotation(IsUtcAnnotation)?.Value) ?? true;
+            return (bool?)property.FindAnnotation(IsUtcAnnotation)?.Value ?? true;
         }
         return true;
     }

@@ -25,16 +25,12 @@ public class DoggoCommandModule : ApplicationCommandModule
             var image = (await _client.SearchImagesAsync(breedsOnly: true, limit: 1)).FirstOrDefault();
             if (image != default)
             {
-                string textContent;
-                var breed = image.Breeds.FirstOrDefault();
-                textContent = GetBreedInfo(breed);
-
                 var embed = new DiscordEmbedBuilder
                 {
                     ImageUrl = image.Url.ToString()
                 };
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-                    .WithContent($"{image.Url} {GetBreedInfo(image.Breeds?.First())}")
+                    .WithContent($"{image.Url} {GetBreedInfo(image.Breeds?.First()!)}")
                     .AddEmbed(embed));
             }
             else

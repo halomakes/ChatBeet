@@ -7,7 +7,7 @@ public static class EnumerationExtensions
         var enumType = typeof(TEnum);
         var memberInfos = enumType.GetMember(@enum.ToString());
         var enumValueMemberInfo = memberInfos.FirstOrDefault(m => m.DeclaringType == enumType);
-        var valueAttributes = enumValueMemberInfo.GetCustomAttributes(typeof(TAttribute), false);
-        return (TAttribute)valueAttributes[0];
+        var valueAttributes = enumValueMemberInfo?.GetCustomAttributes(typeof(TAttribute), false);
+        return (TAttribute)valueAttributes![0];
     }
 }

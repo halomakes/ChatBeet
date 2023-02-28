@@ -6,7 +6,7 @@ public static class DiscordExtensions
 {
     public static string DiscriminatedUsername(this DiscordUser user) => $"{user.Username}#{user.Discriminator}";
 
-    public static (bool Success, string Username, string Discriminator) ParseUsername(this string username)
+    public static (bool Success, string? Username, string? Discriminator) ParseUsername(this string username)
     {
         var hashLocation = username.IndexOf('#');
         if (hashLocation < 0)

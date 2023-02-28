@@ -13,13 +13,13 @@ public class LastFmService
         _client = client;
     }
 
-    public async Task<LastTrack> GetTrackInfo(string track, string artist)
+    public async Task<LastTrack?> GetTrackInfo(string track, string artist)
     {
         var response = await _client.Track.GetInfoAsync(track, artist);
         return response?.Content;
     }
 
-    public async Task<LastArtist> GetArtistInfo(string artist)
+    public async Task<LastArtist?> GetArtistInfo(string artist)
     {
         var response = await _client.Artist.GetInfoAsync(artist);
         return response?.Content;

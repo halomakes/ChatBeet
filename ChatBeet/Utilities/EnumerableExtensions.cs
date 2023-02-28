@@ -16,7 +16,7 @@ public static class EnumerableExtensions
 
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
-        return source.OrderBy(x => Guid.NewGuid());
+        return source.OrderBy(_ => Guid.NewGuid());
     }
 
     public static IEnumerable<T> ToSingleElementSequence<T>(this T item)

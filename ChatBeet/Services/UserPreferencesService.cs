@@ -27,16 +27,16 @@ public class UserPreferencesService
         _config = opts.Value;
     }
 
-    public async Task<string> Set(DiscordUser user, UserPreference preference, string value)
+    public async Task<string?> Set(DiscordUser user, UserPreference preference, string? value)
     {
         var userId = (await _db.GetUserAsync(user)).Id;
         return await Set(userId, preference, value);
     }
 
-    public async Task<string> Set(Guid userId, UserPreference preference, string value)
+    public async Task<string?> Set(Guid userId, UserPreference preference, string? value)
     {
         var isDelete = string.IsNullOrEmpty(value);
-        var normalized = isDelete ? default : Normalize(preference, value);
+        var normalized = isDelete ? default : Normalize(preference, value!);
 
         var existingPref = await _db.UserPreferences.AsQueryable().FirstOrDefaultAsync(p => p.UserId == userId && p.Preference == preference);
         if (existingPref == default)
@@ -68,29 +68,29 @@ public class UserPreferencesService
         return normalized;
     }
 
-    public Task<string> Set(PreferenceChange change) => Set(change.User.Id, change.Preference.Value, change.Value);
+    public Task<string?> Set(PreferenceChange change) => Set(change.User.Id, change.Preference!.Value, change.Value);
 
-    public async Task<string> Get(Guid userId, UserPreference preference)
+    public async Task<string?> Get(Guid userId, UserPreference preference)
     {
         var pref = await _db.UserPreferences.AsQueryable().FirstOrDefaultAsync(p => p.UserId == userId && p.Preference == preference);
         return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
     }
 
-    public async Task<string> Get(DiscordUser user, UserPreference preference)
+    public async Task<string?> Get(DiscordUser user, UserPreference preference)
     {
         var id = (await _db.GetUserAsync(user)).Id;
         var pref = await _db.UserPreferences.AsQueryable().FirstOrDefaultAsync(p => p.UserId == id && p.Preference == preference);
         return string.IsNullOrEmpty(pref?.Value) ? default : pref.Value;
     }
 
-    public async Task<TEnum> Get<TEnum>(Guid userId, UserPreference preference) where TEnum : struct, Enum => Enum.Parse<TEnum>(await Get(userId, preference));
+    public async Task<TEnum> Get<TEnum>(Guid userId, UserPreference preference) where TEnum : struct, Enum => Enum.Parse<TEnum>((await Get(userId, preference))!);
 
     public async Task<TEnum> Get<TEnum>(Guid userId, UserPreference preference, TEnum @default, TEnum? ignore = null) where TEnum : struct, Enum
     {
         var prefValue = await Get(userId, preference);
         if (prefValue == default)
             return @default;
-        var enumValue = Enum.Parse<TEnum>(await Get(userId, preference));
+        var enumValue = Enum.Parse<TEnum>((await Get(userId, preference))!);
         if (ignore.HasValue && ignore.Value.Equals(enumValue))
             return @default;
         return enumValue;
@@ -103,9 +103,9 @@ public class UserPreferencesService
         .Where(p => userIds.Contains(p.UserId))
         .ToListAsync();
 
-    public string GetValidation(UserPreference preference, string value)
+    public string? GetValidation(UserPreference preference, string? value)
     {
-        var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
+        var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName!;
         return string.IsNullOrEmpty(value) ? default : preference switch
         {
             UserPreference.SubjectPronoun => GetCollectionValidation(value, _config.Pronouns.Allowed.Subjects, displayName),
@@ -148,7 +148,7 @@ public class UserPreferencesService
         else return GetNormalizedEnum<TEnum>(value);
     }
 
-    private static string GetCollectionValidation(string value, IEnumerable<string> collection, string displayName)
+    private static string? GetCollectionValidation(string value, IReadOnlyCollection<string> collection, string displayName)
     {
         if (!collection.Contains(value.ToLower()))
         {
@@ -157,16 +157,16 @@ public class UserPreferencesService
         return default;
     }
 
-    private static string GetDateValidation(string value)
+    private static string? GetDateValidation(string value)
     {
-        if (!DateTime.TryParse(value, out var _))
+        if (!DateTime.TryParse(value, out _))
         {
             return $"{value} is not a valid date.";
         }
         return default;
     }
 
-    private static string GetZipValidation(string value)
+    private static string? GetZipValidation(string value)
     {
         var rgx = new Regex(@"(\d{5})");
         if (!rgx.IsMatch(value))
@@ -174,7 +174,7 @@ public class UserPreferencesService
         return default;
     }
 
-    private static string GetEnumValidation<TEnum>(string value, string displayName) where TEnum : struct, Enum
+    private static string? GetEnumValidation<TEnum>(string value, string displayName) where TEnum : struct, Enum
     {
         if (!Enum.TryParse<TEnum>(value, out var _))
         {
@@ -183,14 +183,14 @@ public class UserPreferencesService
         return default;
     }
 
-    private static string GetUnitValidation<TEnum>(string value, string displayName) where TEnum : struct, Enum
+    private static string? GetUnitValidation<TEnum>(string value, string displayName) where TEnum : struct, Enum
     {
-        if (UnitParser.Default.TryParse<TEnum>(value, out var _))
+        if (UnitParser.Default.TryParse<TEnum>(value, out _))
             return default;
-        else return GetEnumValidation<TEnum>(value, displayName);
+        return GetEnumValidation<TEnum>(value, displayName);
     }
 
-    private static string GetColorValidation(string value)
+    private static string? GetColorValidation(string value)
     {
         var rgx = new Regex(@"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
         if (!rgx.IsMatch(value))
@@ -198,7 +198,7 @@ public class UserPreferencesService
         return default;
     }
 
-    public static string GetDiscordConfirmationMessage(UserPreference preference, string value)
+    public static string GetDiscordConfirmationMessage(UserPreference preference, string? value)
     {
         var displayName = preference.GetAttribute<ParameterAttribute>().DisplayName;
         return string.IsNullOrEmpty(value)

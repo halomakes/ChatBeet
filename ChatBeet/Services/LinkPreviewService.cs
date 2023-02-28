@@ -55,5 +55,5 @@ public class LinkPreviewService
         {
             throw new WebException($"Received non-success status from remote server {request.RequestUri} - {(int)response.StatusCode} ({response.StatusCode}).");
         }
-    });
+    })!;
 }

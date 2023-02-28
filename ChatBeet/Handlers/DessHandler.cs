@@ -6,7 +6,6 @@ using ChatBeet.Commands;
 using ChatBeet.Data;
 using ChatBeet.Notifications;
 using ChatBeet.Services;
-using ChatBeet.Utilities;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using MediatR;
@@ -34,7 +33,7 @@ public partial class DessHandler : INotificationHandler<DiscordNotification<Mess
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var users = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
         var commandModule = new BooruCommandModule(booru, mediator, users);
-        var user = await users.GetUserAsync(notification.Event.Author);
+        var user = await users.GetUserAsync(notification.Event.Author, cancellationToken);
         var (text, embed) = await commandModule.GetResponseContent("akatsuki_kirika", Rating.General ,user.Id);
         var builder = new DiscordMessageBuilder()
             .WithContent(text);
