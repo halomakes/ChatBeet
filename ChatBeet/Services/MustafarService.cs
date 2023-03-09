@@ -36,14 +36,36 @@ public class MustafarService
 
         var existingStake = await _repository.Claims
             .Include(c => c.User)
+            .OrderByDescending(c => c.UpdatedAt)
             .FirstOrDefaultAsync(c => c.GuildId == guildId);
         var user = await _users.GetUserAsync(claimant);
+
+        if (existingStake?.UserId == user.Id)
+        {
+            _repository.Claims.Add(new()
+            {
+                GuildId = guildId,
+                UpdatedAt = DateTime.UtcNow,
+                UserId = null
+            });
+            await _repository.SaveChangesAsync();
+            _stats.StatEvents.Add(new()
+            {
+                GuildId = guildId,
+                TriggeringUserId = user.Id,
+                EventType = TripEventType,
+                OccurredAt = DateTime.UtcNow,
+            });
+            await _stats.SaveChangesAsync();
+            throw new StumbleException();
+        }
+
         if (existingStake is null)
         {
             _repository.Claims.Add(new()
             {
                 GuildId = guildId,
-                UpdatedAt = DateTime.Now,
+                UpdatedAt = DateTime.UtcNow,
                 UserId = user.Id
             });
             await _repository.SaveChangesAsync();
@@ -58,24 +80,13 @@ public class MustafarService
             return new(null, user);
         }
 
-        if (existingStake.UserId == user.Id)
-        {
-            _repository.Claims.Remove(existingStake);
-            await _repository.SaveChangesAsync();
-            _stats.StatEvents.Add(new()
-            {
-                GuildId = guildId,
-                TriggeringUserId = user.Id,
-                EventType = TripEventType,
-                OccurredAt = DateTime.UtcNow,
-            });
-            await _stats.SaveChangesAsync();
-            throw new StumbleException();
-        }
-
         var oldUser = existingStake.User;
-        existingStake.UserId = user.Id;
-        existingStake.UpdatedAt = DateTime.Now;
+        _repository.Claims.Add(new()
+        {
+            GuildId = guildId,
+            UpdatedAt = DateTime.UtcNow,
+            UserId = user.Id
+        });
         await _repository.SaveChangesAsync();
         _stats.StatEvents.Add(new()
         {
@@ -92,5 +103,6 @@ public class MustafarService
 
     public async Task<HighGround?> GetAsync(ulong guildId) => await _repository.Claims
         .Include(c => c.User)
+        .OrderByDescending(c => c.UpdatedAt)
         .FirstOrDefaultAsync(c => c.GuildId == guildId);
 }

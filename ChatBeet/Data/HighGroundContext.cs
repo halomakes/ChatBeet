@@ -17,7 +17,7 @@ public partial class CbDbContext : IHighGroundRepository
         modelBuilder.Entity<HighGround>(builder =>
         {
             builder.ToTable("high_ground", "interactions");
-            builder.HasKey(b => b.GuildId);
+            builder.HasKey(b => new { b.GuildId, b.UpdatedAt });
             builder.HasOne(b => b.Guild)
                 .WithMany()
                 .HasForeignKey(b => b.GuildId)
