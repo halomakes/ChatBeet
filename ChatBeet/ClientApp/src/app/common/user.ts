@@ -16,6 +16,10 @@ export class User {
             : this?.irc?.nick;
     }
 
+    get shortName(): string | undefined {
+        return this.discord?.name || this?.irc?.nick;
+    }
+
     constructor(data: any, avatarUrl?: string) {
         this.id = data.id;
         if (data.discord)

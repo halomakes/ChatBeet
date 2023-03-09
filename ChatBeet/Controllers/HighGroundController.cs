@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using ChatBeet.Authorization;
-using ChatBeet.Data.Entities;
+using ChatBeet.Notifications;
 using ChatBeet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,5 +20,5 @@ public class HighGroundController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult<HighGround?>> GetHighGround([FromRoute] ulong guildId) => Ok(await _mustafar.GetAsync(guildId));
+    public async Task<ActionResult<HighGroundChangeNotification>> GetHighGround([FromRoute] ulong guildId) => Ok(await _mustafar.GetChangeAsync(guildId));
 }
