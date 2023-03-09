@@ -4,7 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <UserSecretsId>c79cf495-2496-4295-ad2d-49b3d2c73886</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <Version>4.2.0</Version>
+        <Version>4.3.0</Version>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
         <PlatformTarget>x64</PlatformTarget>
