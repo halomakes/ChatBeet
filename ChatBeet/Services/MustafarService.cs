@@ -105,4 +105,15 @@ public class MustafarService
         .Include(c => c.User)
         .OrderByDescending(c => c.UpdatedAt)
         .FirstOrDefaultAsync(c => c.GuildId == guildId);
+
+    public async Task<HighGroundChangeNotification> GetChangeAsync(ulong guildId)
+    {
+        var pastRecords = await _repository.Claims
+            .Include(c => c.User)
+            .OrderByDescending(c => c.UpdatedAt)
+            .Where(c => c.GuildId == guildId)
+            .Take(2)
+            .ToListAsync();
+        return new(pastRecords.FirstOrDefault()?.User, pastRecords.Skip(1).FirstOrDefault()?.User);
+    }
 }

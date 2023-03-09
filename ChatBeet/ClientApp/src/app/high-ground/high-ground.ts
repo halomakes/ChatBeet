@@ -1,17 +1,13 @@
-import { GuildId } from "../common/guild-id";
 import { User } from "../common/user";
-import { UserId } from "../common/user-id";
 
 export class HighGround {
-    public guildId: GuildId;
-    public userId: UserId;
-    public user: User;
-    public updatedAt: Date;
+    public current?: User;
+    public previous?: User;
 
     constructor(data: any) {
-        this.guildId = data.guildId;
-        this.userId = data.userId;
-        this.updatedAt = new Date(data.updatedAt);
-        this.user = new User(data.user);
+        if (data.current)
+            this.current = new User(data.current);
+        if (data.previous)
+            this.previous = new User(data.previous);
     }
 }
