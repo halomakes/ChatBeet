@@ -23,6 +23,7 @@ public class MetadataAutocompleteProvider : IAutocompleteProvider
             .Where(m => m.GuildId == ctx.Guild.Id)
             .Select(m => m.Key)
             .Where(k => string.IsNullOrWhiteSpace(searchValue) || k.StartsWith(searchValue))
+            .Distinct()
             .Take(MaxResults)
             .ToListAsync();
         return tags.Select(t => new DiscordAutoCompleteChoice(t, t));
