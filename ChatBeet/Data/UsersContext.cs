@@ -12,6 +12,7 @@ public interface IUsersRepository : IApplicationRepository
     DbSet<User> Users { get; }
     DbSet<Guild> Guilds { get; }
     DbSet<UserPreferenceSetting> UserPreferences { get; }
+    DbSet<UserMetadata> Metadata { get; }
     Task<User> GetUserAsync(string ircNick);
     Task<User> GetUserAsync(DiscordUser user, CancellationToken cancellationToken = default);
 }
@@ -21,7 +22,8 @@ public partial class CbDbContext : IUsersRepository
     public virtual DbSet<User> Users { get; set; } = null!;
     public virtual DbSet<Guild> Guilds { get; set; } = null!;
     public virtual DbSet<UserPreferenceSetting> UserPreferences { get; set; } = null!;
-    
+    public virtual DbSet<UserMetadata> Metadata { get; set; } = null!;
+
     public async Task<User> GetUserAsync(DiscordUser user, CancellationToken cancellationToken = default)
     {
         var internalUser = await Users.FirstOrDefaultAsync(l => l.Discord!.Id == user.Id, cancellationToken);
@@ -99,6 +101,31 @@ public partial class CbDbContext : IUsersRepository
             builder.HasOne(b => b.AddedByUser)
                 .WithMany()
                 .HasForeignKey(b => b.AddedBy)
+                .HasPrincipalKey(b => b.Id);
+        });
+        modelBuilder.Entity<UserMetadata>(builder =>
+        {
+            builder.ToTable("user_metadata", "core");
+            builder.HasKey(u => new { u.UserId, u.GuildId, u.Key });
+            builder.HasOne(m => m.User)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .HasPrincipalKey(u => u.Id);
+            builder.HasOne<Guild>()
+                .WithMany()
+                .HasForeignKey(m => m.GuildId)
+                .HasPrincipalKey(g => g.Id);
+            builder.Property(b => b.Key)
+                .IsRequired()
+                .HasMaxLength(50);
+            builder.Property(b => b.Value)
+                .IsRequired()
+                .HasMaxLength(100);
+            builder.Property(b => b.AuthorId)
+                .IsRequired();
+            builder.HasOne(b => b.Author)
+                .WithMany()
+                .HasForeignKey(b => b.AuthorId)
                 .HasPrincipalKey(b => b.Id);
         });
     }

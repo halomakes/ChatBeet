@@ -94,6 +94,7 @@ public class DiscordBotService : BackgroundService
         commands.RegisterCommands<KarmaCommandModule>();
         commands.RegisterCommands<QuoteCommandModule>();
         commands.RegisterCommands<PollCommandModule>();
+        commands.RegisterCommands<UserTagsCommandModule>();
         await _client.ConnectAsync();
         await base.StartAsync(cancellationToken);
     }
