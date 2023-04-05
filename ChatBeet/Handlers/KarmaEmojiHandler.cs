@@ -34,14 +34,16 @@ public class KarmaEmojiHandler : INotificationHandler<DiscordNotification<Messag
         var userRepo = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
         try
         {
-            var user = await userRepo.GetUserAsync(notification.Event.User);
+            var user = await userRepo.GetUserAsync(notification.Event.User, cancellationToken);
             var mention = Formatter.Mention(notification.Event.Message.Author);
             if (notification.Event.Emoji.Name == UpEmoji.Name)
                 await karma.IncrementAsync(notification.Event.Guild.Id, mention, user);
             else
                 await karma.DecrementAsync(notification.Event.Guild.Id, mention, user);
             var level = await karma.GetLevelAsync(notification.Event.Guild.Id, mention);
-            await notification.Event.Message.RespondAsync($"{mention.ToPossessive()} karma is now {level}.");
+            var message = await notification.Event.Message.RespondAsync($"{mention.ToPossessive()} karma is now {level}.");
+            await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+            await message.DeleteAsync();
         }
         catch (SelfKarmaException)
         {

@@ -45,7 +45,7 @@ public partial class KarmaChangeHandler : INotificationHandler<DiscordNotificati
         {
             await karma.RecordVote(notification.Event.Guild.Id, target, currentUser, mode);
             var level = await karma.GetLevelAsync(notification.Event.Guild.Id, target);
-            await notification.Event.Message.RespondAsync(new DiscordMessageBuilder()
+            var message = await notification.Event.Message.RespondAsync(new DiscordMessageBuilder()
                 .WithContent($"{target.ToPossessive()} karma is now {level}."));
             await mediator.Publish(new KarmaChangeNotification(
                     notification.Event.Message,
@@ -53,6 +53,8 @@ public partial class KarmaChangeHandler : INotificationHandler<DiscordNotificati
                     level,
                     level + (mode == KarmaVote.VoteType.Up ? -1 : 1))
                 , cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+            await message.DeleteAsync();
         }
         catch (KarmaRateLimitException e)
         {
