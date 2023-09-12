@@ -67,11 +67,10 @@ public class DiscordBotService : BackgroundService
         commands.RegisterCommands<BirthdayCommandModule>();
         commands.RegisterCommands<BonkCommandModule>();
         commands.RegisterCommands<BooruCommandModule>();
-        commands.RegisterCommands<ComplimentCommandModule>();
         commands.RegisterCommands<DoggoCommandModule>();
         commands.RegisterCommands<GoogleCommandModule>();
         commands.RegisterCommands<DefinitionCommandModule>();
-        commands.RegisterCommands<SystemInfoCommandModule>();
+        commands.RegisterCommands<SystemCommandModule>();
         commands.RegisterCommands<SuspicionCommandModule>();
         commands.RegisterCommands<MessageTransformCommandModule>();
         commands.RegisterCommands<ProgressCommandModule>();

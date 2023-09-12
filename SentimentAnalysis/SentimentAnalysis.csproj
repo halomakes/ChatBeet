@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ML" Version="1.5.1" />
-    <PackageReference Include="Microsoft.ML.LightGbm" Version="1.5.1" />
+    <PackageReference Include="Microsoft.ML" Version="2.0.1" />
+    <PackageReference Include="Microsoft.ML.LightGbm" Version="2.0.1" />
   </ItemGroup>
 
 </Project>

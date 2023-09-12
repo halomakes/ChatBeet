@@ -13,7 +13,6 @@ public interface IUsersRepository : IApplicationRepository
     DbSet<Guild> Guilds { get; }
     DbSet<UserPreferenceSetting> UserPreferences { get; }
     DbSet<UserMetadata> Metadata { get; }
-    Task<User> GetUserAsync(string ircNick);
     Task<User> GetUserAsync(DiscordUser user, CancellationToken cancellationToken = default);
 }
 
@@ -27,18 +26,12 @@ public partial class CbDbContext : IUsersRepository
     public async Task<User> GetUserAsync(DiscordUser user, CancellationToken cancellationToken = default)
     {
         var internalUser = await Users.FirstOrDefaultAsync(l => l.Discord!.Id == user.Id, cancellationToken);
-        return internalUser ?? await CreateUser(user, cancellationToken);
+        if (internalUser is not null)
+            await EnsureUserUpdated(user, internalUser, cancellationToken);
+        return internalUser ?? await CreateUserAsync(user, cancellationToken);
     }
 
-    public async Task<User> GetUserAsync(string ircNick)
-    {
-        var (success, _, _) = ircNick.ParseUsername();
-        if (!success)
-            return await Users.FirstOrDefaultAsync(u => u.Irc!.Nick!.ToLower() == ircNick.ToLower()) ?? throw new ArgumentException("Pass in the DiscordUser please");
-        throw new ArgumentException("Pass in the DiscordUser please");
-    }
-
-    private async Task<User> CreateUser(DiscordUser user, CancellationToken cancellationToken = default)
+    private async Task<User> CreateUserAsync(DiscordUser user, CancellationToken cancellationToken = default)
     {
         var created = Users.Add(new()
         {
@@ -52,6 +45,19 @@ public partial class CbDbContext : IUsersRepository
         });
         await SaveChangesAsync(cancellationToken);
         return created.Entity;
+    }
+
+    private async Task EnsureUserUpdated(DiscordUser discordUser, User internalUser,
+        CancellationToken cancellationToken = default)
+    {
+        if (internalUser.Discord?.Name is not null && internalUser.Discord?.Name != discordUser.Username)
+            internalUser.Discord!.Name = discordUser.Username;
+        if (internalUser.Discord?.Discriminator is not null &&
+            internalUser.Discord?.Discriminator != discordUser.Discriminator)
+            internalUser.Discord!.Discriminator = discordUser.Discriminator;
+
+        if (Entry(internalUser).State == EntityState.Modified)
+            await SaveChangesAsync(cancellationToken);
     }
 
     private void ConfigureUsers(ModelBuilder modelBuilder)

@@ -12,7 +12,7 @@ export class User {
 
     get displayName(): string | undefined {
         return this.discord?.name
-            ? `${this.discord?.name}#${this.discord?.discriminator}`
+            ? this.discord?.name
             : this?.irc?.nick;
     }
 

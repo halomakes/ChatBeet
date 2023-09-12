@@ -67,7 +67,6 @@ static void Configure(WebApplication app)
         endpoints.MapRazorPages();
     });
 
-    app.UseWebOptimizer();
     app.UseStaticFiles();
 
     app.MapFallbackToFile("index.html");
@@ -107,8 +106,6 @@ void RegisterServices(WebApplicationBuilder b)
     ConfigureDatabases(b);
     AddDiscordBot(b);
     ConfigureSwagger(b);
-
-    b.Services.AddWebOptimizer(pipeline => { pipeline.CompileScssFiles(); });
 }
 
 void AddDiscordBot(WebApplicationBuilder b)
@@ -211,7 +208,6 @@ void AddHttpClients(WebApplicationBuilder b)
 
 void AddThirdPartyProviders(WebApplicationBuilder b)
 {
-    b.Services.AddScoped<ComplimentService>();
     b.Services.AddScoped<DadJokeService>();
     b.Services.AddScoped<PixivApiClient>();
     b.Services.AddScoped<AnilistClient>();

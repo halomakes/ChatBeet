@@ -26,14 +26,14 @@ public class GraphicsService
         var fill = Brushes.Solid(Color.White);
         var outline = Pens.Solid(Color.Black, 3);
 
-        TextOptions anakinOptions = new(font)
+        RichTextOptions anakinOptions = new(font)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             Origin = new(424, 391)
         };
         image.Mutate(x => x.DrawText(anakinOptions, anakin.ToUpper(), fill, outline));
 
-        TextOptions obiWanOptions = new(font)
+        RichTextOptions obiWanOptions = new(font)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             Origin = new(1411, 261)
