@@ -54,7 +54,7 @@ public class DiceCommandModule : ApplicationCommandModule
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
                 new DiscordInteractionResponseBuilder()
-                    .WithContent($"Unable to parse roll input \"{dice}\""));
+                    .WithContent($"Unable to parse roll input \"{dice}\" - See https://skizzerz.net/DiceRoller/Dice_Reference"));
         }
     }
 }
