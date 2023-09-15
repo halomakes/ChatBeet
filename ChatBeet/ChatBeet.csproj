@@ -4,7 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <UserSecretsId>c79cf495-2496-4295-ad2d-49b3d2c73886</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <Version>4.3.2</Version>
+        <Version>4.4.0</Version>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
         <PlatformTarget>x64</PlatformTarget>
@@ -27,6 +27,7 @@
     <ItemGroup>
         <PackageReference Include="AspNet.Security.OAuth.Discord" Version="7.0.4" />
         <PackageReference Include="BooruSharp" Version="3.6.0" />
+        <PackageReference Include="DiceRoller" Version="4.2.0" />
         <PackageReference Include="DogApi" Version="0.1.0" />
         <PackageReference Include="DSharpPlus.CommandsNext" Version="4.4.2" />
         <PackageReference Include="DSharpPlus.Interactivity" Version="4.4.2" />
